@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login | Always & Forever Beauty</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Great+Vibes&family=Jost:wght@300;400;500&display=swap" />
+  <style>
+    :root {
+      --cream: #FAF6F1;
+      --gold:  #C9A96E;
+      --rose:  #5C3D3D;
+      --taupe: #B5A49A;
+      --peach: #F2C9B8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #EDE4D9 0%, #DFD0C2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Jost', sans-serif;
+      padding: 2rem;
+    }
+
+    .login-card {
+      background: var(--cream);
+      border-radius: 6px;
+      padding: 3rem 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 8px 48px rgba(92, 61, 61, 0.16);
+      text-align: center;
+    }
+
+    .login-logo {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.4rem;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .login-sub {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--taupe);
+      margin-bottom: 2.5rem;
+      display: block;
+    }
+
+    .login-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+      margin: 0 auto 2.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--taupe);
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--peach);
+      background: #fff;
+      color: var(--rose);
+      font-family: 'Jost', sans-serif;
+      font-size: 0.95rem;
+      border-radius: 3px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus { border-color: var(--gold); }
+
+    .btn-login {
+      width: 100%;
+      padding: 0.9rem;
+      background: var(--gold);
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s;
+    }
+
+    .btn-login:hover { background: var(--rose); }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .login-error {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(192, 57, 43, 0.08);
+      border: 1px solid rgba(192, 57, 43, 0.2);
+      border-radius: 3px;
+      color: #c0392b;
+      font-size: 0.85rem;
+    }
+
+    .login-footer {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: var(--taupe);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 1.5rem;
+      font-size: 0.78rem;
+      color: var(--taupe);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+    }
+
+    .back-link:hover { color: var(--rose); }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <span class="login-logo">Always &amp; Forever Beauty</span>
+    <span class="login-sub">Admin Portal</span>
+    <div class="login-divider"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" required placeholder="admin@email.com" autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <button type="submit" class="btn-login" id="loginBtn">Sign In</button>
+      <div class="login-error" id="loginError"></div>
+    </form>
+
+    <p class="login-footer">This page is for Colleen only — not publicly linked.</p>
+    <a href="../index.html" class="back-link">← Back to website</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase;
+    const sb = createClient(
+      'https://bikidhccblbhibaniduw.supabase.co',
+      'sb_publishable_uQG4MBWVmanCL7oOUWiYEg_eMI5FdBE'
+    );
+
+    // Redirect if already logged in
+    sb.auth.getSession().then(({ data: { session } }) => {
+      if (session) window.location.href = 'dashboard.html';
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const errEl = document.getElementById('loginError');
+      btn.textContent = 'Signing in…';
+      btn.disabled = true;
+      errEl.style.display = 'none';
+
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        errEl.textContent = error.message;
+        errEl.style.display = 'block';
+        btn.textContent = 'Sign In';
+        btn.disabled = false;
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    });
+  </script>
+</body>
+</html>
