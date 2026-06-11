@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Packages & Pricing | Always & Forever Beauty</title>
+  <meta name="description" content="Bridal hair and makeup packages by Colleen Mulholland — Pequot Lakes, MN." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .package-card {
+      background: var(--white);
+      border: 1px solid rgba(201, 169, 110, 0.25);
+      border-radius: 4px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
+
+    .package-card:hover {
+      border-color: var(--gold);
+      box-shadow: 0 8px 40px var(--shadow);
+    }
+
+    .package-card.featured {
+      border-color: var(--gold);
+      box-shadow: 0 8px 40px var(--shadow);
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--gold);
+      color: var(--white);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      padding: 0.3rem 1.2rem;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+
+    .package-name {
+      font-family: var(--font-script);
+      font-size: 1.8rem;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .package-subtitle {
+      font-family: var(--font-sub);
+      font-style: italic;
+      color: var(--taupe);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+
+    .package-price {
+      font-family: var(--font-heading);
+      font-size: 2.8rem;
+      color: var(--rose);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .package-price span {
+      font-size: 1.1rem;
+      vertical-align: super;
+      font-weight: 400;
+    }
+
+    .price-note {
+      font-size: 0.8rem;
+      color: var(--taupe);
+      margin-bottom: 2rem;
+    }
+
+    .package-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+      margin: 1.5rem auto;
+    }
+
+    .package-features {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 2rem;
+    }
+
+    .package-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--rose);
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(201, 169, 110, 0.12);
+    }
+
+    .package-features li:last-child { border-bottom: none; }
+
+    .check {
+      color: var(--gold);
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Add-ons */
+    .addons-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+
+    .addon-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 1.5rem;
+      background: var(--white);
+      border: 1px solid rgba(201, 169, 110, 0.2);
+      border-radius: 3px;
+      font-size: 0.9rem;
+    }
+
+    .addon-item span:first-child { color: var(--rose); }
+    .addon-item span:last-child {
+      color: var(--gold);
+      font-family: var(--font-heading);
+      font-weight: 600;
+    }
+
+    /* Notes */
+    .notes-list {
+      list-style: none;
+      margin-top: 1.5rem;
+    }
+
+    .notes-list li {
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+      font-size: 0.9rem;
+      color: var(--taupe);
+      padding-left: 1.2rem;
+      position: relative;
+    }
+
+    .notes-list li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+    }
+
+    @media (max-width: 900px) {
+      .packages-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+      .addons-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav scrolled" id="mainNav">
+    <ul class="nav-links nav-links-left" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="packages.html" class="active">Packages</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="about.html">About</a></li>
+      <li class="nav-menu-cta"><a href="booking.html">Inquire Now</a></li>
+    </ul>
+    <div class="nav-logo">
+      <img src="images/logo-horizontal-cropped.png" alt="Always & Forever Beauty" style="width:auto; max-width:240px; height:50px; object-fit:contain;" />
+    </div>
+    <div class="nav-right">
+      <a href="booking.html" class="nav-cta-link">Inquire Now</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Page Hero -->
+  <div class="page-hero">
+    <div class="container">
+      <span class="section-label">Investment</span>
+      <h1>Packages &amp; Pricing</h1>
+      <div class="divider"></div>
+      <p class="subheading" style="margin:0 auto;">Everything you need for a beautiful, stress-free wedding morning</p>
+    </div>
+  </div>
+
+  <!-- Packages -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Choose Your Package</span>
+        <h2>Bridal Collections</h2>
+        <div class="divider"></div>
+        <p>All packages include a pre-wedding consultation and are customizable to your needs. Pricing is starting from — final quote provided after inquiry.</p>
+      </div>
+      <div class="packages-grid">
+
+        <!-- Package 1 -->
+        <div class="package-card">
+          <span class="package-name">The Blushing Bride</span>
+          <span class="package-subtitle">Bride only</span>
+          <div class="package-price"><span>$</span>TBD</div>
+          <p class="price-note">Pricing confirmed at inquiry</p>
+          <div class="package-divider"></div>
+          <ul class="package-features">
+            <li><span class="check">✦</span> Bridal hair styling</li>
+            <li><span class="check">✦</span> Bridal makeup application</li>
+            <li><span class="check">✦</span> Pre-wedding consultation</li>
+            <li><span class="check">✦</span> On-location service</li>
+            <li><span class="check">✦</span> Touch-up kit provided</li>
+          </ul>
+          <a href="booking.html" class="btn btn-outline">Inquire</a>
+        </div>
+
+        <!-- Package 2 — Featured -->
+        <div class="package-card featured">
+          <div class="featured-badge">Most Popular</div>
+          <span class="package-name">The Golden Hour</span>
+          <span class="package-subtitle">Bride + up to 4 in party</span>
+          <div class="package-price"><span>$</span>TBD</div>
+          <p class="price-note">Pricing confirmed at inquiry</p>
+          <div class="package-divider"></div>
+          <ul class="package-features">
+            <li><span class="check">✦</span> Bridal hair &amp; makeup</li>
+            <li><span class="check">✦</span> Up to 4 bridesmaids (hair or makeup)</li>
+            <li><span class="check">✦</span> Pre-wedding consultation</li>
+            <li><span class="check">✦</span> On-location service</li>
+            <li><span class="check">✦</span> Touch-up kit provided</li>
+            <li><span class="check">✦</span> Timeline coordination</li>
+          </ul>
+          <a href="booking.html" class="btn btn-primary">Inquire</a>
+        </div>
+
+        <!-- Package 3 -->
+        <div class="package-card">
+          <span class="package-name">The Full Experience</span>
+          <span class="package-subtitle">Full wedding party</span>
+          <div class="package-price"><span>$</span>TBD</div>
+          <p class="price-note">Pricing confirmed at inquiry</p>
+          <div class="package-divider"></div>
+          <ul class="package-features">
+            <li><span class="check">✦</span> Bridal hair &amp; makeup</li>
+            <li><span class="check">✦</span> Full bridal party (hair &amp; makeup)</li>
+            <li><span class="check">✦</span> Mother(s) of bride/groom</li>
+            <li><span class="check">✦</span> Pre-wedding consultation &amp; trial</li>
+            <li><span class="check">✦</span> On-location service</li>
+            <li><span class="check">✦</span> Touch-up kit provided</li>
+            <li><span class="check">✦</span> Full timeline coordination</li>
+          </ul>
+          <a href="booking.html" class="btn btn-outline">Inquire</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Add-ons -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Customize Your Day</span>
+        <h2>Add-On Services</h2>
+        <div class="divider"></div>
+        <p>Add any of these services to your package to create the perfect experience</p>
+      </div>
+      <div class="addons-grid">
+        <div class="addon-item">
+          <span>Bridal Hair Trial Session</span>
+          <span>+ Ask</span>
+        </div>
+        <div class="addon-item">
+          <span>Bridal Makeup Trial Session</span>
+          <span>+ Ask</span>
+        </div>
+        <div class="addon-item">
+          <span>Additional Bridesmaid (Hair)</span>
+          <span>+ Ask</span>
+        </div>
+        <div class="addon-item">
+          <span>Additional Bridesmaid (Makeup)</span>
+          <span>+ Ask</span>
+        </div>
+        <div class="addon-item">
+          <span>Flower Girl Styling</span>
+          <span>+ Ask</span>
+        </div>
+        <div class="addon-item">
+          <span>Rehearsal Dinner Glam</span>
+          <span>+ Ask</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Notes -->
+  <section class="section">
+    <div class="container" style="max-width:760px;">
+      <div class="section-header">
+        <span class="section-label">Good to Know</span>
+        <h2>Booking &amp; Travel Notes</h2>
+        <div class="divider"></div>
+      </div>
+      <ul class="notes-list">
+        <li>A signed contract and deposit are required to hold your wedding date.</li>
+        <li>Travel fees may apply for venues outside the Pequot Lakes / Brainerd Lakes area — ask for details when you inquire.</li>
+        <li>Trial sessions are strongly recommended and are conducted separately from the wedding day.</li>
+        <li>Final headcount is due 30 days before your wedding date.</li>
+        <li>All pricing is in USD. Final quote is provided after the inquiry form is reviewed.</li>
+        <li>Colleen serves a limited number of weddings per season — book early to secure your date.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-banner">
+    <div class="container">
+      <div class="cta-frame">
+        <span class="cta-script">Found your fit?</span>
+        <h2>Let's secure your date</h2>
+        <div class="ornate-divider" style="margin:1rem auto 1.25rem;"></div>
+        <p>Send an inquiry and Colleen will follow up with a personalized quote.</p>
+        <a href="booking.html" class="hero-link">Start Your Inquiry</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="script">Always &amp; Forever Beauty</span>
+          <p>Beauty for your forever moments.<br>Pequot Lakes, MN &amp; surrounding areas.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="https://www.instagram.com/always.forever.beauty_hmua" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="https://www.facebook.com/share/1B8esVaDLR/" target="_blank" rel="noopener">Facebook</a></li>
+            <li><a href="booking.html">Send an Inquiry</a></li>
+            <li><a href="admin/login.html">Owner Login</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2025 Always &amp; Forever Beauty LLC. All rights reserved.</span>
+        <span>Designed by <a href="https://maggiedukek.com/" target="_blank" style="color:rgba(250,246,241,0.4); text-decoration:underline;">MaggieDukek.com</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+    const toggle = document.getElementById('navToggle');
+    const links  = document.getElementById('navLinks');
+    toggle.addEventListener('click', () => links.classList.toggle('open'));
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
+  </script>
+</body>
+</html>

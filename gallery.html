@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery | Always & Forever Beauty</title>
+  <meta name="description" content="Bridal hair and makeup portfolio by Colleen Mulholland — Pequot Lakes, MN." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Filter tabs */
+    .filter-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+
+    .filter-btn {
+      background: none;
+      border: 1px solid rgba(201, 169, 110, 0.35);
+      color: var(--taupe);
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.4rem;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--white);
+    }
+
+    /* Masonry grid */
+    .masonry {
+      columns: 3;
+      column-gap: 1rem;
+    }
+
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 1rem;
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .masonry-item img {
+      width: 100%;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+
+    .masonry-item:hover img { transform: scale(1.04); }
+
+    .masonry-placeholder {
+      width: 100%;
+      background: linear-gradient(135deg, #EDE4D9, #DFD0C2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--taupe);
+      font-family: var(--font-sub);
+      font-style: italic;
+      font-size: 0.85rem;
+    }
+
+    .masonry-item:nth-child(3n+1) .masonry-placeholder { padding-bottom: 133%; }
+    .masonry-item:nth-child(3n+2) .masonry-placeholder { padding-bottom: 75%; }
+    .masonry-item:nth-child(3n+3) .masonry-placeholder { padding-bottom: 100%; }
+
+    .masonry-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(92, 61, 61, 0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
+    }
+
+    .masonry-item:hover .masonry-overlay {
+      background: rgba(92, 61, 61, 0.3);
+    }
+
+    .masonry-overlay-icon {
+      opacity: 0;
+      color: var(--white);
+      font-size: 1.5rem;
+      transition: opacity 0.3s;
+    }
+
+    .masonry-item:hover .masonry-overlay-icon { opacity: 1; }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(30, 20, 20, 0.92);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .lightbox.open { display: flex; }
+
+    .lightbox img {
+      max-height: 88vh;
+      max-width: 90vw;
+      border-radius: 3px;
+      object-fit: contain;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--cream);
+      font-size: 2rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    /* Photo upload note */
+    .upload-note {
+      background: rgba(201, 169, 110, 0.1);
+      border: 1px dashed var(--gold);
+      border-radius: 4px;
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .upload-note p {
+      margin: 0 auto;
+      color: var(--taupe);
+      font-family: var(--font-sub);
+      font-style: italic;
+    }
+
+    @media (max-width: 900px) { .masonry { columns: 2; } }
+    @media (max-width: 480px) { .masonry { columns: 1; } }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav scrolled" id="mainNav">
+    <ul class="nav-links nav-links-left" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="packages.html">Packages</a></li>
+      <li><a href="gallery.html" class="active">Gallery</a></li>
+      <li><a href="about.html">About</a></li>
+      <li class="nav-menu-cta"><a href="booking.html">Inquire Now</a></li>
+    </ul>
+    <div class="nav-logo">
+      <img src="images/logo-horizontal-cropped.png" alt="Always & Forever Beauty" style="width:auto; max-width:240px; height:50px; object-fit:contain;" />
+    </div>
+    <div class="nav-right">
+      <a href="booking.html" class="nav-cta-link">Inquire Now</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Page Hero -->
+  <div class="page-hero">
+    <div class="container">
+      <span class="section-label">The Work</span>
+      <h1>Gallery</h1>
+      <div class="divider"></div>
+      <p class="subheading" style="margin:0 auto;">A collection of beautiful moments</p>
+    </div>
+  </div>
+
+  <!-- Gallery Section -->
+  <section class="section">
+    <div class="container">
+
+      <!-- Filter Tabs -->
+      <div class="filter-tabs">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="updo">Updos</button>
+        <button class="filter-btn" data-filter="waves">Waves &amp; Down Styles</button>
+        <button class="filter-btn" data-filter="makeup">Makeup</button>
+        <button class="filter-btn" data-filter="party">Bridal Party</button>
+      </div>
+
+      <!-- Masonry Grid -->
+      <div class="masonry" id="gallery">
+
+        <div class="masonry-item" data-category="waves">
+          <img src="images/gallery/preview-tall.jpg" alt="Romantic braided half-up bridal style with soft curls" loading="lazy" />
+          <div class="masonry-overlay"><span class="masonry-overlay-icon">+</span></div>
+        </div>
+
+        <div class="masonry-item" data-category="updo">
+          <img src="images/gallery/preview-2.jpg" alt="Soft textured bridal updo with face-framing curls" loading="lazy" />
+          <div class="masonry-overlay"><span class="masonry-overlay-icon">+</span></div>
+        </div>
+
+        <div class="masonry-item" data-category="waves">
+          <img src="images/gallery/preview-4.jpg" alt="Sleek half-up style with cascading dark curls" loading="lazy" />
+          <div class="masonry-overlay"><span class="masonry-overlay-icon">+</span></div>
+        </div>
+
+        <div class="masonry-item" data-category="updo">
+          <img src="images/gallery/preview-3.jpg" alt="Elegant low bun with loose romantic curls" loading="lazy" />
+          <div class="masonry-overlay"><span class="masonry-overlay-icon">+</span></div>
+        </div>
+
+        <div class="masonry-item" data-category="party">
+          <img src="images/gallery/preview-1.jpg" alt="Bridesmaid smiling at her finished half-up style in the mirror" loading="lazy" />
+          <div class="masonry-overlay"><span class="masonry-overlay-icon">+</span></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-banner">
+    <div class="container">
+      <div class="cta-frame">
+        <span class="cta-script">Love what you see?</span>
+        <h2>Let's create your look</h2>
+        <div class="ornate-divider" style="margin:1rem auto 1.25rem;"></div>
+        <p>Reach out to start planning your perfect wedding day beauty.</p>
+        <a href="booking.html" class="hero-link">Inquire Now</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="script">Always &amp; Forever Beauty</span>
+          <p>Beauty for your forever moments.<br>Pequot Lakes, MN &amp; surrounding areas.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="https://www.instagram.com/always.forever.beauty_hmua" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="https://www.facebook.com/share/1B8esVaDLR/" target="_blank" rel="noopener">Facebook</a></li>
+            <li><a href="booking.html">Send an Inquiry</a></li>
+            <li><a href="admin/login.html">Owner Login</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2025 Always &amp; Forever Beauty LLC. All rights reserved.</span>
+        <span>Designed by <a href="https://maggiedukek.com/" target="_blank" style="color:rgba(250,246,241,0.4); text-decoration:underline;">MaggieDukek.com</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">&times;</button>
+    <img src="" alt="" id="lightboxImg" />
+  </div>
+
+  <script>
+    // Nav
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+    const toggle = document.getElementById('navToggle');
+    const links  = document.getElementById('navLinks');
+    toggle.addEventListener('click', () => links.classList.toggle('open'));
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
+
+    // Filter
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        document.querySelectorAll('.masonry-item').forEach(item => {
+          item.style.display = (filter === 'all' || item.dataset.category === filter) ? 'block' : 'none';
+        });
+      });
+    });
+
+    // Lightbox (for when real images are added)
+    const lightbox = document.getElementById('lightbox');
+    const lbImg    = document.getElementById('lightboxImg');
+    document.querySelectorAll('.masonry-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const img = item.querySelector('img');
+        if (img) {
+          lbImg.src = img.src;
+          lbImg.alt = img.alt;
+          lightbox.classList.add('open');
+        }
+      });
+    });
+    document.getElementById('lightboxClose').addEventListener('click', () => lightbox.classList.remove('open'));
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.classList.remove('open'); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') lightbox.classList.remove('open'); });
+  </script>
+</body>
+</html>

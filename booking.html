@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Your Date | Always & Forever Beauty</title>
+  <meta name="description" content="Inquire about bridal hair and makeup with Colleen Mulholland — Always & Forever Beauty, Pequot Lakes, MN." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Soft peach blooms behind the form, like the glows on the home page */
+    .booking-section {
+      background:
+        radial-gradient(ellipse 50% 55% at 70% 30%, rgba(242, 201, 184, 0.45), rgba(242, 201, 184, 0) 70%),
+        radial-gradient(ellipse 45% 50% at 10% 85%, rgba(245, 216, 203, 0.4), rgba(245, 216, 203, 0) 70%);
+    }
+
+    .booking-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.8fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    /* Sidebar */
+    .booking-sidebar h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+      margin: 1.2rem 0;
+    }
+
+    .sidebar-info {
+      margin-top: 2.5rem;
+    }
+
+    .sidebar-info-item {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+      align-items: flex-start;
+    }
+
+    .sidebar-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(201, 169, 110, 0.12);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--gold);
+    }
+
+    .sidebar-icon svg { width: 18px; height: 18px; }
+
+    .sidebar-info-text strong {
+      display: block;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--taupe);
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+    }
+
+    .sidebar-info-text p {
+      font-size: 0.9rem;
+      color: var(--rose);
+      margin: 0;
+    }
+
+    /* Process steps */
+    .process-steps {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(201, 169, 110, 0.2);
+    }
+
+    .process-steps h4 {
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--taupe);
+      margin-bottom: 1.5rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      background: var(--rose);
+      color: var(--cream);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .step p {
+      font-size: 0.88rem;
+      color: var(--taupe);
+      margin: 0;
+      padding-top: 0.3rem;
+    }
+
+    /* Form card — framed like the editorial panels on the rest of the site */
+    .form-card {
+      position: relative;
+      background: linear-gradient(170deg, #FFFDF9 0%, #FAF3E9 55%, #F4EBDC 100%);
+      border: 1px solid rgba(196, 154, 56, 0.5);
+      padding: 3rem;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.65),
+        0 1px 2px rgba(92, 61, 61, 0.05),
+        0 12px 28px rgba(92, 61, 61, 0.09),
+        0 30px 70px rgba(92, 61, 61, 0.10);
+    }
+
+    .form-card::before {
+      content: "";
+      position: absolute;
+      inset: 9px;
+      border: 1px solid rgba(196, 154, 56, 0.3);
+      pointer-events: none;
+    }
+
+    .form-card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-card .subheading {
+      display: block;
+      margin-bottom: 2.5rem;
+    }
+
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+      color: var(--rose);
+      cursor: pointer;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+
+    .form-submit {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    /* Submit styled like the underlined links on the home page */
+    button.hero-link {
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--gold);
+      cursor: pointer;
+    }
+
+    button.hero-link:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .form-note {
+      font-size: 0.8rem;
+      color: var(--taupe);
+      margin-top: 1rem;
+      font-style: italic;
+      max-width: none;
+    }
+
+    /* Success / Error states */
+    .form-success, .form-error {
+      display: none;
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .form-success .script {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .form-success h3 { margin-bottom: 0.75rem; }
+    .form-success p { margin: 0 auto; color: var(--taupe); font-family: var(--font-sub); font-style: italic; }
+
+    .form-error p {
+      color: #c0392b;
+      margin: 0 auto;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 900px) {
+      .booking-layout { grid-template-columns: 1fr; gap: 3rem; }
+      .form-card { padding: 2rem 1.5rem; }
+      .checkbox-group { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav scrolled" id="mainNav">
+    <ul class="nav-links nav-links-left" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="packages.html">Packages</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="about.html">About</a></li>
+      <li class="nav-menu-cta"><a href="booking.html">Inquire Now</a></li>
+    </ul>
+    <div class="nav-logo">
+      <img src="images/logo-horizontal-cropped.png" alt="Always & Forever Beauty" style="width:auto; max-width:240px; height:50px; object-fit:contain;" />
+    </div>
+    <div class="nav-right">
+      <a href="booking.html" class="active nav-cta-link">Inquire Now</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Page Hero -->
+  <div class="page-hero">
+    <div class="container">
+      <span class="section-label">Let's Connect</span>
+      <h1>Book Your Date</h1>
+      <div class="divider"></div>
+      <p class="subheading" style="margin:0 auto;">Fill out the form below and Colleen will be in touch within 48 hours</p>
+    </div>
+  </div>
+
+  <!-- Booking Section -->
+  <section class="section booking-section">
+    <div class="container">
+      <div class="booking-layout">
+
+        <!-- Sidebar -->
+        <div class="booking-sidebar">
+          <span class="section-label">Before You Write</span>
+          <h3>What to Expect</h3>
+          <div class="sidebar-divider"></div>
+          <p style="font-size:0.92rem; color:var(--taupe); font-family:var(--font-sub); font-style:italic;">
+            Every inquiry is personally reviewed by Colleen. You'll receive a response within 48 hours.
+          </p>
+
+          <div class="sidebar-info">
+            <div class="sidebar-info-item">
+              <div class="sidebar-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+              </div>
+              <div class="sidebar-info-text">
+                <strong>Location</strong>
+                <p>Pequot Lakes, MN &amp; Brainerd Lakes area. Travel available statewide.</p>
+              </div>
+            </div>
+            <div class="sidebar-info-item">
+              <div class="sidebar-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <div class="sidebar-info-text">
+                <strong>Response Time</strong>
+                <p>Within 48 hours of receiving your inquiry.</p>
+              </div>
+            </div>
+            <div class="sidebar-info-item">
+              <div class="sidebar-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <div class="sidebar-info-text">
+                <strong>Book Early</strong>
+                <p>Dates fill up fast — inquire 12–18 months out for peak season dates.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="process-steps">
+            <h4>How It Works</h4>
+            <div class="step">
+              <div class="step-num">1</div>
+              <p>Submit your inquiry with your wedding details.</p>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <p>Colleen reviews and follows up to confirm availability.</p>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <p>A contract and deposit secure your date.</p>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <p>Schedule your trial session (highly recommended).</p>
+            </div>
+            <div class="step">
+              <div class="step-num">5</div>
+              <p>Enjoy a beautiful, stress-free wedding morning.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <div class="form-card">
+          <span class="cta-script" style="font-size:2.2rem;">Inquiry form</span>
+          <h2>Tell Me About Your Day</h2>
+          <span class="subheading">All fields marked * are required</span>
+
+          <form id="inquiryForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required placeholder="Your name" />
+              </div>
+              <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required placeholder="your@email.com" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="phone">Phone Number *</label>
+                <input type="tel" id="phone" name="phone" required placeholder="(xxx) xxx-xxxx" />
+              </div>
+              <div class="form-group">
+                <label for="wedding_date">Wedding Date *</label>
+                <input type="date" id="wedding_date" name="wedding_date" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Services Needed *</label>
+              <div class="checkbox-group">
+                <label class="checkbox-item">
+                  <input type="checkbox" name="services" value="Bridal Hair" /> Bridal Hair
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="services" value="Bridal Makeup" /> Bridal Makeup
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="services" value="Bridesmaid Hair" /> Bridesmaid Hair
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="services" value="Bridesmaid Makeup" /> Bridesmaid Makeup
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="services" value="Hair Trial" /> Hair Trial
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="services" value="Makeup Trial" /> Makeup Trial
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="wedding_size">Wedding Party Size *</label>
+              <select id="wedding_size" name="wedding_size" required>
+                <option value="" disabled selected>Select one</option>
+                <option value="Bride only">Bride only</option>
+                <option value="2-3 people">2–3 people</option>
+                <option value="4-6 people">4–6 people</option>
+                <option value="7-10 people">7–10 people</option>
+                <option value="10+ people">10+ people</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="message">Anything Else I Should Know?</label>
+              <textarea id="message" name="message" placeholder="Tell me about your venue, your vision, your vibe — anything that helps me understand your day!"></textarea>
+            </div>
+
+            <div class="form-submit">
+              <button type="submit" class="hero-link" id="submitBtn">
+                Send My Inquiry
+              </button>
+            </div>
+            <p class="form-note">Your information is kept private and will only be used to follow up on your inquiry.</p>
+          </form>
+
+          <!-- Success State -->
+          <div class="form-success" id="formSuccess">
+            <span class="script">Thank you!</span>
+            <h3>Your inquiry has been received</h3>
+            <p>Colleen will be in touch within 48 hours. We can't wait to be part of your day!</p>
+          </div>
+
+          <!-- Error State -->
+          <div class="form-error" id="formError">
+            <p id="errorMessage">Something went wrong. Please try again or email us directly.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="script">Always &amp; Forever Beauty</span>
+          <p>Beauty for your forever moments.<br>Pequot Lakes, MN &amp; surrounding areas.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="https://www.instagram.com/always.forever.beauty_hmua" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="https://www.facebook.com/share/1B8esVaDLR/" target="_blank" rel="noopener">Facebook</a></li>
+            <li><a href="booking.html">Send an Inquiry</a></li>
+            <li><a href="admin/login.html">Owner Login</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2025 Always &amp; Forever Beauty LLC. All rights reserved.</span>
+        <span>Designed by <a href="https://maggiedukek.com/" target="_blank" style="color:rgba(250,246,241,0.4); text-decoration:underline;">MaggieDukek.com</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Nav
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+    const toggle = document.getElementById('navToggle');
+    const links  = document.getElementById('navLinks');
+    toggle.addEventListener('click', () => links.classList.toggle('open'));
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
+
+    // Supabase client
+    const { createClient } = supabase;
+    const sb = createClient(
+      'https://bikidhccblbhibaniduw.supabase.co',
+      'sb_publishable_uQG4MBWVmanCL7oOUWiYEg_eMI5FdBE'
+    );
+
+    // Form submission
+    document.getElementById('inquiryForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.textContent = 'Sending…';
+      submitBtn.disabled = true;
+
+      // Gather checked services
+      const checked = [...document.querySelectorAll('input[name="services"]:checked')];
+      const services = checked.map(c => c.value).join(', ');
+
+      const payload = {
+        name:           document.getElementById('name').value.trim(),
+        email:          document.getElementById('email').value.trim(),
+        phone:          document.getElementById('phone').value.trim(),
+        wedding_date:   document.getElementById('wedding_date').value,
+        services_needed: services || null,
+        wedding_size:   document.getElementById('wedding_size').value,
+        message:        document.getElementById('message').value.trim() || null,
+        status:         'new'
+      };
+
+      const { error } = await sb.from('inquiries').insert([payload]);
+
+      if (error) {
+        console.error(error);
+        document.getElementById('formError').style.display = 'block';
+        document.getElementById('errorMessage').textContent =
+          'Something went wrong: ' + (error.message || 'Please try again.');
+        submitBtn.textContent = 'Send My Inquiry';
+        submitBtn.disabled = false;
+      } else {
+        document.getElementById('inquiryForm').style.display = 'none';
+        document.getElementById('formSuccess').style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
