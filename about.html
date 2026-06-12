@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Colleen | Always & Forever Beauty</title>
+  <meta name="description" content="Meet Colleen Mulholland — bridal hair and makeup artist with 20+ years of experience in Pequot Lakes, MN." />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Hero — warm editorial treatment to match the home page */
+    .page-hero {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 55% 70% at 50% 42%, rgba(255, 252, 247, 0.85), rgba(255, 252, 247, 0) 70%),
+        radial-gradient(ellipse 90% 60% at 50% 0%, rgba(236, 192, 170, 0.7), rgba(236, 192, 170, 0) 75%),
+        linear-gradient(180deg, #ECC0AA 0%, #F2C9B8 35%, #F6D4C2 65%, var(--cream) 100%);
+    }
+
+    /* Gold floral watermark, same texture as the home page editorial sections */
+    .page-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url('images/background gold flowers.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.13;
+      pointer-events: none;
+      -webkit-mask-image: radial-gradient(ellipse 75% 80% at 50% 50%, #000 35%, transparent 88%);
+      mask-image: radial-gradient(ellipse 75% 80% at 50% 50%, #000 35%, transparent 88%);
+    }
+
+    .page-hero .container { position: relative; z-index: 1; }
+
+    /* About section layout */
+    .about-intro {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .about-photo {
+      position: relative;
+      max-width: 430px;
+      margin: 0 auto;
+    }
+
+    .about-photo-frame {
+      aspect-ratio: 1/1;
+      background: linear-gradient(135deg, #EDE4D9, #DFD0C2);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .about-photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .about-photo-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--taupe);
+      font-family: var(--font-sub);
+      font-style: italic;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .about-photo-accent {
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      width: 80px;
+      height: 80px;
+      border: 2px solid var(--rose);
+      border-radius: 2px;
+      z-index: -1;
+    }
+
+    .about-years-badge {
+      position: absolute;
+      bottom: 2rem;
+      left: -2rem;
+      background: var(--rose);
+      color: var(--cream);
+      padding: 1.2rem 1.5rem;
+      border-radius: 3px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(92, 61, 61, 0.25);
+    }
+
+    .about-years-badge .years-num {
+      font-family: var(--font-heading);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--gold);
+      display: block;
+      line-height: 1;
+    }
+
+    .about-years-badge .years-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.75;
+    }
+
+    .about-text .script {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .about-text h2 { margin-bottom: 1rem; }
+
+    .about-text p {
+      margin-bottom: 1.25rem;
+      max-width: none;
+    }
+
+    /* Values */
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    .value-item {
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .value-num {
+      font-family: var(--font-script);
+      font-size: 3rem;
+      color: var(--rose);
+      display: block;
+      line-height: 1;
+      margin-bottom: 0.75rem;
+    }
+
+    .value-item h4 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .value-item p {
+      font-size: 0.88rem;
+      color: var(--taupe);
+      max-width: none;
+      margin: 0;
+    }
+
+    /* Fun facts */
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+
+    .fact-item {
+      background: var(--white);
+      border-left: 3px solid var(--rose);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 3px 3px 0;
+    }
+
+    .fact-item p {
+      font-size: 0.92rem;
+      margin: 0;
+      color: var(--rose);
+    }
+
+    .fact-label {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--rose);
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+
+    @media (max-width: 900px) {
+      .about-intro {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+      .about-years-badge { left: 1rem; }
+      .values-grid { grid-template-columns: 1fr 1fr; }
+      .facts-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .values-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav scrolled" id="mainNav">
+    <ul class="nav-links nav-links-left" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="packages.html">Packages</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+      <li class="nav-menu-cta"><a href="booking.html">Inquire Now</a></li>
+    </ul>
+    <div class="nav-logo">
+      <img src="images/logo-horizontal-cropped.png" alt="Always & Forever Beauty" style="width:auto; max-width:240px; height:50px; object-fit:contain;" />
+    </div>
+    <div class="nav-right">
+      <a href="booking.html" class="nav-cta-link">Inquire Now</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Page Hero -->
+  <div class="page-hero">
+    <div class="container">
+      <span class="section-label">Hi, I'm Colleen</span>
+      <h1>Bridal work is where my heart is</h1>
+      <div class="divider"></div>
+      <p class="subheading" style="margin:0 auto;">20+ years of making brides feel like themselves — only more beautiful</p>
+    </div>
+  </div>
+
+  <!-- About Intro -->
+  <section class="section">
+    <div class="container">
+      <div class="about-intro">
+
+        <div class="about-photo">
+          <div class="about-photo-frame">
+            <img src="images/colleen.jpg" alt="Colleen Mulholland" onerror="this.style.display='none'" />
+            <div class="about-photo-placeholder">
+              Add a photo of Colleen here<br><br>
+              <small>Save as <code>images/colleen.jpg</code></small>
+            </div>
+          </div>
+          <div class="about-photo-accent"></div>
+          <div class="about-years-badge">
+            <span class="years-num">20+</span>
+            <span class="years-label">Years of Experience</span>
+          </div>
+        </div>
+
+        <div class="about-text">
+          <span class="section-label">My Story</span>
+          <h2>Passion for brides.<br>Rooted in Minnesota.</h2>
+          <div class="divider" style="margin:1.2rem 0;"></div>
+
+          <p>Hi — I'm Colleen. I've been doing hair and makeup for over 20 years, and bridal work is truly where my heart is. There's something so special about being part of a couple's most important day, and I take that trust seriously.</p>
+
+          <p>Based in Pequot Lakes, MN, I serve brides throughout the Brainerd Lakes area and beyond. Whether your wedding is at a lakeside resort, a rustic barn, or a ballroom, I come to you — bringing everything needed for a relaxed, beautiful getting-ready morning.</p>
+
+          <p>My approach is always personal. I listen to what you want, bring my years of expertise to the table, and together we create a look that feels authentically you — just on your most radiant day.</p>
+
+          <div style="margin-top: 2rem;">
+            <a href="booking.html" class="hero-link">Work With Me</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">What I Believe In</span>
+        <h2>My Approach</h2>
+        <div class="divider"></div>
+      </div>
+      <div class="values-grid">
+        <div class="value-item">
+          <span class="value-num">01</span>
+          <h4>You First, Always</h4>
+          <p>I'm here to enhance your natural beauty — not transform you into someone you don't recognize. Every look starts with you.</p>
+        </div>
+        <div class="value-item">
+          <span class="value-num">02</span>
+          <h4>Calm &amp; Unhurried</h4>
+          <p>Your getting-ready morning should feel joyful, not stressful. I bring a calm, organized energy to every single wedding.</p>
+        </div>
+        <div class="value-item">
+          <span class="value-num">03</span>
+          <h4>All-Day Beautiful</h4>
+          <p>Products and techniques that hold up through tears, dancing, outdoor ceremonies, and everything in between.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fun Facts -->
+  <section class="section">
+    <div class="container" style="max-width: 860px;">
+      <div class="section-header">
+        <span class="section-label">A Little More About Me</span>
+        <h2>Quick Facts</h2>
+        <div class="divider"></div>
+      </div>
+      <div class="facts-grid">
+        <div class="fact-item">
+          <span class="fact-label">Based In</span>
+          <p>Pequot Lakes, MN — serving the Brainerd Lakes area and beyond</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-label">Experience</span>
+          <p>20+ years in hair and makeup, specializing in bridal for over a decade</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-label">Style</span>
+          <p>Romantic, timeless, and tailored to you — no cookie-cutter looks here</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-label">What I Love</span>
+          <p>The moment a bride sees herself in the mirror for the first time — that reaction is everything</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-label">Travel</span>
+          <p>Happy to travel throughout MN — travel fees may apply outside the local area</p>
+        </div>
+        <div class="fact-item">
+          <span class="fact-label">Booking</span>
+          <p>Dates fill up quickly — I recommend reaching out 12–18 months before your wedding</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-banner">
+    <div class="container">
+      <div class="cta-frame">
+        <span class="cta-script">Ready to connect?</span>
+        <h2>I'd love to be part of your day</h2>
+        <div class="ornate-divider" style="margin:1rem auto 1.25rem;"></div>
+        <p>Fill out the inquiry form and I'll be in touch within 48 hours.</p>
+        <a href="booking.html" class="hero-link">Send an Inquiry</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="script">Always &amp; Forever Beauty</span>
+          <p>Beauty for your forever moments.<br>Pequot Lakes, MN &amp; surrounding areas.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="https://www.instagram.com/always.forever.beauty_hmua" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="https://www.facebook.com/share/1B8esVaDLR/" target="_blank" rel="noopener">Facebook</a></li>
+            <li><a href="booking.html">Send an Inquiry</a></li>
+            <li><a href="admin/login.html">Owner Login</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2025 Always &amp; Forever Beauty LLC. All rights reserved.</span>
+        <span>Designed by <a href="https://maggiedukek.com/" target="_blank" style="color:rgba(250,246,241,0.4); text-decoration:underline;">MaggieDukek.com</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+    const toggle = document.getElementById('navToggle');
+    const links  = document.getElementById('navLinks');
+    toggle.addEventListener('click', () => links.classList.toggle('open'));
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
+  </script>
+</body>
+</html>
