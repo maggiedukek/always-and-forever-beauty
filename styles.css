@@ -189,6 +189,10 @@ p {
   transform: translateX(-50%);
   display: flex;
   align-items: center;
+  /* Soft light halo behind the logo so the gold reads clearly on the maroon nav */
+  padding: 0.2rem 1rem;
+  border-radius: 60px;
+  background: radial-gradient(ellipse 92% 130% at 50% 50%, rgba(250,246,241,0.22), rgba(250,246,241,0) 70%);
 }
 
 .nav-logo img {
@@ -295,7 +299,9 @@ p {
 .footer {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, #7a5050 0%, #5C3D3D 45%, #4a3030 100%);
+  /* Stay in the nav's warm maroon tone instead of fading to near-black,
+     so the footer reads as the same colour as the header */
+  background: linear-gradient(180deg, #7a5050 0%, #5C3D3D 55%, #5C3D3D 100%);
   border-top: 1px solid rgba(196, 154, 56, 0.5);
   box-shadow: 0 -2px 18px rgba(0, 0, 0, 0.25), 0 -4px 12px rgba(196, 154, 56, 0.25);
   color: rgba(250, 246, 241, 0.75);
