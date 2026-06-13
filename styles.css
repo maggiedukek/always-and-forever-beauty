@@ -432,6 +432,48 @@ p {
   border-color: var(--rose);
 }
 
+/* ---- Gallery-style section header — script title flanked by gold rules ---- */
+.gallery-heading {
+  position: relative;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.gallery-heading > * { position: relative; z-index: 1; }
+.gallery-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-family: var(--font-script);
+  font-size: clamp(2.6rem, 6vw, 4.5rem);
+  font-weight: 400;
+  color: var(--gold);
+  line-height: 1.1;
+  margin: 0;
+}
+.gallery-title::before,
+.gallery-title::after {
+  content: "";
+  width: 80px;
+  height: 1px;
+  flex-shrink: 0;
+}
+.gallery-title::before { background: linear-gradient(90deg, rgba(196,154,56,0), rgba(196,154,56,0.55)); }
+.gallery-title::after  { background: linear-gradient(90deg, rgba(196,154,56,0.55), rgba(196,154,56,0)); }
+.gallery-heading p {
+  margin: 0.9rem auto 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--rose);
+}
+@media (max-width: 600px) {
+  .gallery-title { gap: 0.9rem; }
+  .gallery-title::before, .gallery-title::after { width: 36px; }
+  .gallery-heading p { font-size: 0.75rem; letter-spacing: 0.22em; }
+}
+
 /* ---- CTA Banner — framed invitation card ---- */
 .cta-banner {
   position: relative;
