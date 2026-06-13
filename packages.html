@@ -11,6 +11,24 @@
   <meta name="description" content="Bridal hair and makeup packages by Colleen Mulholland — Pequot Lakes, MN." />
   <link rel="stylesheet" href="styles.css" />
   <style>
+    /* Ghosted background photo behind the Bridal Collections section (like the gallery) */
+    .packages-collections { position: relative; overflow: hidden; }
+    .packages-collections::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url('images/gallery-backdrop.jpg');
+      background-size: cover;
+      background-position: center 30%;
+      opacity: 0.16;
+      filter: blur(2px) sepia(0.28) saturate(0.78) brightness(1.08) contrast(0.92);
+      pointer-events: none;
+      z-index: 0;
+      -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 14%, #000 32%, #000 82%, transparent 100%);
+      mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 14%, #000 32%, #000 82%, transparent 100%);
+    }
+    .packages-collections .container { position: relative; z-index: 1; }
+
     .packages-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -210,7 +228,7 @@
   </div>
 
   <!-- Packages -->
-  <section class="section">
+  <section class="section packages-collections">
     <div class="container">
       <header class="gallery-heading">
         <h2 class="gallery-title">Bridal Collections</h2>
