@@ -7,20 +7,6 @@
   <meta name="description" content="Timeless bridal hair and makeup by Colleen Mulholland. Serving brides in Pequot Lakes, MN and surrounding areas." />
   <link rel="stylesheet" href="styles.css" />
   <style>
-    /* Nav logo recoloured to the hero name's metallic gold gradient (logo shape used as a mask) */
-    .nav-logo-mark {
-      display: block;
-      height: 50px;
-      aspect-ratio: 972 / 248;
-      background: linear-gradient(105deg,
-        #7E5C1C 0%, #A87E2A 22%, #D9B45C 45%, #C49A38 60%, #8A6420 82%, #A87E2A 100%);
-      -webkit-mask: url('images/logo-horizontal-cropped.png') center / contain no-repeat;
-      mask: url('images/logo-horizontal-cropped.png') center / contain no-repeat;
-    }
-    @media (max-width: 1024px) { .nav-logo-mark { height: 44px; } }
-    @media (max-width: 880px)  { .nav-logo-mark { height: 42px; } }
-    @media (max-width: 768px)  { .nav-logo-mark { height: 38px; } }
-
     /* ---- Hero ---- */
     .hero {
       position: relative;
@@ -882,9 +868,10 @@
       margin-top: -2px;
       padding: 10rem 0 6.75rem;
       background:
-        radial-gradient(ellipse 75% 220px at 50% 100%, #FBF6F0 35%, rgba(251,246,240,0) 78%),
+        radial-gradient(ellipse 75% 220px at 50% 100%, #FAF8F3 35%, rgba(250,248,243,0) 78%),
         radial-gradient(ellipse 66% 500px at 50% 620px, #F9F2E9 38%, rgba(249,242,233,0) 75%),
-        linear-gradient(180deg, var(--cream) 0%, var(--cream) 140px, #F9EFE6 460px, #F9F2E9 760px, #FAF8F3 100%);
+        /* hold a flat band at the bottom so it meets the next section with no line */
+        linear-gradient(180deg, var(--cream) 0%, var(--cream) 140px, #F9EFE6 460px, #F9F2E9 760px, #FAF8F3 calc(100% - 90px), #FAF8F3 100%);
     }
 
     /* Ghosted photo backdrop — soft cream wash keeps the spread readable */
@@ -1098,7 +1085,8 @@
       padding: 7.75rem 0 7.25rem;
       background:
         radial-gradient(ellipse 70% 55% at 50% 28%, rgba(255,252,247,0.85), rgba(255,252,247,0) 70%),
-        linear-gradient(180deg, #FAF8F3 0%, #F8F1E7 50%, var(--cream) 100%);
+        /* hold the same flat band at the top so the seam with the gallery is invisible */
+        linear-gradient(180deg, #FAF8F3 0%, #FAF8F3 90px, #F8F1E7 50%, var(--cream) 100%);
     }
 
     /* Gold floral watermark, same texture as the intro and about sections */
@@ -1309,7 +1297,7 @@
       <li class="nav-menu-cta"><a href="booking.html">Inquire Now</a></li>
     </ul>
     <div class="nav-logo">
-      <span class="nav-logo-mark" role="img" aria-label="Always &amp; Forever Beauty"></span>
+      <img src="images/logo-horizontal-cropped.png" alt="Always & Forever Beauty" style="width:auto; max-width:240px; height:50px; object-fit:contain;" />
     </div>
     <div class="nav-right">
       <a href="booking.html" class="nav-cta-link">Inquire Now</a>
