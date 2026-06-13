@@ -21,7 +21,8 @@
         linear-gradient(165deg, #F3EBE0 0%, #EDE4D9 45%, #E9DDCC 100%);
     }
 
-    /* Satin sheen + soft vignette so the hero reads layered, not flat */
+    /* Satin sheen + soft vignette so the hero reads layered, not flat.
+       Faded out at the bottom so it can't print a line where the next section starts */
     .hero::after {
       content: "";
       position: absolute;
@@ -36,6 +37,8 @@
           rgba(255,255,255,0.16) 62%,
           transparent 76%),
         radial-gradient(ellipse 130% 100% at 50% 42%, transparent 58%, rgba(92,61,61,0.07) 100%);
+      -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 96%);
+      mask-image: linear-gradient(to bottom, #000 72%, transparent 96%);
     }
 
     /* Gold splatter texture over the cream areas — fades out where the photo sits */
@@ -69,45 +72,61 @@
       height: 88%;
       aspect-ratio: 4 / 3;
       max-width: 100%;
-      background-image: url('images/gallery/preview-1.jpg');
+      /* Cream wash over the photo's white wall so it melts into the page background
+         (front photo is mirrored, so its wall sits top-right) */
+      background-image:
+        linear-gradient(235deg, rgba(240,228,212,0.85) 0%, rgba(240,228,212,0.45) 28%, rgba(240,228,212,0) 52%),
+        linear-gradient(to bottom, rgba(240,228,212,0.7) 0%, rgba(240,228,212,0) 30%),
+        url('images/gallery/preview-1-flipped.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       /* Warm the photo's cool whites toward the page's cream so edges stop reading as a rectangle */
       filter: sepia(0.16) saturate(0.97) brightness(1.04);
       -webkit-mask-image:
-        linear-gradient(to right, transparent 0%, #000 15%, #000 88%, transparent 100%),
-        linear-gradient(to bottom, transparent 0%, #000 12%, #000 82%, transparent 100%);
+        linear-gradient(to right, transparent 0%, #000 26%, #000 88%, transparent 100%),
+        linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
       -webkit-mask-composite: source-in;
       mask-image:
-        linear-gradient(to right, transparent 0%, #000 15%, #000 88%, transparent 100%),
-        linear-gradient(to bottom, transparent 0%, #000 12%, #000 82%, transparent 100%);
+        linear-gradient(to right, transparent 0%, #000 26%, #000 88%, transparent 100%),
+        linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
       mask-composite: intersect;
+      animation: heroBaseFade 16s ease-in-out infinite;
     }
 
-    /* Second hero photo, stacked on top — slowly crossfades with the first */
+    /* Second hero photo, stacked on top — the two take turns, never blending,
+       so neither photo ghosts through the other */
     .hero-bg-alt {
-      background-image: url('images/gallery/updo-01.jpg');
+      background-image:
+        linear-gradient(125deg, rgba(240,228,212,0.85) 0%, rgba(240,228,212,0.45) 28%, rgba(240,228,212,0) 52%),
+        linear-gradient(to bottom, rgba(240,228,212,0.7) 0%, rgba(240,228,212,0) 30%),
+        url('images/gallery/updo-01.jpg');
       background-position: center 18%;
       opacity: 0;
       animation: heroCrossfade 16s ease-in-out infinite;
     }
 
+    @keyframes heroBaseFade {
+      0%, 40%   { opacity: 1; }
+      46%, 92%  { opacity: 0; }
+      98%, 100% { opacity: 1; }
+    }
+
     @keyframes heroCrossfade {
-      0%, 42%  { opacity: 0; }
-      50%, 92% { opacity: 1; }
-      100%     { opacity: 0; }
+      0%, 46%   { opacity: 0; }
+      52%, 86%  { opacity: 1; }
+      92%, 100% { opacity: 0; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .hero-bg-alt { animation: none; }
+      .hero-bg, .hero-bg-alt { animation: none; }
     }
 
     .hero-overlay {
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(to bottom, rgba(242,221,205,0) 74%, rgba(242,221,205,0.5) 88%, rgba(242,221,205,1) 100%),
+        linear-gradient(to bottom, rgba(242,221,205,0) 66%, rgba(242,221,205,0.55) 84%, rgba(242,221,205,1) 97%),
         radial-gradient(ellipse 50% 62% at 22% 55%, rgba(244,206,186,0.75), rgba(244,206,186,0.4) 50%, rgba(244,206,186,0) 74%),
         radial-gradient(ellipse 45% 35% at 12% 0%, rgba(236,170,140,0.50), rgba(236,170,140,0) 70%),
         radial-gradient(ellipse 30% 24% at 40% 4%, rgba(236,170,140,0.48), rgba(236,170,140,0) 72%),
@@ -148,7 +167,8 @@
       text-align: left;
     }
 
-    /* Peach fade washing the whole headline zone */
+    /* Peach fade washing the whole headline zone — masked at the bottom so it
+       dissolves before the hero's edge instead of getting clipped to a hard line */
     .hero-content::before {
       content: "";
       position: absolute;
@@ -157,50 +177,45 @@
         rgba(236,170,140,0.65),
         rgba(242,201,184,0.40) 58%,
         transparent 88%);
+      -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 92%);
+      mask-image: linear-gradient(to bottom, #000 60%, transparent 92%);
       z-index: -1;
       pointer-events: none;
     }
 
-    /* Tight white pools directly behind each line of text for readability */
-    .hero-content::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 56% 19% at 28% 32%, rgba(255,255,255,0.60), rgba(255,255,255,0) 80%),
-        radial-gradient(ellipse 74% 24% at 45% 52%, rgba(255,255,255,0.65), rgba(255,255,255,0) 80%),
-        radial-gradient(ellipse 68% 15% at 42% 67%, rgba(255,255,255,0.55), rgba(255,255,255,0) 80%),
-        radial-gradient(ellipse 56% 15% at 30% 80%, rgba(255,255,255,0.50), rgba(255,255,255,0) 80%);
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    .hero-content h1 {
-      font-size: 1.1rem;
+    .hero-content .tagline {
+      font-size: 0.9rem;
       font-weight: 400;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--rose);
-      text-shadow: 0 0 8px rgba(255,253,248,0.95), 0 0 18px rgba(255,253,248,0.7);
+      /* Tight cream halo hugging the letters — same treatment as mobile */
+      text-shadow:
+        0 0 4px rgba(250,243,232,0.95),
+        0 0 10px rgba(250,243,232,0.85),
+        0 0 18px rgba(250,243,232,0.7);
       opacity: 0;
       animation: fadeUp 1s ease 0.3s forwards;
-      margin-bottom: 1rem;
+      margin: 0 0 1rem;
     }
 
     .hero-content .script {
       display: block;
       font-size: 3.4rem;
+      font-weight: 400;
       /* Roomy line box + padding so the gradient paints the full tall script glyphs (no clipping) */
       line-height: 1.3;
       padding: 0.1em 0.1em 0.05em 0;
-      margin-bottom: 0.1rem;
-      /* Metallic gold — gradient catches light like foil instead of flat color */
+      margin: 0 0 0.1rem;
+      /* Deep metallic gold — dark enough to hold against the light background */
       background: linear-gradient(105deg,
-        #9C7426 0%, #C49A38 22%, #EDD491 40%, #F6E7B5 47%, #D9B45C 58%, #A87E2A 80%, #C49A38 100%);
+        #7E5C1C 0%, #A87E2A 22%, #D9B45C 45%, #C49A38 60%, #8A6420 82%, #A87E2A 100%);
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 1px 1px rgba(92,61,61,0.30)) drop-shadow(0 0 14px rgba(255,253,248,0.55));
+      filter: drop-shadow(0 1px 1px rgba(92,61,61,0.35))
+        drop-shadow(0 0 3px rgba(250,243,232,0.95))
+        drop-shadow(0 0 8px rgba(250,243,232,0.85));
       opacity: 0;
       animation: fadeUp 1s ease 0.6s forwards;
     }
@@ -210,7 +225,10 @@
       display: block;
       margin-bottom: 1.25rem;
       color: var(--rose);
-      text-shadow: 0 0 8px rgba(255,253,248,0.9), 0 0 16px rgba(255,253,248,0.6);
+      text-shadow:
+        0 0 4px rgba(250,243,232,0.95),
+        0 0 10px rgba(250,243,232,0.85),
+        0 0 18px rgba(250,243,232,0.7);
       opacity: 0;
       animation: fadeUp 1s ease 0.9s forwards;
     }
@@ -243,11 +261,61 @@
 
     .hero-scroll { display: none; }
 
-    /* On small screens the photo box spans the full width, bottom-anchored */
-    @media (max-width: 700px) {
+    /* Below desktop widths the photo fills the open space at the top, away from the text.
+       Only true desktop (>1024px) keeps the photo beside the text on the right. */
+    @media (max-width: 1024px) {
+      /* Text sits at a fixed distance below the nav (no bottom-alignment gap),
+         tucked up into the photo's fade so the two flow together */
+      .hero {
+        align-items: flex-start;
+      }
+
+      .hero-content {
+        margin-top: calc(2rem + min(52vw, 34vh));
+        /* Desktop gives the content a 6rem top pad — on mobile that just pushes
+           the header away from the photo */
+        padding-top: 1rem;
+      }
+
+      /* Pull the two hero links closer together on mobile */
+      .hero-btns {
+        gap: 0.85rem 1.5rem;
+      }
+
       .hero-bg {
         height: auto;
-        width: 100%;
+        width: min(58%, 36vh);
+        bottom: auto;
+        /* Sit a touch below the nav and keep the top fade + wash light so her whole head reads */
+        top: 3rem;
+        /* Square slot gives the portrait photos room to show the whole subject */
+        aspect-ratio: 1 / 1;
+        background-position: 100% 40%;
+        background-image:
+          linear-gradient(235deg, rgba(240,228,212,0.55) 0%, rgba(240,228,212,0.22) 18%, rgba(240,228,212,0) 38%),
+          linear-gradient(to bottom, rgba(240,228,212,0.45) 0%, rgba(240,228,212,0) 16%),
+          url('images/gallery/preview-1-flipped.jpg');
+        -webkit-mask-image:
+          linear-gradient(to right, transparent 0%, #000 14%, #000 88%, transparent 100%),
+          linear-gradient(to bottom, transparent 0%, #000 6%, #000 82%, transparent 100%);
+        mask-image:
+          linear-gradient(to right, transparent 0%, #000 14%, #000 88%, transparent 100%),
+          linear-gradient(to bottom, transparent 0%, #000 6%, #000 82%, transparent 100%);
+      }
+
+      .hero-bg-alt {
+        background-image:
+          linear-gradient(125deg, rgba(240,228,212,0.55) 0%, rgba(240,228,212,0.22) 18%, rgba(240,228,212,0) 38%),
+          linear-gradient(to bottom, rgba(240,228,212,0.45) 0%, rgba(240,228,212,0) 16%),
+          url('images/gallery/updo-01.jpg');
+        /* Frame the whole bride — headroom above her updo through her back */
+        background-position: center 28%;
+      }
+
+      /* Name scales with the screen so it always lands on one line */
+      .hero-content .script {
+        font-size: clamp(1.7rem, 8.2vw, 3.4rem);
+        white-space: nowrap;
       }
     }
 
@@ -452,24 +520,15 @@
       margin-top: 0;
       padding: 2.75rem 0;
       background: linear-gradient(170deg, #F8F1E7 0%, #F4EDE3 55%, #EFE6D8 100%);
-      border: 1px solid rgba(196,154,56,0.5);
+      border: none;
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.65),
-        0 1px 2px rgba(92,61,61,0.05),
         0 12px 28px rgba(92,61,61,0.09),
-        0 30px 70px rgba(92,61,61,0.10),
-        0 0 45px 12px rgba(255,214,188,0.85),
-        0 0 110px 45px rgba(247,184,152,0.45);
+        0 30px 70px rgba(92,61,61,0.10);
     }
 
-    /* Inner frame line, matching .intro-frame */
+    /* Inner frame line removed — keep the box borderless so no gold line shows */
     .services-banner::before {
-      content: "";
-      position: absolute;
-      inset: 10px;
-      border: 1px solid rgba(196,154,56,0.35);
-      pointer-events: none;
-      z-index: 2;
+      content: none;
     }
 
     .services-banner::after {
@@ -1169,10 +1228,11 @@
       .gallery-title::before, .gallery-title::after { width: 40px; }
       .gallery-heading p { font-size: 0.78rem; }
       .gallery-slide { display: block; }
-      .ge-item { margin: 0 0 2.25rem; }
-      .ge-feature-tall { max-width: 400px; margin-left: auto; margin-right: auto; }
-      .ge-a { width: 88%; margin-left: auto; }
-      .ge-b { width: 74%; margin-right: auto; }
+      .ge-item { margin: 0 0 2rem; }
+      /* Capped widths keep the stacked photos modest instead of filling the screen */
+      .ge-feature-tall { max-width: 330px; margin-left: auto; margin-right: auto; }
+      .ge-a { width: min(72%, 310px); margin-left: auto; }
+      .ge-b { width: min(64%, 290px); margin-right: auto; }
       .gallery-preview-footer { margin-top: 2.5rem; }
     }
   </style>
@@ -1207,8 +1267,8 @@
     <img src="images/floweraccent.png" alt="" class="hero-watermark" />
     <img src="images/floweraccent.png" alt="" class="hero-watermark hero-watermark-2" />
     <div class="hero-content">
-      <h1>Timeless beauty.<br>Lasting love.</h1>
-      <span class="script">Always &amp; Forever Beauty</span>
+      <p class="tagline">Timeless beauty.<br>Lasting love.</p>
+      <h1 class="script">Always &amp; Forever Beauty</h1>
       <span class="subheading">Bridal hair &amp; makeup by Colleen Mulholland — Pequot Lakes, MN</span>
       <div class="hero-btns">
         <a href="booking.html" class="hero-link">Book Your Date</a>
@@ -1350,16 +1410,16 @@
           <figure class="ge-item ge-feature-tall">
             <div class="ge-mat">
               <div class="ge-frame">
-                <img src="images/gallery/preview-tall.jpg" alt="Romantic braided half-up bridal style with soft curls" loading="lazy" />
+                <img src="images/gallery/waves-03.jpg" alt="Bride with soft side-swept waves and a braided accent" loading="lazy" />
               </div>
             </div>
-            <figcaption><span class="ge-num">No. 01</span> Romantic braided half-up</figcaption>
+            <figcaption><span class="ge-num">No. 01</span> Soft side-swept waves</figcaption>
           </figure>
 
           <figure class="ge-item ge-a">
             <div class="ge-mat">
               <div class="ge-frame">
-                <img src="images/gallery/preview-2.jpg" alt="Soft textured bridal updo with face-framing curls" loading="lazy" />
+                <img src="images/gallery/updo-05.jpg" alt="Bride seated in the salon with a soft textured updo" loading="lazy" />
               </div>
             </div>
             <figcaption><span class="ge-num">No. 02</span> Soft textured updo</figcaption>
@@ -1368,10 +1428,10 @@
           <figure class="ge-item ge-b">
             <div class="ge-mat">
               <div class="ge-frame">
-                <img src="images/gallery/preview-3.jpg" alt="Elegant low bun with loose romantic curls" loading="lazy" />
+                <img src="images/gallery/preview-5.jpg" alt="Client admiring her polished low bun in the mirror" loading="lazy" />
               </div>
             </div>
-            <figcaption><span class="ge-num">No. 03</span> Elegant low bun</figcaption>
+            <figcaption><span class="ge-num">No. 03</span> Polished low bun</figcaption>
           </figure>
         </div>
 
@@ -1379,10 +1439,10 @@
           <figure class="ge-item ge-feature-tall">
             <div class="ge-mat">
               <div class="ge-frame">
-                <img src="images/gallery/preview-4.jpg" alt="Sleek half-up style with cascading dark curls" loading="lazy" />
+                <img src="images/gallery/party-01.jpg" alt="Smiling client with an elegant braided updo" loading="lazy" />
               </div>
             </div>
-            <figcaption><span class="ge-num">No. 04</span> Cascading curls</figcaption>
+            <figcaption><span class="ge-num">No. 04</span> A joyful finish</figcaption>
           </figure>
 
           <figure class="ge-item ge-a">
@@ -1397,10 +1457,10 @@
           <figure class="ge-item ge-b">
             <div class="ge-mat">
               <div class="ge-frame">
-                <img src="images/gallery/preview-5.jpg" alt="Polished low bun styled in front of the mirror" loading="lazy" />
+                <img src="images/gallery/updo-09.jpg" alt="Bride at the styling chair with a sculpted high bun" loading="lazy" />
               </div>
             </div>
-            <figcaption><span class="ge-num">No. 06</span> Polished low bun</figcaption>
+            <figcaption><span class="ge-num">No. 06</span> Sculpted high bun</figcaption>
           </figure>
         </div>
       </div>
