@@ -7,6 +7,20 @@
   <meta name="description" content="Timeless bridal hair and makeup by Colleen Mulholland. Serving brides in Pequot Lakes, MN and surrounding areas." />
   <link rel="stylesheet" href="styles.css" />
   <style>
+    /* Nav logo recoloured to the hero name's metallic gold gradient (logo shape used as a mask) */
+    .nav-logo-mark {
+      display: block;
+      height: 50px;
+      aspect-ratio: 972 / 248;
+      background: linear-gradient(105deg,
+        #7E5C1C 0%, #A87E2A 22%, #D9B45C 45%, #C49A38 60%, #8A6420 82%, #A87E2A 100%);
+      -webkit-mask: url('images/logo-horizontal-cropped.png') center / contain no-repeat;
+      mask: url('images/logo-horizontal-cropped.png') center / contain no-repeat;
+    }
+    @media (max-width: 1024px) { .nav-logo-mark { height: 44px; } }
+    @media (max-width: 880px)  { .nav-logo-mark { height: 42px; } }
+    @media (max-width: 768px)  { .nav-logo-mark { height: 38px; } }
+
     /* ---- Hero ---- */
     .hero {
       position: relative;
@@ -261,9 +275,9 @@
 
     .hero-scroll { display: none; }
 
-    /* Below desktop widths the photo fills the open space at the top, away from the text.
-       Only true desktop (>1024px) keeps the photo beside the text on the right. */
-    @media (max-width: 1024px) {
+    /* The large photo stays beside the text down to 900px; below that the photo
+       moves to the open space at the top, away from the text. */
+    @media (max-width: 900px) {
       /* Text sits at a fixed distance below the nav (no bottom-alignment gap),
          tucked up into the photo's fade so the two flow together */
       .hero {
@@ -271,7 +285,7 @@
       }
 
       .hero-content {
-        margin-top: calc(2rem + min(52vw, 34vh));
+        margin-top: calc(1rem + min(36vw, 24vh));
         /* Desktop gives the content a 6rem top pad — on mobile that just pushes
            the header away from the photo */
         padding-top: 1rem;
@@ -284,23 +298,23 @@
 
       .hero-bg {
         height: auto;
-        width: min(58%, 36vh);
+        width: min(52%, 30vh);
         bottom: auto;
-        /* Sit a touch below the nav and keep the top fade + wash light so her whole head reads */
-        top: 3rem;
-        /* Square slot gives the portrait photos room to show the whole subject */
-        aspect-ratio: 1 / 1;
+        /* Sit well below the fixed nav so her head isn't tucked up under it */
+        top: 5.5rem;
+        /* Taller portrait slot so the bride reads larger */
+        aspect-ratio: 4 / 5;
         background-position: 100% 40%;
         background-image:
           linear-gradient(235deg, rgba(240,228,212,0.55) 0%, rgba(240,228,212,0.22) 18%, rgba(240,228,212,0) 38%),
           linear-gradient(to bottom, rgba(240,228,212,0.45) 0%, rgba(240,228,212,0) 16%),
           url('images/gallery/preview-1-flipped.jpg');
-        -webkit-mask-image:
-          linear-gradient(to right, transparent 0%, #000 14%, #000 88%, transparent 100%),
-          linear-gradient(to bottom, transparent 0%, #000 6%, #000 82%, transparent 100%);
-        mask-image:
-          linear-gradient(to right, transparent 0%, #000 14%, #000 88%, transparent 100%),
-          linear-gradient(to bottom, transparent 0%, #000 6%, #000 82%, transparent 100%);
+        /* Oval vignette fade — reaches fully transparent INSIDE all four edges,
+           so the photo melts into the cream with no straight sides */
+        -webkit-mask-image: radial-gradient(ellipse 58% 52% at 50% 44%, #000 40%, rgba(0,0,0,0.5) 66%, transparent 84%);
+        -webkit-mask-composite: source-over;
+        mask-image: radial-gradient(ellipse 58% 52% at 50% 44%, #000 40%, rgba(0,0,0,0.5) 66%, transparent 84%);
+        mask-composite: add;
       }
 
       .hero-bg-alt {
@@ -1177,6 +1191,8 @@
       line-height: 1;
       margin-bottom: 0.9rem;
       opacity: 0.85;
+      /* Force the plain text heart glyph (gold), not the OS colour emoji */
+      font-variant-emoji: text;
     }
 
     .testimonial-quote p {
@@ -1201,6 +1217,46 @@
       text-transform: uppercase;
       color: var(--gold);
       font-weight: 500;
+    }
+
+    /* ---- Flip cards — tap/click a card to reveal the quote (all screen sizes) ---- */
+    .testimonial-quote {
+      cursor: pointer;
+      perspective: 1200px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tq-inner {
+      display: grid;
+      width: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .tq-front,
+    .tq-content {
+      grid-area: 1 / 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+    /* Back face starts rotated; flipping the inner brings it forward */
+    .tq-content { transform: rotateY(180deg); }
+    .testimonial-quote.flipped .tq-inner { transform: rotateY(180deg); }
+    .tq-front .quote-mark { font-size: 1.6rem; margin-bottom: 0.4rem; }
+    .tq-front .testimonial-author { font-size: 0.82rem; }
+    .tq-hint {
+      margin-top: 1.1rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--taupe);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tq-inner { transition: none; }
     }
 
     /* Roomier CTA banner on the home page */
@@ -1230,9 +1286,13 @@
       .gallery-slide { display: block; }
       .ge-item { margin: 0 0 2rem; }
       /* Capped widths keep the stacked photos modest instead of filling the screen */
-      .ge-feature-tall { max-width: 330px; margin-left: auto; margin-right: auto; }
-      .ge-a { width: min(72%, 310px); margin-left: auto; }
-      .ge-b { width: min(64%, 290px); margin-right: auto; }
+      /* All stacked photos the same size as the feature, centered, head kept in frame */
+      .ge-feature-tall,
+      .ge-a,
+      .ge-b { width: 100%; max-width: 330px; margin-left: auto; margin-right: auto; }
+      .ge-frame img { object-position: center top; }
+      /* No. 03 (polished low bun) — shift the bride toward the right of the frame */
+      .ge-frame img[src*="preview-5"] { object-position: 25% top; }
       .gallery-preview-footer { margin-top: 2.5rem; }
     }
   </style>
@@ -1249,7 +1309,7 @@
       <li class="nav-menu-cta"><a href="booking.html">Inquire Now</a></li>
     </ul>
     <div class="nav-logo">
-      <img src="images/logo-horizontal-cropped.png" alt="Always & Forever Beauty" style="width:auto; max-width:240px; height:50px; object-fit:contain;" />
+      <span class="nav-logo-mark" role="img" aria-label="Always &amp; Forever Beauty"></span>
     </div>
     <div class="nav-right">
       <a href="booking.html" class="nav-cta-link">Inquire Now</a>
@@ -1479,23 +1539,50 @@
         <p>What brides say</p>
       </header>
       <div class="testimonials-grid">
-        <div class="testimonial-quote">
-          <div class="quote-mark">&hearts;</div>
-          <p>Colleen has always been so, so easy to work with! You show her your vision and she never fails to bring it to life!! I will forever choose Always &amp; Forever Beauty!</p>
-          <div class="ornate-divider"></div>
-          <div class="testimonial-author">— Kaya</div>
+        <div class="testimonial-quote" tabindex="0">
+          <div class="tq-inner">
+            <div class="tq-front">
+              <div class="quote-mark">&hearts;&#xFE0E;</div>
+              <div class="testimonial-author">— Kaya</div>
+              <span class="tq-hint">Tap to read</span>
+            </div>
+            <div class="tq-content">
+              <div class="quote-mark">&hearts;&#xFE0E;</div>
+              <p>Colleen has always been so, so easy to work with! You show her your vision and she never fails to bring it to life!! I will forever choose Always &amp; Forever Beauty!</p>
+              <div class="ornate-divider"></div>
+              <div class="testimonial-author">— Kaya</div>
+            </div>
+          </div>
         </div>
-        <div class="testimonial-quote">
-          <div class="quote-mark">&hearts;</div>
-          <p>Thank you so much for being a part of my day! You made me feel my best, and I wouldn't have asked for anyone else to get me all dolled up! I will definitely be referring all my friends with hair &amp; makeup needs to you!</p>
-          <div class="ornate-divider"></div>
-          <div class="testimonial-author">— Marissa, Bride</div>
+        <div class="testimonial-quote" tabindex="0">
+          <div class="tq-inner">
+            <div class="tq-front">
+              <div class="quote-mark">&hearts;&#xFE0E;</div>
+              <div class="testimonial-author">— Marissa, Bride</div>
+              <span class="tq-hint">Tap to read</span>
+            </div>
+            <div class="tq-content">
+              <div class="quote-mark">&hearts;&#xFE0E;</div>
+              <p>Thank you so much for being a part of my day! You made me feel my best, and I wouldn't have asked for anyone else to get me all dolled up! I will definitely be referring all my friends with hair &amp; makeup needs to you!</p>
+              <div class="ornate-divider"></div>
+              <div class="testimonial-author">— Marissa, Bride</div>
+            </div>
+          </div>
         </div>
-        <div class="testimonial-quote">
-          <div class="quote-mark">&hearts;</div>
-          <p>Thank you — for going above &amp; beyond, for always being there, for all the texts &amp; phone calls, and for all the time &amp; energy you put into helping us with our wedding. Thank you x 1,000!</p>
-          <div class="ornate-divider"></div>
-          <div class="testimonial-author">— Erin &amp; Dusty</div>
+        <div class="testimonial-quote" tabindex="0">
+          <div class="tq-inner">
+            <div class="tq-front">
+              <div class="quote-mark">&hearts;&#xFE0E;</div>
+              <div class="testimonial-author">— Erin &amp; Dusty</div>
+              <span class="tq-hint">Tap to read</span>
+            </div>
+            <div class="tq-content">
+              <div class="quote-mark">&hearts;&#xFE0E;</div>
+              <p>Thank you — for going above &amp; beyond, for always being there, for all the texts &amp; phone calls, and for all the time &amp; energy you put into helping us with our wedding. Thank you x 1,000!</p>
+              <div class="ornate-divider"></div>
+              <div class="testimonial-author">— Erin &amp; Dusty</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1566,6 +1653,17 @@
         slides[current].classList.add('active');
       }, 10000);
     }
+
+    // Testimonials — tap/click (or Enter/Space) to flip a card on mobile & tablet
+    document.querySelectorAll('.testimonial-quote').forEach(card => {
+      card.addEventListener('click', () => card.classList.toggle('flipped'));
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          card.classList.toggle('flipped');
+        }
+      });
+    });
   </script>
 </body>
 </html>
