@@ -61,6 +61,10 @@
       height: 42px;
       width: auto;
       object-fit: contain;
+      /* Match the public nav: brighten the gold + tight edge so it reads on the maroon bar */
+      filter: brightness(1.25) contrast(1.03)
+        drop-shadow(0 0 1px rgba(255, 250, 243, 0.55))
+        drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
     }
 
     .topbar-right {
