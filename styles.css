@@ -189,10 +189,13 @@ p {
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  /* Soft light halo behind the logo so the gold reads clearly on the maroon nav */
-  padding: 0.2rem 1rem;
-  border-radius: 60px;
-  background: radial-gradient(ellipse 92% 130% at 50% 50%, rgba(250,246,241,0.22), rgba(250,246,241,0) 70%);
+}
+
+/* Brighten the gold and give it a tight light edge so it reads on the maroon nav */
+.nav-logo img {
+  filter: brightness(1.25) contrast(1.03)
+    drop-shadow(0 0 1px rgba(255, 250, 243, 0.55))
+    drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
 }
 
 .nav-logo img {
