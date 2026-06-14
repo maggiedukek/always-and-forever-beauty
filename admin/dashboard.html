@@ -135,11 +135,12 @@
       display: flex;
       align-items: center;
       gap: 1.25rem;
-      background: linear-gradient(120deg, var(--peach) 0%, #F7DACD 60%, var(--cream) 100%);
+      background: linear-gradient(120deg, #F7E6DA 0%, #FBF4EC 55%, var(--cream) 100%);
       border: 1px solid rgba(196,154,56,0.3);
-      border-radius: 4px;
-      padding: 1.25rem 1.75rem;
-      margin-bottom: 1.5rem;
+      border-radius: 6px;
+      padding: 1rem 1.6rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 2px 14px rgba(92,61,61,0.05);
     }
 
     .welcome-photo {
@@ -169,14 +170,16 @@
     /* ---- Stats + Calendar Grid ---- */
     .dash-grid {
       display: grid;
-      grid-template-columns: 250px 1fr;
+      grid-template-columns: 1fr;
       gap: 1.25rem;
       align-items: start;
       margin-bottom: 2rem;
     }
 
+    /* 4 stat boxes sit in a row across the top, above the full-width calendar */
     .stats-col {
       display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 1.25rem;
     }
 
@@ -737,15 +740,15 @@
           <span class="stat-num" id="stat-total">—</span>
           <span class="stat-label">Total Inquiries</span>
         </div>
-        <div class="stat-card" style="border-color: var(--new);">
+        <div class="stat-card">
           <span class="stat-num" id="stat-new">—</span>
           <span class="stat-label">New</span>
         </div>
-        <div class="stat-card" style="border-color: var(--booked);">
+        <div class="stat-card">
           <span class="stat-num" id="stat-booked">—</span>
           <span class="stat-label">Booked</span>
         </div>
-        <div class="stat-card" style="border-color: var(--review);">
+        <div class="stat-card">
           <span class="stat-num" id="stat-review">—</span>
           <span class="stat-label">In Review</span>
         </div>
