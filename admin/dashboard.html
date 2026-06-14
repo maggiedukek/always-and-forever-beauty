@@ -721,6 +721,28 @@
       .welcome { flex-direction: column; text-align: center; }
     }
 
+    @media (max-width: 640px) {
+      /* Topbar — drop the title + email and inline the logo so nothing overlaps */
+      .topbar { padding: 0 1rem; height: 58px; }
+      .topbar-title { display: none; }
+      .topbar-user { display: none; }
+      .topbar-logo { position: static; transform: none; }
+      .topbar-logo img { height: 30px !important; }
+      .topbar-right { gap: 0.7rem; }
+      .topbar-link { font-size: 0.7rem; }
+      .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.7rem; }
+
+      /* Calendar — wrap the controls and shrink the cells so it fits the screen */
+      .panel-header { flex-wrap: wrap; gap: 0.6rem; }
+      .cal-controls { flex-wrap: wrap; justify-content: center; gap: 0.4rem; width: 100%; }
+      .cal-month-label { min-width: 0; flex: 1; text-align: center; }
+      .btn-add-schedule { padding: 0.5rem 0.9rem; }
+      .cal-day { min-height: 52px; padding: 0.18rem; }
+      .cal-weekday { padding: 0.5rem 0.1rem; font-size: 0.58rem; letter-spacing: 0.03em; }
+      .cal-day-num { width: 20px; height: 20px; line-height: 20px; font-size: 0.72rem; }
+      .cal-legend { gap: 0.7rem; padding: 0.8rem 1rem; font-size: 0.66rem; }
+    }
+
     /* ---- Add Client modal ---- */
     .modal-overlay {
       position: fixed; inset: 0;
