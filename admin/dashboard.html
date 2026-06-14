@@ -374,8 +374,11 @@
     .drawer-body {
       position: relative;
       padding: 2rem 1.75rem;
-      /* Soft peach wash at the top so the panel isn't flat */
-      background: linear-gradient(180deg, rgba(247,225,212,0.5) 0%, rgba(250,246,241,0.95) 26%, var(--cream) 100%);
+      /* Peach wash at the top + a soft peach glow at the bottom for dimension */
+      background:
+        radial-gradient(ellipse 90% 45% at 50% 100%, rgba(242,201,184,0.4), rgba(242,201,184,0) 72%),
+        radial-gradient(ellipse 70% 30% at 50% 0%, rgba(244,206,186,0.55), rgba(244,206,186,0) 70%),
+        linear-gradient(180deg, rgba(247,225,212,0.5) 0%, rgba(250,246,241,0.92) 30%, var(--cream) 100%);
     }
     /* Gold floral backdrop, faded out at the top and bottom */
     .drawer-body::before {
@@ -385,7 +388,7 @@
       z-index: 0;
       pointer-events: none;
       background: url('../images/background gold flowers.png') center / cover no-repeat;
-      opacity: 0.26;
+      opacity: 0.15;
       -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 80%, transparent 100%);
       mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 80%, transparent 100%);
     }
@@ -397,14 +400,14 @@
       text-align: center;
       background: linear-gradient(170deg, #FFFDF8 0%, #F8F1E7 60%, #F4EAD8 100%);
       border: 1px solid rgba(196,154,56,0.4);
-      border-radius: 6px;
-      padding: 1.3rem 1.5rem;
+      border-radius: 0;
+      padding: 1.4rem 1.5rem;
       margin-bottom: 1.5rem;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 6px 18px rgba(92,61,61,0.07);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 8px 22px rgba(236,170,140,0.28);
     }
     .client-card::before {
       content: ""; position: absolute; inset: 7px;
-      border: 1px solid rgba(196,154,56,0.25); border-radius: 4px; pointer-events: none;
+      border: 1px solid rgba(196,154,56,0.25); border-radius: 0; pointer-events: none;
     }
     .client-card-name {
       display: block; font-family: 'Playfair Display', serif; font-size: 1.65rem;
@@ -1354,6 +1357,19 @@
       const contractBtn = document.getElementById('contractBtn');
       if (contractBtn) contractBtn.addEventListener('click', () => openUploadContract(inquiry.name));
 
+      // Delete an old / declined request
+      const deleteBtn = document.getElementById('deleteInquiryBtn');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', async () => {
+          if (!confirm('Permanently delete this request? This cannot be undone.')) return;
+          const { error } = await sb.from('inquiries').delete().eq('id', inquiry.id);
+          if (error) { alert('Could not delete: ' + error.message); return; }
+          allInquiries = allInquiries.filter(i => i.id !== inquiry.id);
+          updateStats(); renderTable(); renderCalendar();
+          closeDrawer();
+        });
+      }
+
       // Send confirmation
       const confirmBtn = document.getElementById('confirmBtn');
       if (confirmBtn) {
@@ -1391,14 +1407,14 @@
       const curIdx = stageIndex(i.stage);
       return `
         <div class="client-card">
-          <span class="client-card-name">${esc(i.name)}</span>
+          <span class="client-card-name">${esc(i.wedding_name || i.name)}</span>
           <span class="client-card-rule"></span>
           <span class="client-card-date">${formatDate(i.wedding_date)}</span>
         </div>
         <div class="detail-grid">
           <div class="detail-row">
-            <label>Wedding Name</label>
-            <p>${esc(i.wedding_name || '—')}</p>
+            <label>Name</label>
+            <p>${esc(i.name)}</p>
           </div>
           <div class="detail-row">
             <label>Email</label>
@@ -1462,6 +1478,10 @@
             Send Booking Confirmation
           </button>
           ${i.confirmation_sent ? `<div class="email-sent-badge">✓ Confirmation already sent</div>` : ''}
+        </div>
+
+        <div class="drawer-section" style="text-align:center;">
+          <button id="deleteInquiryBtn" class="contract-link contract-del" style="padding:0.55rem 1.4rem;">Delete this request</button>
         </div>
       `;
     }
