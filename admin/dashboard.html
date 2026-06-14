@@ -445,15 +445,16 @@
 
     .detail-row label {
       display: block;
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--taupe);
+      color: var(--gold);
+      font-weight: 500;
       margin-bottom: 0.3rem;
     }
 
     .detail-row p {
-      font-size: 1.05rem;
+      font-size: 1.25rem;
       color: var(--rose);
       max-width: none;
     }
@@ -471,10 +472,11 @@
     }
 
     .drawer-section h4 {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--taupe);
+      color: var(--rose);
+      font-weight: 600;
       margin-bottom: 1.25rem;
     }
 
@@ -1083,16 +1085,44 @@
     // ---- Add Client modal ----
     const addClientOverlay = document.getElementById('addClientOverlay');
     const addClientModal = document.getElementById('addClientModal');
-    function openAddClient() {
+    let editingInquiryId = null;
+
+    // Opens the modal blank to add, or pre-filled to edit an existing client
+    function openAddClient(editInquiry) {
+      const form = document.getElementById('addClientForm');
+      const title = document.getElementById('addClientTitle');
+      const submit = document.getElementById('addClientSubmit');
       document.getElementById('addClientError').textContent = '';
+      form.reset();
+      if (editInquiry && editInquiry.id != null) {
+        editingInquiryId = editInquiry.id;
+        title.textContent = 'Edit Client';
+        submit.textContent = 'Save Changes';
+        const parts = (editInquiry.name || '').trim().split(/\s+/);
+        form.first_name.value   = parts[0] || '';
+        form.last_name.value    = parts.slice(1).join(' ');
+        form.wedding_name.value = editInquiry.wedding_name || '';
+        form.wedding_date.value = editInquiry.wedding_date || '';
+        form.email.value        = editInquiry.email || '';
+        form.phone.value        = editInquiry.phone || '';
+        form.wedding_size.value = editInquiry.wedding_size || '';
+        form.status.value       = editInquiry.status || 'new';
+        form.services.value     = editInquiry.services_needed || '';
+        form.message.value      = editInquiry.message || '';
+      } else {
+        editingInquiryId = null;
+        title.textContent = 'Add a Client';
+        submit.textContent = 'Add Client';
+      }
       addClientOverlay.classList.add('open');
       addClientModal.classList.add('open');
     }
     function closeAddClient() {
       addClientOverlay.classList.remove('open');
       addClientModal.classList.remove('open');
+      editingInquiryId = null;
     }
-    document.getElementById('addScheduleBtn').addEventListener('click', openAddClient);
+    document.getElementById('addScheduleBtn').addEventListener('click', () => openAddClient());
     document.getElementById('addClientClose').addEventListener('click', closeAddClient);
     addClientOverlay.addEventListener('click', closeAddClient);
 
@@ -1113,22 +1143,29 @@
         wedding_date: fd.get('wedding_date') || null,
         services_needed: clean('services'),
         wedding_size: clean('wedding_size'),
-        status: fd.get('status') || 'booked',
+        status: fd.get('status') || 'new',
         message: clean('message')
       };
       if (!first) { err.textContent = 'First name is required.'; return; }
+      const editId = editingInquiryId;
       btn.disabled = true;
-      btn.textContent = 'Adding…';
-      const { error } = await sb.from('inquiries').insert([row]);
+      btn.textContent = editId ? 'Saving…' : 'Adding…';
+      const { error } = editId
+        ? await sb.from('inquiries').update(row).eq('id', editId)
+        : await sb.from('inquiries').insert([row]);
       btn.disabled = false;
-      btn.textContent = 'Add Client';
+      btn.textContent = editId ? 'Save Changes' : 'Add Client';
       if (error) {
-        err.textContent = 'Could not add client: ' + error.message;
+        err.textContent = 'Could not save: ' + error.message;
         return;
       }
       e.target.reset();
       closeAddClient();
-      loadInquiries();
+      await loadInquiries();
+      if (editId) {
+        const updated = allInquiries.find(i => String(i.id) === String(editId));
+        if (updated) openDrawer(updated);
+      }
     });
 
     // ---- Contracts (upload / house / download) ----
@@ -1353,6 +1390,10 @@
       const reopenBtn = document.getElementById('reopenBtn');
       if (reopenBtn) reopenBtn.addEventListener('click', () => applyUpdate({ status: STAGES[stageIndex(inquiry.stage)].status }));
 
+      // Edit all the client's details
+      const editBtn = document.getElementById('editDetailsBtn');
+      if (editBtn) editBtn.addEventListener('click', () => openAddClient(inquiry));
+
       // Contract — upload a contract for this client (pre-fills their name)
       const contractBtn = document.getElementById('contractBtn');
       if (contractBtn) contractBtn.addEventListener('click', () => openUploadContract(inquiry.name));
@@ -1410,6 +1451,9 @@
           <span class="client-card-name">${esc(i.wedding_name || i.name)}</span>
           <span class="client-card-rule"></span>
           <span class="client-card-date">${formatDate(i.wedding_date)}</span>
+        </div>
+        <div style="text-align:center; margin:-0.5rem 0 1.4rem;">
+          <button id="editDetailsBtn" class="contract-link">✎ Edit details</button>
         </div>
         <div class="detail-grid">
           <div class="detail-row">
