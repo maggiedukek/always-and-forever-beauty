@@ -920,8 +920,16 @@
     <form class="modal-body" id="addClientForm">
       <div class="detail-grid">
         <div class="form-field">
-          <label>Name *</label>
-          <input type="text" name="name" required />
+          <label>First Name *</label>
+          <input type="text" name="first_name" required />
+        </div>
+        <div class="form-field">
+          <label>Last Name</label>
+          <input type="text" name="last_name" />
+        </div>
+        <div class="form-field">
+          <label>Wedding Name</label>
+          <input type="text" name="wedding_name" placeholder="e.g. Smith &amp; Jones" />
         </div>
         <div class="form-field">
           <label>Wedding / Event Date</label>
@@ -1092,8 +1100,11 @@
       err.textContent = '';
       const fd = new FormData(e.target);
       const clean = (k) => { const v = (fd.get(k) || '').trim(); return v === '' ? null : v; };
+      const first = (fd.get('first_name') || '').trim();
+      const last = (fd.get('last_name') || '').trim();
       const row = {
-        name: clean('name'),
+        name: (first + ' ' + last).trim(),
+        wedding_name: clean('wedding_name'),
         email: clean('email'),
         phone: clean('phone'),
         wedding_date: fd.get('wedding_date') || null,
@@ -1102,7 +1113,7 @@
         status: fd.get('status') || 'booked',
         message: clean('message')
       };
-      if (!row.name) { err.textContent = 'Name is required.'; return; }
+      if (!first) { err.textContent = 'First name is required.'; return; }
       btn.disabled = true;
       btn.textContent = 'Adding…';
       const { error } = await sb.from('inquiries').insert([row]);
@@ -1385,6 +1396,10 @@
           <span class="client-card-date">${formatDate(i.wedding_date)}</span>
         </div>
         <div class="detail-grid">
+          <div class="detail-row">
+            <label>Wedding Name</label>
+            <p>${esc(i.wedding_name || '—')}</p>
+          </div>
           <div class="detail-row">
             <label>Email</label>
             <p><a href="mailto:${esc(i.email)}" style="color:var(--rose); text-decoration:underline;">${esc(i.email)}</a></p>
