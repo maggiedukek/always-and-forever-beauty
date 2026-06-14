@@ -63,13 +63,17 @@
 
     .login-logo-img {
       display: block;
-      width: 220px;
-      max-width: 72%;
+      width: 240px;
+      max-width: 80%;
       height: auto;
       margin: 0 auto 0.7rem;
-      padding: 0.6rem 0.9rem 0.5rem;
-      /* Soft cream halo behind the gold logo so it reads on the peach card */
-      background: radial-gradient(ellipse 80% 74% at 50% 46%, rgba(255,253,249,0.97) 30%, rgba(255,253,249,0) 78%);
+      padding: 1.4rem 1.2rem;
+      /* Cream oval behind the gold logo that slowly fades out so it reads on the peach */
+      background: radial-gradient(ellipse 66% 58% at 50% 47%,
+        rgba(255,252,247,1) 0%,
+        rgba(255,252,247,0.96) 42%,
+        rgba(255,252,247,0.42) 68%,
+        rgba(255,252,247,0) 90%);
       filter: contrast(1.05) saturate(1.08);
     }
 
@@ -79,6 +83,7 @@
       text-transform: uppercase;
       color: var(--rose);
       font-weight: 500;
+      margin-top: 1.5rem;
       margin-bottom: 0.4rem;
       display: block;
     }
