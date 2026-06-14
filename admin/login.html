@@ -67,6 +67,10 @@
       max-width: 64%;
       height: auto;
       margin: 0 auto 0.6rem;
+      /* Lift the gold off the light peach card so it reads clearly */
+      filter: contrast(1.06) saturate(1.12)
+        drop-shadow(0 1px 2px rgba(74,48,48,0.4))
+        drop-shadow(0 0 1px rgba(74,48,48,0.3));
     }
 
     .login-sub {
@@ -119,7 +123,7 @@
     .btn-login {
       width: 100%;
       padding: 0.9rem;
-      background: var(--gold);
+      background: var(--rose);
       color: #fff;
       border: none;
       border-radius: 3px;
@@ -133,7 +137,7 @@
       transition: background 0.2s;
     }
 
-    .btn-login:hover { background: var(--rose); }
+    .btn-login:hover { background: #7a5050; }
     .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .login-error {
