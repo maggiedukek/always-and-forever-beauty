@@ -63,19 +63,18 @@
 
     .login-logo-img {
       display: block;
-      width: 240px;
-      max-width: 80%;
+      width: 210px;
+      max-width: 72%;
       height: auto;
-      margin: 0 auto 0.7rem;
-      padding: 1.6rem 1.4rem;
-      /* Maroon oval behind the gold logo (fades out) so the gold reads like it does on the nav bar */
-      background: radial-gradient(ellipse 76% 78% at 50% 50%,
-        rgba(92,61,61,1) 0%,
-        rgba(92,61,61,0.98) 60%,
-        rgba(92,61,61,0.55) 80%,
-        rgba(92,61,61,0) 97%);
-      filter: brightness(1.12) contrast(1.03)
-        drop-shadow(0 0 1px rgba(255,250,243,0.4));
+      margin: 0 auto 0.9rem;
+      padding: 0.9rem 1.1rem;
+      /* Small maroon card (gold edge) so the gold logo reads like it does on the nav bar */
+      background: linear-gradient(180deg, #6a4848 0%, #5C3D3D 60%, #4f3434 100%);
+      border: 1px solid rgba(196,154,56,0.5);
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(92,61,61,0.22);
+      /* Same brightening as the nav logo */
+      filter: brightness(1.16) contrast(1.04);
     }
 
     .login-sub {
