@@ -385,7 +385,7 @@
       z-index: 0;
       pointer-events: none;
       background: url('../images/background gold flowers.png') center / cover no-repeat;
-      opacity: 0.4;
+      opacity: 0.26;
       -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 80%, transparent 100%);
       mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 80%, transparent 100%);
     }
@@ -407,12 +407,12 @@
       border: 1px solid rgba(196,154,56,0.25); border-radius: 4px; pointer-events: none;
     }
     .client-card-name {
-      display: block; font-family: 'Playfair Display', serif; font-size: 1.4rem;
+      display: block; font-family: 'Playfair Display', serif; font-size: 1.65rem;
       font-weight: 600; color: var(--rose); line-height: 1.2;
     }
     .client-card-rule { display: block; width: 42px; height: 1px; background: var(--gold); opacity: 0.7; margin: 0.6rem auto; }
     .client-card-date {
-      display: block; font-family: 'Jost', sans-serif; font-size: 0.95rem;
+      display: block; font-family: 'Jost', sans-serif; font-size: 1.1rem;
       letter-spacing: 0.06em; color: var(--gold);
     }
 
@@ -433,7 +433,7 @@
     .stage-step.done .stage-dot { background: var(--gold); border-color: var(--gold); color: #fff; }
     .stage-step.active .stage-dot { background: var(--rose); border-color: var(--rose); color: #fff; box-shadow: 0 0 0 4px rgba(92,61,61,0.12); }
     .stage-step:hover .stage-dot { border-color: var(--rose); }
-    .stage-label { font-size: 0.64rem; letter-spacing: 0.03em; text-transform: uppercase; color: var(--taupe); line-height: 1.2; padding: 0 2px; }
+    .stage-label { font-size: 0.72rem; letter-spacing: 0.03em; text-transform: uppercase; color: var(--taupe); line-height: 1.2; padding: 0 2px; }
     .stage-step.active .stage-label, .stage-step.done .stage-label { color: var(--rose); font-weight: 500; }
 
     .detail-row {
@@ -442,7 +442,7 @@
 
     .detail-row label {
       display: block;
-      font-size: 0.7rem;
+      font-size: 0.78rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--taupe);
@@ -450,7 +450,7 @@
     }
 
     .detail-row p {
-      font-size: 0.95rem;
+      font-size: 1.05rem;
       color: var(--rose);
       max-width: none;
     }
@@ -468,7 +468,7 @@
     }
 
     .drawer-section h4 {
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--taupe);
@@ -482,7 +482,7 @@
       background: var(--white);
       color: var(--rose);
       font-family: 'Jost', sans-serif;
-      font-size: 0.9rem;
+      font-size: 1rem;
       border-radius: 3px;
       outline: none;
       cursor: pointer;
@@ -496,7 +496,7 @@
       border: none;
       border-radius: 3px;
       font-family: 'Jost', sans-serif;
-      font-size: 0.8rem;
+      font-size: 0.88rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       cursor: pointer;
@@ -1431,7 +1431,7 @@
 
         <div class="drawer-section">
           <h4>Contract</h4>
-          <p style="font-size:0.85rem; color:var(--taupe); margin-bottom:1rem;">
+          <p style="font-size:0.95rem; color:var(--taupe); margin-bottom:1rem;">
             Upload this client's contract to keep it on file. <em>(Emailing it to the client is coming soon.)</em>
           </p>
           <button class="btn-confirm" id="contractBtn" style="background:var(--gold);">Upload Contract for ${esc(i.name)}</button>
@@ -1439,7 +1439,7 @@
 
         <div class="drawer-section">
           <h4>Booking Confirmation Email</h4>
-          <p style="font-size:0.85rem; color:var(--taupe); margin-bottom:1rem;">
+          <p style="font-size:0.95rem; color:var(--taupe); margin-bottom:1rem;">
             Send a confirmation email to <strong>${esc(i.email)}</strong> letting them know they are booked.
           </p>
           <button class="btn-confirm" id="confirmBtn"
