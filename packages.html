@@ -11,6 +11,18 @@
   <meta name="description" content="Bridal hair and makeup packages by Colleen Mulholland — Pequot Lakes, MN." />
   <link rel="stylesheet" href="styles.css" />
   <style>
+    /* Gold floral watermark in the page hero */
+    .page-hero { position: relative; overflow: hidden; }
+    .page-hero::before {
+      content: "";
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background: url('images/background gold flowers.png') center / cover no-repeat;
+      opacity: 0.14;
+      -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 32%, transparent 86%);
+      mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 32%, transparent 86%);
+    }
+    .page-hero .container { position: relative; z-index: 1; }
+
     /* Ghosted background photo behind the Bridal Collections section (like the gallery) */
     .packages-collections { position: relative; overflow: hidden; }
     .packages-collections::before {
@@ -220,10 +232,10 @@
   <!-- Page Hero -->
   <div class="page-hero">
     <div class="container">
-      <span class="section-label">Investment</span>
+      <span class="section-label">Your wedding morning</span>
       <h1>Packages &amp; Pricing</h1>
       <div class="divider"></div>
-      <p class="subheading" style="margin:0 auto;">Everything you need for a beautiful, stress-free wedding morning</p>
+      <p class="subheading" style="margin:0 auto;">Something for every bride and every party — so your morning feels calm, joyful, and completely taken care of.</p>
     </div>
   </div>
 
@@ -234,13 +246,14 @@
         <h2 class="gallery-title">Bridal Collections</h2>
         <p>Choose Your Package</p>
       </header>
-      <p style="text-align:center; max-width:60ch; margin:0 auto 3rem; font-family:var(--font-sub); font-style:italic; font-size:1.05rem; color:var(--taupe);">All packages include a pre-wedding consultation and are customizable to your needs. Pricing is starting from — final quote provided after inquiry.</p>
+      <p style="text-align:center; max-width:60ch; margin:0 auto 3rem; font-family:var(--font-sub); font-style:italic; font-size:1.05rem; color:var(--taupe);">Every package includes a pre-wedding consultation, and I'm always happy to tailor one to fit your day. These are starting points — I'll send your personal quote once we've talked through what you're dreaming up.</p>
       <div class="packages-grid">
 
         <!-- Package 1 -->
         <div class="package-card">
           <span class="package-name">The Blushing Bride</span>
           <span class="package-subtitle">Bride only</span>
+          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">Just you — soft, glowing, and completely ready for your moment.</p>
           <div class="package-price"><span>$</span>TBD</div>
           <p class="price-note">Pricing confirmed at inquiry</p>
           <div class="package-divider"></div>
@@ -259,6 +272,7 @@
           <div class="featured-badge">Most Popular</div>
           <span class="package-name">The Golden Hour</span>
           <span class="package-subtitle">Bride + up to 4 in party</span>
+          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">You and your closest girls, getting ready and glowing together.</p>
           <div class="package-price"><span>$</span>TBD</div>
           <p class="price-note">Pricing confirmed at inquiry</p>
           <div class="package-divider"></div>
@@ -277,6 +291,7 @@
         <div class="package-card">
           <span class="package-name">The Full Experience</span>
           <span class="package-subtitle">Full wedding party</span>
+          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">Everyone you love, polished and camera-ready from the first look on.</p>
           <div class="package-price"><span>$</span>TBD</div>
           <p class="price-note">Pricing confirmed at inquiry</p>
           <div class="package-divider"></div>
@@ -300,10 +315,10 @@
   <section class="section section--alt">
     <div class="container">
       <div class="section-header">
-        <span class="section-label">Customize Your Day</span>
+        <span class="section-label">A few extra touches</span>
         <h2>Add-On Services</h2>
         <div class="divider"></div>
-        <p>Add any of these services to your package to create the perfect experience</p>
+        <p>Little extras to make the morning fully yours — add any of them to your package.</p>
       </div>
       <div class="addons-grid">
         <div class="addon-item">
@@ -348,7 +363,7 @@
         <li>Trial sessions are strongly recommended and are conducted separately from the wedding day.</li>
         <li>Final headcount is due 30 days before your wedding date.</li>
         <li>All pricing is in USD. Final quote is provided after the inquiry form is reviewed.</li>
-        <li>Colleen serves a limited number of weddings per season — book early to secure your date.</li>
+        <li>I take a limited number of weddings each season — reach out early to save your date.</li>
       </ul>
     </div>
   </section>
@@ -360,7 +375,7 @@
         <span class="cta-script">Found your fit?</span>
         <h2>Let's secure your date</h2>
         <div class="ornate-divider" style="margin:1rem auto 1.25rem;"></div>
-        <p>Send an inquiry and Colleen will follow up with a personalized quote.</p>
+        <p>Send your inquiry and I'll follow up personally with a quote made just for your day.</p>
         <a href="booking.html" class="hero-link">Start Your Inquiry</a>
       </div>
     </div>
