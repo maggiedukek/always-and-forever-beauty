@@ -23,6 +23,19 @@
     }
     .page-hero .container { position: relative; z-index: 1; }
 
+    /* Gold headers get the hero's metallic gold gradient (instead of flat gold) */
+    .section-label,
+    .gallery-title,
+    .package-name {
+      background: linear-gradient(105deg, #7E5C1C 0%, #A87E2A 22%, #D9B45C 45%, #C49A38 60%, #8A6420 82%, #A87E2A 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: var(--gold);
+    }
+    /* Gold accents I don't want → maroon */
+    .package-features .check { color: var(--rose); -webkit-text-fill-color: var(--rose); }
+
     /* Ghosted background photo behind the Bridal Collections section (like the gallery) */
     .packages-collections { position: relative; overflow: hidden; }
     .packages-collections::before {
@@ -73,7 +86,7 @@
       top: -14px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--gold);
+      background: var(--rose);
       color: var(--white);
       font-size: 0.72rem;
       letter-spacing: 0.12em;
