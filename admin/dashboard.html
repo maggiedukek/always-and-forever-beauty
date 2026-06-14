@@ -245,6 +245,14 @@
       font-weight: 600;
     }
 
+    /* Calendar — bigger heading + a very light peach layer for depth */
+    .cal-panel .panel-header h2 { font-size: 1.6rem; }
+    .cal-panel {
+      background:
+        radial-gradient(ellipse 85% 55% at 50% 0%, rgba(244,206,186,0.22), rgba(244,206,186,0) 68%),
+        linear-gradient(180deg, rgba(247,228,216,0.32) 0%, rgba(255,255,255,0.95) 38%, var(--white) 100%);
+    }
+
     .filter-row {
       display: flex;
       gap: 0.5rem;
@@ -860,7 +868,7 @@
     <div class="dash-grid">
 
       <!-- Calendar Panel -->
-      <div class="panel" style="margin-bottom: 0;">
+      <div class="panel cal-panel" style="margin-bottom: 0;">
         <div class="panel-header">
           <h2>Calendar</h2>
           <div class="cal-controls">
