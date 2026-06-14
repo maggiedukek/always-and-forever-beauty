@@ -134,7 +134,9 @@
     .welcome {
       display: flex;
       align-items: center;
-      gap: 1.25rem;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem 1.5rem;
       background: linear-gradient(120deg, #F7E6DA 0%, #FBF4EC 55%, var(--cream) 100%);
       border: 1px solid rgba(196,154,56,0.3);
       border-radius: 6px;
@@ -142,6 +144,7 @@
       margin-bottom: 1.25rem;
       box-shadow: 0 2px 14px rgba(92,61,61,0.05);
     }
+    .welcome-intro { display: flex; align-items: center; gap: 1.25rem; }
 
     .welcome-photo {
       width: 72px;
@@ -176,11 +179,11 @@
       margin-bottom: 2rem;
     }
 
-    /* 4 stat boxes sit in a row across the top, above the full-width calendar */
+    /* 4 compact stat boxes tucked into the header bar, beside the greeting */
     .stats-col {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
     }
 
     .stat-card {
@@ -188,18 +191,19 @@
       border: 1px solid rgba(196,154,56,0.28);
       border-left: 3px solid var(--gold);
       border-radius: 4px;
-      padding: 0.85rem 1.1rem;
-      box-shadow: 0 2px 14px rgba(92,61,61,0.05);
+      padding: 0.5rem 0.95rem;
+      min-width: 96px;
+      box-shadow: 0 2px 10px rgba(92,61,61,0.04);
     }
 
     .stat-num {
       font-family: 'Playfair Display', serif;
-      font-size: 1.7rem;
+      font-size: 1.4rem;
       font-weight: 600;
       color: var(--rose);
       display: block;
       line-height: 1;
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.15rem;
     }
 
     .stat-label {
@@ -724,17 +728,15 @@
 
   <div class="main">
 
-    <!-- Welcome -->
+    <!-- Welcome + Stats header -->
     <div class="welcome">
-      <img src="../images/colleen.jpg" alt="Colleen" class="welcome-photo" />
-      <div>
-        <span class="welcome-script">Hello, Colleen!</span>
-        <p class="welcome-sub">Here's what's happening with your brides.</p>
+      <div class="welcome-intro">
+        <img src="../images/colleen.jpg" alt="Colleen" class="welcome-photo" />
+        <div>
+          <span class="welcome-script">Hello, Colleen!</span>
+          <p class="welcome-sub">Here's what's happening with your brides.</p>
+        </div>
       </div>
-    </div>
-
-    <!-- Stats + Calendar -->
-    <div class="dash-grid">
       <div class="stats-col">
         <div class="stat-card">
           <span class="stat-num" id="stat-total">—</span>
@@ -753,6 +755,10 @@
           <span class="stat-label">In Review</span>
         </div>
       </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="dash-grid">
 
       <!-- Calendar Panel -->
       <div class="panel" style="margin-bottom: 0;">
