@@ -371,7 +371,33 @@
 
     .drawer-close:hover { opacity: 1; }
 
-    .drawer-body { padding: 2rem 1.75rem; }
+    .drawer-body {
+      padding: 2rem 1.75rem;
+      /* Soft peach wash at the top + gold floral watermark so the panel isn't flat */
+      background:
+        linear-gradient(180deg, rgba(247,225,212,0.6) 0%, rgba(250,246,241,0.92) 24%, rgba(250,246,241,0.97) 100%),
+        url('../images/background gold flowers.png') center -30px / 340px auto no-repeat;
+    }
+
+    /* ---- Stage flow stepper ---- */
+    .stage-flow { display: flex; align-items: flex-start; justify-content: space-between; }
+    .stage-step { flex: 1; text-align: center; position: relative; cursor: pointer; }
+    .stage-step:not(:last-child)::after {
+      content: ''; position: absolute; top: 13px; left: 50%; width: 100%; height: 2px;
+      background: rgba(196,154,56,0.25); z-index: 0;
+    }
+    .stage-step.done::after { background: var(--gold); }
+    .stage-dot {
+      width: 28px; height: 28px; border-radius: 50%; background: #fff;
+      border: 2px solid rgba(196,154,56,0.45); display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 0.45rem; position: relative; z-index: 1; font-size: 0.78rem; color: var(--taupe);
+      transition: all 0.2s;
+    }
+    .stage-step.done .stage-dot { background: var(--gold); border-color: var(--gold); color: #fff; }
+    .stage-step.active .stage-dot { background: var(--rose); border-color: var(--rose); color: #fff; box-shadow: 0 0 0 4px rgba(92,61,61,0.12); }
+    .stage-step:hover .stage-dot { border-color: var(--rose); }
+    .stage-label { font-size: 0.64rem; letter-spacing: 0.03em; text-transform: uppercase; color: var(--taupe); line-height: 1.2; padding: 0 2px; }
+    .stage-step.active .stage-label, .stage-step.done .stage-label { color: var(--rose); font-weight: 500; }
 
     .detail-row {
       margin-bottom: 1.5rem;
@@ -931,6 +957,18 @@
     let allInquiries = [];
     let currentFilter = 'all';
 
+    // Client workflow stages — each maps to a status that drives the stat boxes/calendar
+    const STAGES = [
+      { key: 'inquiry',      label: 'Inquiry',         status: 'new' },
+      { key: 'consultation', label: 'Consultation',    status: 'in_review' },
+      { key: 'contract',     label: 'Contract',        status: 'in_review' },
+      { key: 'confirmed',    label: 'Confirm Booking', status: 'booked' }
+    ];
+    function stageIndex(stage) {
+      const i = STAGES.findIndex(s => s.key === (stage || 'inquiry'));
+      return i < 0 ? 0 : i;
+    }
+
     // Auth guard
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
@@ -1046,8 +1084,10 @@
     const CONTRACTS_BUCKET = 'contracts';
     const uploadContractOverlay = document.getElementById('uploadContractOverlay');
     const uploadContractModal = document.getElementById('uploadContractModal');
-    function openUploadContract() {
+    function openUploadContract(prefillName) {
       document.getElementById('uploadContractError').textContent = '';
+      const nameInput = document.querySelector('#uploadContractForm [name="client_name"]');
+      if (nameInput) nameInput.value = (typeof prefillName === 'string') ? prefillName : '';
       uploadContractOverlay.classList.add('open');
       uploadContractModal.classList.add('open');
     }
@@ -1239,22 +1279,32 @@
       document.getElementById('drawer').classList.add('open');
       document.getElementById('drawerOverlay').classList.add('open');
 
-      // Status change
-      const statusSel = document.getElementById('statusSelect');
-      if (statusSel) {
-        statusSel.addEventListener('change', async () => {
-          const { error } = await sb
-            .from('inquiries')
-            .update({ status: statusSel.value })
-            .eq('id', inquiry.id);
-          if (!error) {
-            inquiry.status = statusSel.value;
-            allInquiries = allInquiries.map(i => i.id === inquiry.id ? inquiry : i);
-            updateStats();
-            renderTable();
-          }
-        });
+      // Helper: persist a change, refresh the dashboard, re-render the panel
+      async function applyUpdate(patch) {
+        const { error } = await sb.from('inquiries').update(patch).eq('id', inquiry.id);
+        if (error) { alert('Could not update: ' + error.message); return; }
+        Object.assign(inquiry, patch);
+        allInquiries = allInquiries.map(i => i.id === inquiry.id ? inquiry : i);
+        updateStats();
+        renderTable();
+        openDrawer(inquiry);
       }
+
+      // Stage flow — click a step to move the client along (also sets the mapped status)
+      document.querySelectorAll('#stageFlow .stage-step').forEach(step => {
+        step.addEventListener('click', () => {
+          const st = STAGES.find(s => s.key === step.dataset.stage);
+          if (st) applyUpdate({ stage: st.key, status: st.status });
+        });
+      });
+      const declineBtn = document.getElementById('declineBtn');
+      if (declineBtn) declineBtn.addEventListener('click', () => applyUpdate({ status: 'declined' }));
+      const reopenBtn = document.getElementById('reopenBtn');
+      if (reopenBtn) reopenBtn.addEventListener('click', () => applyUpdate({ status: STAGES[stageIndex(inquiry.stage)].status }));
+
+      // Contract — upload a contract for this client (pre-fills their name)
+      const contractBtn = document.getElementById('contractBtn');
+      if (contractBtn) contractBtn.addEventListener('click', () => openUploadContract(inquiry.name));
 
       // Send confirmation
       const confirmBtn = document.getElementById('confirmBtn');
@@ -1290,6 +1340,7 @@
     document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
 
     function buildDrawerHTML(i) {
+      const curIdx = stageIndex(i.stage);
       return `
         <div class="detail-grid">
           <div class="detail-row">
@@ -1324,13 +1375,17 @@
         ${i.message ? `<div class="detail-row"><label>Message</label><p style="white-space:pre-wrap">${esc(i.message)}</p></div>` : ''}
 
         <div class="drawer-section">
-          <h4>Update Status</h4>
-          <select class="status-select" id="statusSelect">
-            <option value="new"       ${i.status==='new'       ?'selected':''}>New</option>
-            <option value="in_review" ${i.status==='in_review' ?'selected':''}>In Review</option>
-            <option value="booked"    ${i.status==='booked'    ?'selected':''}>Booked</option>
-            <option value="declined"  ${i.status==='declined'  ?'selected':''}>Declined</option>
-          </select>
+          <h4>Where they're at</h4>
+          <div class="stage-flow" id="stageFlow">
+            ${STAGES.map((s, idx) => {
+              const cls = i.status === 'declined' ? '' : (idx < curIdx ? 'done' : (idx === curIdx ? 'active' : ''));
+              const dot = (i.status !== 'declined' && idx < curIdx) ? '✓' : (idx + 1);
+              return `<div class="stage-step ${cls}" data-stage="${s.key}"><div class="stage-dot">${dot}</div><div class="stage-label">${s.label}</div></div>`;
+            }).join('')}
+          </div>
+          ${i.status === 'declined'
+            ? `<p style="text-align:center; color:var(--declined); font-size:0.85rem; margin-top:0.85rem;">This inquiry was declined. <button id="reopenBtn" class="contract-link" style="margin-left:0.4rem;">Reopen</button></p>`
+            : `<div style="text-align:center; margin-top:0.95rem;"><button id="declineBtn" class="contract-link contract-del">Mark as Declined</button></div>`}
         </div>
 
         <div class="drawer-section">
@@ -1338,6 +1393,14 @@
           <textarea class="status-select" id="adminNotes" rows="4" style="resize:vertical; min-height:96px; font-family:'Jost',sans-serif; line-height:1.5;" placeholder="Private notes about this client — timeline, preferences, follow-ups…">${esc(i.admin_notes || '')}</textarea>
           <button class="btn-confirm" id="saveNotesBtn" style="margin-top:0.75rem;">Save Notes</button>
           <span id="notesSaved" style="display:none; color:var(--new); font-size:0.8rem; margin-left:0.75rem;">Saved ✓</span>
+        </div>
+
+        <div class="drawer-section">
+          <h4>Contract</h4>
+          <p style="font-size:0.85rem; color:var(--taupe); margin-bottom:1rem;">
+            Upload this client's contract to keep it on file. <em>(Emailing it to the client is coming soon.)</em>
+          </p>
+          <button class="btn-confirm" id="contractBtn" style="background:var(--gold);">Upload Contract for ${esc(i.name)}</button>
         </div>
 
         <div class="drawer-section">
