@@ -640,6 +640,48 @@
       .stats-col { grid-template-columns: 1fr; }
       .welcome { flex-direction: column; text-align: center; }
     }
+
+    /* ---- Add Client modal ---- */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(30,20,20,0.4);
+      z-index: 300; display: none;
+    }
+    .modal-overlay.open { display: block; }
+    .modal {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.97);
+      width: 560px; max-width: 94vw; max-height: 90vh; overflow-y: auto;
+      background: var(--cream); z-index: 301; border-radius: 6px;
+      border: 1px solid rgba(196,154,56,0.4);
+      box-shadow: 0 24px 64px rgba(92,61,61,0.32);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+    .modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+    .modal-header {
+      padding: 1.2rem 1.5rem;
+      background: linear-gradient(180deg, #7a5050 0%, #5C3D3D 100%);
+      color: var(--cream);
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(196,154,56,0.5);
+      border-radius: 6px 6px 0 0;
+    }
+    .modal-header h3 { font-family: 'Playfair Display', serif; color: var(--cream); font-size: 1.15rem; }
+    .modal-body { padding: 1.5rem; }
+    .form-field { margin-bottom: 1rem; }
+    .form-field label {
+      display: block; font-size: 0.7rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--taupe); margin-bottom: 0.35rem;
+    }
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%; padding: 0.6rem 0.8rem;
+      border: 1px solid rgba(196,154,56,0.4); background: var(--white);
+      color: var(--rose); font-family: 'Jost', sans-serif; font-size: 0.9rem;
+      border-radius: 3px; outline: none;
+    }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--gold); }
+    .form-error { color: var(--declined); font-size: 0.82rem; margin-bottom: 0.75rem; min-height: 1rem; }
   </style>
 </head>
 <body>
@@ -697,7 +739,7 @@
             <button class="cal-nav-btn" id="calPrev" aria-label="Previous month">&lsaquo;</button>
             <span class="cal-month-label" id="calMonthLabel">—</span>
             <button class="cal-nav-btn" id="calNext" aria-label="Next month">&rsaquo;</button>
-            <button class="btn-add-schedule" id="addScheduleBtn">+ Add to Schedule</button>
+            <button class="btn-add-schedule" id="addScheduleBtn">+ Add Client</button>
           </div>
         </div>
         <div class="cal-grid" id="calGrid"></div>
@@ -763,6 +805,58 @@
     <div class="drawer-body" id="drawerBody">
       <!-- Populated by JS -->
     </div>
+  </div>
+
+  <!-- Add Client Modal -->
+  <div class="modal-overlay" id="addClientOverlay"></div>
+  <div class="modal" id="addClientModal" role="dialog" aria-modal="true" aria-labelledby="addClientTitle">
+    <div class="modal-header">
+      <h3 id="addClientTitle">Add a Client</h3>
+      <button class="drawer-close" id="addClientClose" aria-label="Close">&times;</button>
+    </div>
+    <form class="modal-body" id="addClientForm">
+      <div class="detail-grid">
+        <div class="form-field">
+          <label>Name *</label>
+          <input type="text" name="name" required />
+        </div>
+        <div class="form-field">
+          <label>Wedding / Event Date</label>
+          <input type="date" name="wedding_date" />
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" name="email" />
+        </div>
+        <div class="form-field">
+          <label>Phone</label>
+          <input type="tel" name="phone" />
+        </div>
+        <div class="form-field">
+          <label>Party Size</label>
+          <input type="text" name="wedding_size" placeholder="e.g. Bride + 4" />
+        </div>
+        <div class="form-field">
+          <label>Status</label>
+          <select name="status">
+            <option value="booked">Booked</option>
+            <option value="new">New</option>
+            <option value="in_review">In Review</option>
+            <option value="declined">Declined</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Services</label>
+        <input type="text" name="services" placeholder="e.g. Bridal hair &amp; makeup, 3 bridesmaids" />
+      </div>
+      <div class="form-field">
+        <label>Notes</label>
+        <textarea name="message" rows="3"></textarea>
+      </div>
+      <div class="form-error" id="addClientError"></div>
+      <button type="submit" class="btn-confirm" id="addClientSubmit" style="margin-top:0;">Add Client</button>
+    </form>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -838,12 +932,52 @@
       renderCalendar();
     });
 
-    document.getElementById('addScheduleBtn').addEventListener('click', () => {
-      if (SELF_BOOKING_URL) {
-        window.location.href = SELF_BOOKING_URL;
-      } else {
-        alert('Self-booking page coming soon — this button will take you there once it\'s set up.');
+    // ---- Add Client modal ----
+    const addClientOverlay = document.getElementById('addClientOverlay');
+    const addClientModal = document.getElementById('addClientModal');
+    function openAddClient() {
+      document.getElementById('addClientError').textContent = '';
+      addClientOverlay.classList.add('open');
+      addClientModal.classList.add('open');
+    }
+    function closeAddClient() {
+      addClientOverlay.classList.remove('open');
+      addClientModal.classList.remove('open');
+    }
+    document.getElementById('addScheduleBtn').addEventListener('click', openAddClient);
+    document.getElementById('addClientClose').addEventListener('click', closeAddClient);
+    addClientOverlay.addEventListener('click', closeAddClient);
+
+    document.getElementById('addClientForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('addClientSubmit');
+      const err = document.getElementById('addClientError');
+      err.textContent = '';
+      const fd = new FormData(e.target);
+      const clean = (k) => { const v = (fd.get(k) || '').trim(); return v === '' ? null : v; };
+      const row = {
+        name: clean('name'),
+        email: clean('email'),
+        phone: clean('phone'),
+        wedding_date: fd.get('wedding_date') || null,
+        services_needed: clean('services'),
+        wedding_size: clean('wedding_size'),
+        status: fd.get('status') || 'booked',
+        message: clean('message')
+      };
+      if (!row.name) { err.textContent = 'Name is required.'; return; }
+      btn.disabled = true;
+      btn.textContent = 'Adding…';
+      const { error } = await sb.from('inquiries').insert([row]);
+      btn.disabled = false;
+      btn.textContent = 'Add Client';
+      if (error) {
+        err.textContent = 'Could not add client: ' + error.message;
+        return;
       }
+      e.target.reset();
+      closeAddClient();
+      loadInquiries();
     });
 
     function renderCalendar() {
@@ -1121,4 +1255,19 @@
     function formatDate(d) {
       if (!d) return '—';
       const date = new Date(d + 'T12:00:00');
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function formatDateTime(dt) {
+      if (!dt) return '—';
+      const date = new Date(dt);
+      const datePart = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const timePart = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      return `${datePart} · ${timePart}`;
+    }
+
+    // Boot the dashboard
+    init();
+  </script>
+</body>
+</html>
