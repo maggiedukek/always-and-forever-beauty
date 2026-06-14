@@ -1073,7 +1073,7 @@
       const path = `${Date.now()}-${safeName}`;
       const { error: upErr } = await sb.storage.from(CONTRACTS_BUCKET).upload(path, file, { upsert: false });
       if (upErr) { btn.disabled = false; btn.textContent = 'Upload Contract'; err.textContent = 'Upload failed: ' + upErr.message; return; }
-      const { error: insErr } = await sb.from('contracts').insert([{ client_name: clientName, file_path: path, file_name: file.name }]);
+      const { error: insErr } = await sb.from('contract_files').insert([{ client_name: clientName, file_path: path, file_name: file.name }]);
       btn.disabled = false; btn.textContent = 'Upload Contract';
       if (insErr) { err.textContent = 'File uploaded, but could not record it: ' + insErr.message; return; }
       e.target.reset();
@@ -1083,7 +1083,7 @@
 
     async function loadContracts() {
       const el = document.getElementById('contractsList');
-      const { data, error } = await sb.from('contracts').select('*').order('uploaded_at', { ascending: false });
+      const { data, error } = await sb.from('contract_files').select('*').order('uploaded_at', { ascending: false });
       if (error) {
         el.innerHTML = `<div style="padding:1.5rem 1.75rem; color:var(--taupe); font-style:italic; font-size:0.88rem;">Contracts storage isn't set up yet. (${esc(error.message)})</div>`;
         return;
@@ -1115,7 +1115,7 @@
         item.querySelector('[data-action="delete"]').addEventListener('click', async () => {
           if (!confirm('Delete this contract? This cannot be undone.')) return;
           await sb.storage.from(CONTRACTS_BUCKET).remove([path]);
-          await sb.from('contracts').delete().eq('id', id);
+          await sb.from('contract_files').delete().eq('id', id);
           loadContracts();
         });
       });
