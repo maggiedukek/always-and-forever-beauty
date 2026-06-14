@@ -682,6 +682,26 @@
     }
     .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--gold); }
     .form-error { color: var(--declined); font-size: 0.82rem; margin-bottom: 0.75rem; min-height: 1rem; }
+    .form-field input[type="file"] { padding: 0.5rem; cursor: pointer; }
+
+    /* ---- Contracts list ---- */
+    .contract-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 0.9rem 1.75rem; border-bottom: 1px solid rgba(196,154,56,0.12); font-size: 0.88rem;
+    }
+    .contract-item:last-child { border-bottom: none; }
+    .contract-meta { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+    .contract-name { font-weight: 500; }
+    .contract-sub { font-size: 0.75rem; color: var(--taupe); }
+    .contract-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .contract-link {
+      font-family: 'Jost', sans-serif; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--gold); border: 1px solid rgba(196,154,56,0.5); border-radius: 3px;
+      padding: 0.35rem 0.8rem; cursor: pointer; background: none; transition: all 0.2s;
+    }
+    .contract-link:hover { background: var(--gold); color: #fff; }
+    .contract-del { color: var(--declined); border-color: rgba(140,26,26,0.4); }
+    .contract-del:hover { background: var(--declined); color: #fff; border-color: var(--declined); }
   </style>
 </head>
 <body>
@@ -783,6 +803,17 @@
       </div>
     </div>
 
+    <!-- Contracts Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Contracts</h2>
+        <button class="btn-add-schedule" id="uploadContractBtn">+ Upload Contract</button>
+      </div>
+      <div id="contractsList">
+        <div style="padding:2rem; text-align:center; color:var(--taupe); font-style:italic; font-size:0.9rem;">Loading contracts…</div>
+      </div>
+    </div>
+
     <!-- Email Log Panel -->
     <div class="panel">
       <div class="panel-header">
@@ -859,6 +890,27 @@
     </form>
   </div>
 
+  <!-- Upload Contract Modal -->
+  <div class="modal-overlay" id="uploadContractOverlay"></div>
+  <div class="modal" id="uploadContractModal" role="dialog" aria-modal="true" aria-labelledby="uploadContractTitle">
+    <div class="modal-header">
+      <h3 id="uploadContractTitle">Upload a Contract</h3>
+      <button class="drawer-close" id="uploadContractClose" aria-label="Close">&times;</button>
+    </div>
+    <form class="modal-body" id="uploadContractForm">
+      <div class="form-field">
+        <label>Client Name *</label>
+        <input type="text" name="client_name" required placeholder="Bride's name" />
+      </div>
+      <div class="form-field">
+        <label>Contract File (PDF) *</label>
+        <input type="file" name="file" accept="application/pdf,.pdf" required />
+      </div>
+      <div class="form-error" id="uploadContractError"></div>
+      <button type="submit" class="btn-confirm" id="uploadContractSubmit" style="margin-top:0;">Upload Contract</button>
+    </form>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const { createClient } = supabase;
@@ -880,6 +932,7 @@
       document.getElementById('userEmail').textContent = session.user.email;
       loadInquiries();
       loadEmailLog();
+      loadContracts();
     }
 
     // Sign out
@@ -979,6 +1032,85 @@
       closeAddClient();
       loadInquiries();
     });
+
+    // ---- Contracts (upload / house / download) ----
+    const CONTRACTS_BUCKET = 'contracts';
+    const uploadContractOverlay = document.getElementById('uploadContractOverlay');
+    const uploadContractModal = document.getElementById('uploadContractModal');
+    function openUploadContract() {
+      document.getElementById('uploadContractError').textContent = '';
+      uploadContractOverlay.classList.add('open');
+      uploadContractModal.classList.add('open');
+    }
+    function closeUploadContract() {
+      uploadContractOverlay.classList.remove('open');
+      uploadContractModal.classList.remove('open');
+    }
+    document.getElementById('uploadContractBtn').addEventListener('click', openUploadContract);
+    document.getElementById('uploadContractClose').addEventListener('click', closeUploadContract);
+    uploadContractOverlay.addEventListener('click', closeUploadContract);
+
+    document.getElementById('uploadContractForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('uploadContractSubmit');
+      const err = document.getElementById('uploadContractError');
+      err.textContent = '';
+      const fd = new FormData(e.target);
+      const clientName = (fd.get('client_name') || '').trim();
+      const file = fd.get('file');
+      if (!clientName || !file || !file.name) { err.textContent = 'Client name and a PDF file are required.'; return; }
+      btn.disabled = true; btn.textContent = 'Uploading…';
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `${Date.now()}-${safeName}`;
+      const { error: upErr } = await sb.storage.from(CONTRACTS_BUCKET).upload(path, file, { upsert: false });
+      if (upErr) { btn.disabled = false; btn.textContent = 'Upload Contract'; err.textContent = 'Upload failed: ' + upErr.message; return; }
+      const { error: insErr } = await sb.from('contracts').insert([{ client_name: clientName, file_path: path, file_name: file.name }]);
+      btn.disabled = false; btn.textContent = 'Upload Contract';
+      if (insErr) { err.textContent = 'File uploaded, but could not record it: ' + insErr.message; return; }
+      e.target.reset();
+      closeUploadContract();
+      loadContracts();
+    });
+
+    async function loadContracts() {
+      const el = document.getElementById('contractsList');
+      const { data, error } = await sb.from('contracts').select('*').order('uploaded_at', { ascending: false });
+      if (error) {
+        el.innerHTML = `<div style="padding:1.5rem 1.75rem; color:var(--taupe); font-style:italic; font-size:0.88rem;">Contracts storage isn't set up yet. (${esc(error.message)})</div>`;
+        return;
+      }
+      if (!data || !data.length) {
+        el.innerHTML = `<div style="padding:1.5rem 1.75rem; color:var(--taupe); font-style:italic; font-size:0.88rem;">No contracts uploaded yet.</div>`;
+        return;
+      }
+      el.innerHTML = data.map(c => `
+        <div class="contract-item" data-id="${esc(String(c.id))}" data-path="${esc(c.file_path)}">
+          <div class="contract-meta">
+            <span class="contract-name">${esc(c.client_name)}</span>
+            <span class="contract-sub">${esc(c.file_name)} · ${formatDateTime(c.uploaded_at)}</span>
+          </div>
+          <div class="contract-actions">
+            <button class="contract-link" data-action="download">Download</button>
+            <button class="contract-link contract-del" data-action="delete">Delete</button>
+          </div>
+        </div>
+      `).join('');
+      el.querySelectorAll('.contract-item').forEach(item => {
+        const path = item.dataset.path;
+        const id = item.dataset.id;
+        item.querySelector('[data-action="download"]').addEventListener('click', async () => {
+          const { data: signed, error } = await sb.storage.from(CONTRACTS_BUCKET).createSignedUrl(path, 120);
+          if (error) { alert('Could not open file: ' + error.message); return; }
+          window.open(signed.signedUrl, '_blank');
+        });
+        item.querySelector('[data-action="delete"]').addEventListener('click', async () => {
+          if (!confirm('Delete this contract? This cannot be undone.')) return;
+          await sb.storage.from(CONTRACTS_BUCKET).remove([path]);
+          await sb.from('contracts').delete().eq('id', id);
+          loadContracts();
+        });
+      });
+    }
 
     function renderCalendar() {
       const monthNames = ['January','February','March','April','May','June',
