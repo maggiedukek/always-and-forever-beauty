@@ -133,6 +133,8 @@
 
     /* ---- Welcome ---- */
     .welcome {
+      position: relative;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -145,6 +147,17 @@
       margin-bottom: 1.25rem;
       box-shadow: 0 2px 14px rgba(92,61,61,0.05);
     }
+    /* Gold floral watermark behind the greeting, photo + stats */
+    .welcome::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: url('../images/background gold flowers.png') center / cover no-repeat;
+      opacity: 0.12;
+    }
+    .welcome > * { position: relative; z-index: 1; }
     .welcome-intro { display: flex; align-items: center; gap: 1.25rem; }
 
     .welcome-photo {
