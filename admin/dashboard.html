@@ -1263,6 +1263,22 @@
           await sendConfirmation(inquiry);
         });
       }
+
+      // Save notes
+      const saveNotesBtn = document.getElementById('saveNotesBtn');
+      if (saveNotesBtn) {
+        saveNotesBtn.addEventListener('click', async () => {
+          const notes = document.getElementById('adminNotes').value;
+          saveNotesBtn.disabled = true; saveNotesBtn.textContent = 'Saving…';
+          const { error } = await sb.from('inquiries').update({ admin_notes: notes }).eq('id', inquiry.id);
+          saveNotesBtn.disabled = false; saveNotesBtn.textContent = 'Save Notes';
+          if (error) { alert('Could not save notes: ' + error.message); return; }
+          inquiry.admin_notes = notes;
+          allInquiries = allInquiries.map(i => i.id === inquiry.id ? inquiry : i);
+          const saved = document.getElementById('notesSaved');
+          if (saved) { saved.style.display = 'inline'; setTimeout(() => { saved.style.display = 'none'; }, 2500); }
+        });
+      }
     }
 
     function closeDrawer() {
@@ -1315,6 +1331,13 @@
             <option value="booked"    ${i.status==='booked'    ?'selected':''}>Booked</option>
             <option value="declined"  ${i.status==='declined'  ?'selected':''}>Declined</option>
           </select>
+        </div>
+
+        <div class="drawer-section">
+          <h4>Notes</h4>
+          <textarea class="status-select" id="adminNotes" rows="4" style="resize:vertical; min-height:96px; font-family:'Jost',sans-serif; line-height:1.5;" placeholder="Private notes about this client — timeline, preferences, follow-ups…">${esc(i.admin_notes || '')}</textarea>
+          <button class="btn-confirm" id="saveNotesBtn" style="margin-top:0.75rem;">Save Notes</button>
+          <span id="notesSaved" style="display:none; color:var(--new); font-size:0.8rem; margin-left:0.75rem;">Saved ✓</span>
         </div>
 
         <div class="drawer-section">
