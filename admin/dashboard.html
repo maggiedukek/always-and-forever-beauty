@@ -25,7 +25,16 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Jost', sans-serif; background: var(--bg); color: var(--rose); min-height: 100vh; }
+    body {
+      font-family: 'Jost', sans-serif;
+      color: var(--rose);
+      min-height: 100vh;
+      /* Gold-flake texture washed with cream so it stays subtle behind the content */
+      background:
+        linear-gradient(rgba(248,242,233,0.58), rgba(248,242,233,0.58)),
+        url('../images/gold-splatter.png') center / cover fixed,
+        var(--bg);
+    }
 
     /* ---- Top Bar ---- */
     .topbar {
@@ -176,18 +185,18 @@
       border: 1px solid rgba(196,154,56,0.28);
       border-left: 3px solid var(--gold);
       border-radius: 4px;
-      padding: 1.5rem;
+      padding: 0.85rem 1.1rem;
       box-shadow: 0 2px 14px rgba(92,61,61,0.05);
     }
 
     .stat-num {
       font-family: 'Playfair Display', serif;
-      font-size: 2.2rem;
+      font-size: 1.7rem;
       font-weight: 600;
       color: var(--rose);
       display: block;
       line-height: 1;
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.2rem;
     }
 
     .stat-label {
