@@ -63,14 +63,14 @@
 
     .login-logo-img {
       display: block;
-      width: 200px;
-      max-width: 64%;
+      width: 220px;
+      max-width: 72%;
       height: auto;
-      margin: 0 auto 0.6rem;
-      /* Lift the gold off the light peach card so it reads clearly */
-      filter: contrast(1.06) saturate(1.12)
-        drop-shadow(0 1px 2px rgba(74,48,48,0.4))
-        drop-shadow(0 0 1px rgba(74,48,48,0.3));
+      margin: 0 auto 0.7rem;
+      padding: 0.6rem 0.9rem 0.5rem;
+      /* Soft cream halo behind the gold logo so it reads on the peach card */
+      background: radial-gradient(ellipse 80% 74% at 50% 46%, rgba(255,253,249,0.97) 30%, rgba(255,253,249,0) 78%);
+      filter: contrast(1.05) saturate(1.08);
     }
 
     .login-sub {
