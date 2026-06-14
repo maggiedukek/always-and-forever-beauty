@@ -67,14 +67,15 @@
       max-width: 80%;
       height: auto;
       margin: 0 auto 0.7rem;
-      padding: 1.4rem 1.2rem;
-      /* Cream oval behind the gold logo that slowly fades out so it reads on the peach */
-      background: radial-gradient(ellipse 66% 58% at 50% 47%,
-        rgba(255,252,247,1) 0%,
-        rgba(255,252,247,0.96) 42%,
-        rgba(255,252,247,0.42) 68%,
-        rgba(255,252,247,0) 90%);
-      filter: contrast(1.05) saturate(1.08);
+      padding: 1.6rem 1.4rem;
+      /* Maroon oval behind the gold logo (fades out) so the gold reads like it does on the nav bar */
+      background: radial-gradient(ellipse 76% 78% at 50% 50%,
+        rgba(92,61,61,1) 0%,
+        rgba(92,61,61,0.98) 60%,
+        rgba(92,61,61,0.55) 80%,
+        rgba(92,61,61,0) 97%);
+      filter: brightness(1.12) contrast(1.03)
+        drop-shadow(0 0 1px rgba(255,250,243,0.4));
     }
 
     .login-sub {
