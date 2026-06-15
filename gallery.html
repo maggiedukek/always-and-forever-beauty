@@ -627,17 +627,18 @@
           .select('*')
           .order('sort_order', { ascending: true })
           .order('created_at', { ascending: false });
-        if (error || !data || !data.length) return;
-        // Newest first, prepended above the default photos
+        if (error || !data || !data.length) return; // keep the built-in photos as a fallback
+        // A managed gallery exists → replace the defaults with it
+        grid.innerHTML = '';
         data.forEach(p => {
-          const url = sb.storage.from('gallery').getPublicUrl(p.file_path).data.publicUrl;
+          const url = p.image_url || sb.storage.from('gallery').getPublicUrl(p.file_path).data.publicUrl;
           const item = document.createElement('div');
           item.className = 'masonry-item';
           item.dataset.category = p.category || 'all';
           item.innerHTML =
             '<img src="' + url + '" alt="' + (p.alt || 'Bridal hair &amp; makeup') + '" loading="lazy" />' +
             '<div class="masonry-overlay"><span class="masonry-overlay-icon">+</span></div>';
-          grid.insertBefore(item, grid.firstChild);
+          grid.appendChild(item);
         });
       } catch (e) { /* gallery storage not set up yet — defaults still show */ }
     })();

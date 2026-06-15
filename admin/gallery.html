@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Gallery | Always & Forever Beauty Admin</title>
+  <link rel="icon" type="image/x-icon" href="../images/favicon.ico" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Great+Vibes&family=Jost:wght@300;400;500&display=swap" />
+  <style>
+    :root {
+      --cream: #FAF6F1; --bg: #F2EBE3; --gold: #C49A38; --rose: #5C3D3D;
+      --taupe: #B5A49A; --peach: #F2C9B8; --white: #fff; --declined: #8C1A1A;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Jost', sans-serif; color: var(--rose); min-height: 100vh;
+      background:
+        linear-gradient(rgba(248,242,233,0.58), rgba(248,242,233,0.58)),
+        url('../images/gold-splatter.png') center / cover fixed, var(--bg);
+    }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 100; padding: 0 2rem; height: 64px;
+      display: flex; align-items: center; justify-content: space-between; color: var(--cream);
+      background: linear-gradient(180deg, #7a5050 0%, #5C3D3D 45%, #4a3030 100%);
+      border-bottom: 1px solid rgba(196,154,56,0.5);
+      box-shadow: 0 2px 18px rgba(0,0,0,0.25), 0 4px 12px rgba(196,154,56,0.25);
+    }
+    .topbar-logo { position: absolute; left: 50%; transform: translateX(-50%); }
+    .topbar-logo img {
+      height: 38px; width: auto;
+      filter: brightness(1.25) contrast(1.03) drop-shadow(0 0 1px rgba(255,250,243,0.55)) drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+    }
+    .topbar-link {
+      font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--peach);
+      border-bottom: 1px solid var(--peach); padding-bottom: 2px; cursor: pointer; background: none; border-top: none; border-left: none; border-right: none;
+      border-bottom: 1px solid var(--peach); font-family: 'Jost', sans-serif;
+    }
+    .topbar-link:hover { color: var(--cream); border-color: var(--cream); }
+    @media (max-width: 640px) { .topbar-logo { display: none; } }
+
+    .main { padding: 2rem; max-width: 1100px; margin: 0 auto; }
+
+    .page-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .page-head h1 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; }
+    .page-head p { font-size: 0.85rem; color: var(--taupe); margin-top: 0.2rem; }
+
+    .btn-add {
+      background: var(--rose); color: #fff; border: none; border-radius: 3px;
+      padding: 0.6rem 1.2rem; font-family: 'Jost', sans-serif; font-size: 0.78rem;
+      letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; white-space: nowrap;
+    }
+    .btn-add:hover { background: #7a5050; }
+
+    .filter-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .filter-pill {
+      background: none; border: 1px solid rgba(196,154,56,0.4); color: var(--rose);
+      font-family: 'Jost', sans-serif; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 0.35rem 0.9rem; border-radius: 20px; cursor: pointer; transition: all 0.2s;
+    }
+    .filter-pill:hover, .filter-pill.active { background: var(--rose); border-color: var(--rose); color: #fff; }
+
+    .gal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+    .gal-card {
+      background: var(--white); border: 1px solid rgba(196,154,56,0.3); border-radius: 5px; overflow: hidden;
+      box-shadow: 0 2px 12px rgba(92,61,61,0.07); display: flex; flex-direction: column;
+    }
+    .gal-card img { width: 100%; height: 180px; object-fit: cover; display: block; background: #eee; }
+    .gal-card-body { padding: 0.6rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .gal-cat-select {
+      width: 100%; padding: 0.4rem 0.5rem; border: 1px solid rgba(196,154,56,0.4); border-radius: 3px;
+      font-family: 'Jost', sans-serif; font-size: 0.82rem; color: var(--rose); background: var(--cream); cursor: pointer;
+    }
+    .gal-card-actions { display: flex; gap: 0.35rem; align-items: center; }
+    .gal-btn {
+      flex: 1; border: 1px solid rgba(196,154,56,0.4); background: none; color: var(--rose);
+      border-radius: 3px; padding: 0.35rem; cursor: pointer; font-size: 0.9rem; line-height: 1; transition: all 0.15s;
+    }
+    .gal-btn:hover { background: var(--rose); color: #fff; border-color: var(--rose); }
+    .gal-btn.del { color: var(--declined); border-color: rgba(140,26,26,0.4); }
+    .gal-btn.del:hover { background: var(--declined); color: #fff; border-color: var(--declined); }
+    .gal-empty { padding: 3rem; text-align: center; color: var(--taupe); font-style: italic; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(30,20,20,0.4); z-index: 300; display: none; }
+    .modal-overlay.open { display: block; }
+    .modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0.97);
+      width: 480px; max-width: 94vw; background: var(--cream); z-index: 301; border-radius: 6px;
+      border: 1px solid rgba(196,154,56,0.4); box-shadow: 0 24px 64px rgba(92,61,61,0.32);
+      opacity: 0; pointer-events: none; transition: opacity 0.22s, transform 0.22s;
+    }
+    .modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%) scale(1); }
+    .modal-header {
+      padding: 1.2rem 1.5rem; background: linear-gradient(180deg, #7a5050, #5C3D3D); color: var(--cream);
+      display: flex; justify-content: space-between; align-items: center; border-radius: 6px 6px 0 0;
+    }
+    .modal-header h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--cream); }
+    .modal-close { background: none; border: none; color: var(--cream); font-size: 1.5rem; cursor: pointer; line-height: 1; opacity: 0.8; }
+    .modal-body { padding: 1.5rem; }
+    .form-field { margin-bottom: 1rem; }
+    .form-field label { display: block; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 0.35rem; }
+    .form-field select, .form-field input[type="file"] {
+      width: 100%; padding: 0.6rem 0.8rem; border: 1px solid rgba(196,154,56,0.4); background: var(--white);
+      color: var(--rose); font-family: 'Jost', sans-serif; font-size: 0.9rem; border-radius: 3px; outline: none;
+    }
+    .form-error { color: var(--declined); font-size: 0.82rem; margin-bottom: 0.75rem; min-height: 1rem; }
+    .btn-confirm {
+      width: 100%; padding: 0.85rem; background: var(--rose); color: #fff; border: none; border-radius: 3px;
+      font-family: 'Jost', sans-serif; font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer;
+    }
+    .btn-confirm:hover { background: #7a5050; }
+    .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <a href="dashboard.html" class="topbar-link">&larr; Dashboard</a>
+    <div class="topbar-logo"><img src="../images/logo-horizontal-cropped.png" alt="Always & Forever Beauty" /></div>
+    <button class="topbar-link" id="signoutBtn">Sign Out</button>
+  </div>
+
+  <div class="main">
+    <div class="page-head">
+      <div>
+        <h1>Manage Gallery</h1>
+        <p>Add, reorder, recategorize, or remove the photos on your public gallery page.</p>
+      </div>
+      <button class="btn-add" id="addPhotoBtn">+ Add Photo</button>
+    </div>
+
+    <div class="filter-row" id="filterRow">
+      <button class="filter-pill active" data-filter="all">All</button>
+      <button class="filter-pill" data-filter="updo">Updos</button>
+      <button class="filter-pill" data-filter="waves">Waves &amp; Down</button>
+      <button class="filter-pill" data-filter="makeup">Makeup</button>
+      <button class="filter-pill" data-filter="party">Bridal Party</button>
+    </div>
+
+    <div class="gal-grid" id="galGrid">
+      <div class="gal-empty">Loading gallery…</div>
+    </div>
+  </div>
+
+  <!-- Add Photo Modal -->
+  <div class="modal-overlay" id="addOverlay"></div>
+  <div class="modal" id="addModal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3>Add a Gallery Photo</h3>
+      <button class="modal-close" id="addClose" aria-label="Close">&times;</button>
+    </div>
+    <form class="modal-body" id="addForm">
+      <div class="form-field">
+        <label>Category *</label>
+        <select name="category" required>
+          <option value="updo">Updos</option>
+          <option value="waves">Waves &amp; Down Styles</option>
+          <option value="makeup">Makeup</option>
+          <option value="party">Bridal Party</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Photo *</label>
+        <input type="file" name="file" accept="image/*" required />
+      </div>
+      <div class="form-error" id="addError"></div>
+      <button type="submit" class="btn-confirm" id="addSubmit">Add Photo</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const sb = supabase.createClient(
+      'https://bikidhccblbhibaniduw.supabase.co',
+      'sb_publishable_uQG4MBWVmanCL7oOUWiYEg_eMI5FdBE'
+    );
+    const BUCKET = 'gallery';
+    const CATS = { updo: 'Updos', waves: 'Waves & Down Styles', makeup: 'Makeup', party: 'Bridal Party' };
+    let photos = [];
+    let filter = 'all';
+
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = 'login.html'; return; }
+      loadGallery();
+    }
+
+    document.getElementById('signoutBtn').addEventListener('click', async () => {
+      await sb.auth.signOut(); window.location.href = 'login.html';
+    });
+
+    function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function photoUrl(p) { return p.image_url || sb.storage.from(BUCKET).getPublicUrl(p.file_path).data.publicUrl; }
+
+    async function loadGallery() {
+      const { data, error } = await sb.from('gallery_photos').select('*')
+        .order('sort_order', { ascending: true }).order('created_at', { ascending: false });
+      const grid = document.getElementById('galGrid');
+      if (error) { grid.innerHTML = '<div class="gal-empty">Gallery isn\'t set up yet. (' + esc(error.message) + ')</div>'; return; }
+      photos = data || [];
+      render();
+    }
+
+    document.getElementById('filterRow').addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-pill'); if (!btn) return;
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filter = btn.dataset.filter;
+      render();
+    });
+
+    function render() {
+      const grid = document.getElementById('galGrid');
+      const list = filter === 'all' ? photos : photos.filter(p => p.category === filter);
+      if (!list.length) { grid.innerHTML = '<div class="gal-empty">No photos here yet — click &ldquo;+ Add Photo&rdquo;.</div>'; return; }
+      grid.innerHTML = list.map(p => {
+        const opts = Object.keys(CATS).map(k => '<option value="' + k + '"' + (p.category === k ? ' selected' : '') + '>' + CATS[k] + '</option>').join('');
+        return '<div class="gal-card" data-id="' + esc(String(p.id)) + '">' +
+          '<img src="' + esc(photoUrl(p)) + '" alt="" loading="lazy" />' +
+          '<div class="gal-card-body">' +
+            '<select class="gal-cat-select" data-action="cat">' + opts + '</select>' +
+            '<div class="gal-card-actions">' +
+              '<button class="gal-btn" data-action="up" title="Move earlier">&uarr;</button>' +
+              '<button class="gal-btn" data-action="down" title="Move later">&darr;</button>' +
+              '<button class="gal-btn del" data-action="del" title="Delete">&times;</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+      grid.querySelectorAll('.gal-card').forEach(card => {
+        const id = card.dataset.id;
+        card.querySelector('[data-action="cat"]').addEventListener('change', (e) => updateCategory(id, e.target.value));
+        card.querySelector('[data-action="up"]').addEventListener('click', () => move(id, -1));
+        card.querySelector('[data-action="down"]').addEventListener('click', () => move(id, 1));
+        card.querySelector('[data-action="del"]').addEventListener('click', () => del(id));
+      });
+    }
+
+    async function updateCategory(id, category) {
+      await sb.from('gallery_photos').update({ category }).eq('id', id);
+      const p = photos.find(x => String(x.id) === String(id)); if (p) p.category = category;
+    }
+
+    // Reorder within the full list by swapping sort_order with the neighbour
+    async function move(id, dir) {
+      const sorted = [...photos].sort((a,b) => (a.sort_order||0) - (b.sort_order||0));
+      const idx = sorted.findIndex(p => String(p.id) === String(id));
+      const swapIdx = idx + dir;
+      if (idx < 0 || swapIdx < 0 || swapIdx >= sorted.length) return;
+      const a = sorted[idx], b = sorted[swapIdx];
+      const ao = a.sort_order || 0, bo = b.sort_order || 0;
+      await sb.from('gallery_photos').update({ sort_order: bo }).eq('id', a.id);
+      await sb.from('gallery_photos').update({ sort_order: ao }).eq('id', b.id);
+      a.sort_order = bo; b.sort_order = ao;
+      render();
+    }
+
+    async function del(id) {
+      if (!confirm('Remove this photo from the gallery?')) return;
+      const p = photos.find(x => String(x.id) === String(id));
+      if (p && p.file_path) { await sb.storage.from(BUCKET).remove([p.file_path]); }
+      await sb.from('gallery_photos').delete().eq('id', id);
+      photos = photos.filter(x => String(x.id) !== String(id));
+      render();
+    }
+
+    // Add photo modal
+    const addOverlay = document.getElementById('addOverlay');
+    const addModal = document.getElementById('addModal');
+    function openAdd() { document.getElementById('addError').textContent = ''; document.getElementById('addForm').reset(); addOverlay.classList.add('open'); addModal.classList.add('open'); }
+    function closeAdd() { addOverlay.classList.remove('open'); addModal.classList.remove('open'); }
+    document.getElementById('addPhotoBtn').addEventListener('click', openAdd);
+    document.getElementById('addClose').addEventListener('click', closeAdd);
+    addOverlay.addEventListener('click', closeAdd);
+
+    document.getElementById('addForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('addSubmit');
+      const err = document.getElementById('addError');
+      err.textContent = '';
+      const fd = new FormData(e.target);
+      const category = fd.get('category');
+      const file = fd.get('file');
+      if (!file || !file.name) { err.textContent = 'Please choose a photo.'; return; }
+      btn.disabled = true; btn.textContent = 'Uploading…';
+      const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = category + '/' + Date.now() + '-' + safe;
+      const { error: upErr } = await sb.storage.from(BUCKET).upload(path, file, { upsert: false });
+      if (upErr) { btn.disabled = false; btn.textContent = 'Add Photo'; err.textContent = 'Upload failed: ' + upErr.message; return; }
+      const nextOrder = (photos.reduce((m, p) => Math.max(m, p.sort_order || 0), 0)) + 1;
+      const { error: insErr } = await sb.from('gallery_photos').insert([{ file_path: path, category, sort_order: nextOrder }]);
+      btn.disabled = false; btn.textContent = 'Add Photo';
+      if (insErr) { err.textContent = 'Photo uploaded, but could not record it: ' + insErr.message; return; }
+      e.target.reset(); closeAdd(); loadGallery();
+    });
+
+    init();
+  </script>
+</body>
+</html>

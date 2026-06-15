@@ -971,10 +971,11 @@
     <div class="panel">
       <div class="panel-header">
         <h2>Gallery</h2>
-        <button class="btn-add-schedule" id="addPhotoBtn">+ Add Photo</button>
+        <a href="gallery.html" class="btn-add-schedule" style="text-decoration:none;">Manage Gallery →</a>
       </div>
-      <div id="galleryAdminList" class="gallery-admin">
-        <div style="padding:2rem; text-align:center; color:var(--taupe); font-style:italic; font-size:0.9rem;">Loading gallery…</div>
+      <div style="padding:1.5rem 1.75rem; color:var(--taupe); font-size:0.92rem; line-height:1.6;">
+        Add, reorder, recategorize, and remove the photos on your public gallery — all on the
+        <a href="gallery.html" style="color:var(--gold); text-decoration:underline;">Manage Gallery</a> page.
       </div>
     </div>
 
@@ -1083,32 +1084,6 @@
     </form>
   </div>
 
-  <!-- Add Gallery Photo Modal -->
-  <div class="modal-overlay" id="addPhotoOverlay"></div>
-  <div class="modal" id="addPhotoModal" role="dialog" aria-modal="true" aria-labelledby="addPhotoTitle">
-    <div class="modal-header">
-      <h3 id="addPhotoTitle">Add a Gallery Photo</h3>
-      <button class="drawer-close" id="addPhotoClose" aria-label="Close">&times;</button>
-    </div>
-    <form class="modal-body" id="addPhotoForm">
-      <div class="form-field">
-        <label>Category *</label>
-        <select name="category" required>
-          <option value="updo">Updos</option>
-          <option value="waves">Waves &amp; Down Styles</option>
-          <option value="makeup">Makeup</option>
-          <option value="party">Bridal Party</option>
-        </select>
-      </div>
-      <div class="form-field">
-        <label>Photo *</label>
-        <input type="file" name="file" accept="image/*" required />
-      </div>
-      <div class="form-error" id="addPhotoError"></div>
-      <button type="submit" class="btn-confirm" id="addPhotoSubmit" style="margin-top:0;">Add Photo</button>
-    </form>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const { createClient } = supabase;
@@ -1143,7 +1118,6 @@
       loadInquiries();
       loadEmailLog();
       loadContracts();
-      loadGalleryAdmin();
     }
 
     // Sign out
@@ -1281,76 +1255,6 @@
         if (updated) openDrawer(updated);
       }
     });
-
-    // ---- Gallery manager (upload / organise / delete) ----
-    const GALLERY_BUCKET = 'gallery';
-    const GAL_CAT_LABELS = { updo: 'Updos', waves: 'Waves & Down', makeup: 'Makeup', party: 'Bridal Party' };
-    const addPhotoOverlay = document.getElementById('addPhotoOverlay');
-    const addPhotoModal = document.getElementById('addPhotoModal');
-    function openAddPhoto() {
-      document.getElementById('addPhotoError').textContent = '';
-      document.getElementById('addPhotoForm').reset();
-      addPhotoOverlay.classList.add('open');
-      addPhotoModal.classList.add('open');
-    }
-    function closeAddPhoto() {
-      addPhotoOverlay.classList.remove('open');
-      addPhotoModal.classList.remove('open');
-    }
-    document.getElementById('addPhotoBtn').addEventListener('click', openAddPhoto);
-    document.getElementById('addPhotoClose').addEventListener('click', closeAddPhoto);
-    addPhotoOverlay.addEventListener('click', closeAddPhoto);
-
-    document.getElementById('addPhotoForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('addPhotoSubmit');
-      const err = document.getElementById('addPhotoError');
-      err.textContent = '';
-      const fd = new FormData(e.target);
-      const category = fd.get('category');
-      const file = fd.get('file');
-      if (!file || !file.name) { err.textContent = 'Please choose a photo.'; return; }
-      btn.disabled = true; btn.textContent = 'Uploading…';
-      const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const path = `${category}/${Date.now()}-${safe}`;
-      const { error: upErr } = await sb.storage.from(GALLERY_BUCKET).upload(path, file, { upsert: false });
-      if (upErr) { btn.disabled = false; btn.textContent = 'Add Photo'; err.textContent = 'Upload failed: ' + upErr.message; return; }
-      const { error: insErr } = await sb.from('gallery_photos').insert([{ file_path: path, category }]);
-      btn.disabled = false; btn.textContent = 'Add Photo';
-      if (insErr) { err.textContent = 'Photo uploaded, but could not record it: ' + insErr.message; return; }
-      e.target.reset();
-      closeAddPhoto();
-      loadGalleryAdmin();
-    });
-
-    async function loadGalleryAdmin() {
-      const el = document.getElementById('galleryAdminList');
-      const { data, error } = await sb.from('gallery_photos').select('*').order('created_at', { ascending: false });
-      if (error) {
-        el.innerHTML = `<div style="padding:1.5rem 1.75rem; color:var(--taupe); font-style:italic; font-size:0.88rem;">Gallery storage isn't set up yet. (${esc(error.message)})</div>`;
-        return;
-      }
-      if (!data || !data.length) {
-        el.innerHTML = `<div style="padding:1.5rem 1.75rem; color:var(--taupe); font-style:italic; font-size:0.88rem;">No photos yet — click “+ Add Photo” to start your gallery.</div>`;
-        return;
-      }
-      el.innerHTML = data.map(p => {
-        const url = sb.storage.from(GALLERY_BUCKET).getPublicUrl(p.file_path).data.publicUrl;
-        return `<div class="gallery-admin-item" data-id="${esc(String(p.id))}" data-path="${esc(p.file_path)}">
-          <img src="${esc(url)}" alt="" />
-          <span class="gallery-admin-cat">${esc(GAL_CAT_LABELS[p.category] || p.category || '')}</span>
-          <button class="gallery-admin-del" data-action="del" title="Delete">×</button>
-        </div>`;
-      }).join('');
-      el.querySelectorAll('.gallery-admin-item').forEach(item => {
-        item.querySelector('[data-action="del"]').addEventListener('click', async () => {
-          if (!confirm('Remove this photo from the gallery?')) return;
-          await sb.storage.from(GALLERY_BUCKET).remove([item.dataset.path]);
-          await sb.from('gallery_photos').delete().eq('id', item.dataset.id);
-          loadGalleryAdmin();
-        });
-      });
-    }
 
     // ---- Contracts (upload / house / download) ----
     const CONTRACTS_BUCKET = 'contracts';
