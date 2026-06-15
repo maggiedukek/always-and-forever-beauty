@@ -280,6 +280,9 @@
          tucked up into the photo's fade so the two flow together */
       .hero {
         align-items: flex-start;
+        /* Hug the content instead of forcing 75vh — that empty bottom was the big gap */
+        min-height: auto;
+        padding-bottom: 2.5rem;
       }
 
       .hero-content {
@@ -417,6 +420,8 @@
     @media (max-width: 900px) {
       .intro-side { margin-top: 0; }
       .intro-side::after { display: none; }
+      /* Tighter top so the Welcome card follows the hero closely on mobile */
+      .intro-strip { padding: 3.25rem 0; }
     }
 
     .intro-side h3 {
