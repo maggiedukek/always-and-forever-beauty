@@ -88,12 +88,12 @@
       /* Warm the photo's cool whites toward the page's cream so edges stop reading as a rectangle */
       filter: sepia(0.16) saturate(0.97) brightness(1.04);
       -webkit-mask-image:
-        linear-gradient(to right, transparent 0%, #000 26%, #000 88%, transparent 100%),
-        linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+        linear-gradient(to right, transparent 0%, #000 26%, #000 95%, transparent 100%),
+        linear-gradient(to bottom, transparent 0%, #000 5%, #000 82%, transparent 100%);
       -webkit-mask-composite: source-in;
       mask-image:
-        linear-gradient(to right, transparent 0%, #000 26%, #000 88%, transparent 100%),
-        linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+        linear-gradient(to right, transparent 0%, #000 26%, #000 95%, transparent 100%),
+        linear-gradient(to bottom, transparent 0%, #000 5%, #000 82%, transparent 100%);
       mask-composite: intersect;
       animation: heroBaseFade 16s ease-in-out infinite;
     }
