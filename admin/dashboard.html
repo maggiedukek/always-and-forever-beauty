@@ -1114,6 +1114,11 @@
         window.location.href = 'login.html';
         return;
       }
+      // First login with the temporary password — force her to set her own
+      if (session.user && session.user.user_metadata && session.user.user_metadata.must_change_password) {
+        window.location.href = 'reset-password.html';
+        return;
+      }
       document.getElementById('userEmail').textContent = session.user.email;
       loadInquiries();
       loadEmailLog();

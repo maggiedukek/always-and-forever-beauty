@@ -193,6 +193,8 @@
       <div class="login-error" id="loginError"></div>
     </form>
 
+    <p style="margin-top:1.25rem; font-size:0.82rem;"><a href="#" id="forgotLink" style="color:var(--rose); text-decoration:underline; letter-spacing:0.04em;">Forgot your password?</a></p>
+
     <p class="login-footer">This page is for Colleen only — not publicly linked.</p>
     <a href="../index.html" class="back-link">← Back to website</a>
   </div>
@@ -230,6 +232,31 @@
         btn.disabled = false;
       } else {
         window.location.href = 'dashboard.html';
+      }
+    });
+
+    // Forgot password — emails a reset link
+    document.getElementById('forgotLink').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const errEl = document.getElementById('loginError');
+      const email = document.getElementById('email').value.trim();
+      errEl.style.display = 'block';
+      if (!email) {
+        errEl.style.background = ''; errEl.style.borderColor = ''; errEl.style.color = '';
+        errEl.textContent = 'Enter your email above first, then tap “Forgot your password.”';
+        return;
+      }
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/admin/reset-password.html'
+      });
+      if (error) {
+        errEl.style.background = ''; errEl.style.borderColor = ''; errEl.style.color = '';
+        errEl.textContent = error.message;
+      } else {
+        errEl.style.background = 'rgba(46,125,81,0.1)';
+        errEl.style.borderColor = 'rgba(46,125,81,0.25)';
+        errEl.style.color = '#2E7D51';
+        errEl.textContent = 'Check your email for a link to reset your password.';
       }
     });
   </script>
