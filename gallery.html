@@ -578,6 +578,7 @@
     <img src="" alt="" id="lightboxImg" />
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // Nav
     const nav = document.getElementById('mainNav');
@@ -599,18 +600,42 @@
       });
     });
 
-    // Lightbox (for when real images are added)
+    // Load Colleen's uploaded gallery photos from Supabase (newest first), keeping the defaults
+    const sb = supabase.createClient(
+      'https://bikidhccblbhibaniduw.supabase.co',
+      'sb_publishable_uQG4MBWVmanCL7oOUWiYEg_eMI5FdBE'
+    );
+    (async function loadGalleryPhotos() {
+      const grid = document.getElementById('gallery');
+      try {
+        const { data, error } = await sb
+          .from('gallery_photos')
+          .select('*')
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: false });
+        if (error || !data || !data.length) return;
+        // Newest first, prepended above the default photos
+        data.forEach(p => {
+          const url = sb.storage.from('gallery').getPublicUrl(p.file_path).data.publicUrl;
+          const item = document.createElement('div');
+          item.className = 'masonry-item';
+          item.dataset.category = p.category || 'all';
+          item.innerHTML =
+            '<img src="' + url + '" alt="' + (p.alt || 'Bridal hair &amp; makeup') + '" loading="lazy" />' +
+            '<div class="masonry-overlay"><span class="masonry-overlay-icon">+</span></div>';
+          grid.insertBefore(item, grid.firstChild);
+        });
+      } catch (e) { /* gallery storage not set up yet — defaults still show */ }
+    })();
+
+    // Lightbox (delegated, so it covers the uploaded photos too)
     const lightbox = document.getElementById('lightbox');
     const lbImg    = document.getElementById('lightboxImg');
-    document.querySelectorAll('.masonry-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const img = item.querySelector('img');
-        if (img) {
-          lbImg.src = img.src;
-          lbImg.alt = img.alt;
-          lightbox.classList.add('open');
-        }
-      });
+    document.getElementById('gallery').addEventListener('click', e => {
+      const item = e.target.closest('.masonry-item');
+      if (!item) return;
+      const img = item.querySelector('img');
+      if (img) { lbImg.src = img.src; lbImg.alt = img.alt; lightbox.classList.add('open'); }
     });
     document.getElementById('lightboxClose').addEventListener('click', () => lightbox.classList.remove('open'));
     lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.classList.remove('open'); });
