@@ -13,10 +13,32 @@
   <style>
     /* Soft peach blooms behind the form, like the glows on the home page */
     .booking-section {
+      position: relative;
+      overflow: hidden;
       background:
         radial-gradient(ellipse 50% 55% at 70% 30%, rgba(242, 201, 184, 0.45), rgba(242, 201, 184, 0) 70%),
         radial-gradient(ellipse 45% 50% at 10% 85%, rgba(245, 216, 203, 0.4), rgba(245, 216, 203, 0) 70%);
     }
+    /* Subtle gold-flake texture over the booking section */
+    .booking-section::before {
+      content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background: url('images/gold-splatter.png') center / cover no-repeat;
+      opacity: 0.1;
+      -webkit-mask-image: radial-gradient(ellipse 75% 80% at 50% 50%, #000 30%, transparent 85%);
+      mask-image: radial-gradient(ellipse 75% 80% at 50% 50%, #000 30%, transparent 85%);
+    }
+    .booking-section .container { position: relative; z-index: 1; }
+
+    /* Subtle gold floral watermark in the page hero */
+    .page-hero { position: relative; overflow: hidden; }
+    .page-hero::before {
+      content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background: url('images/background gold flowers.png') center / cover no-repeat;
+      opacity: 0.12;
+      -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 32%, transparent 86%);
+      mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 32%, transparent 86%);
+    }
+    .page-hero .container { position: relative; z-index: 1; }
 
     .booking-layout {
       display: grid;
@@ -255,10 +277,10 @@
   <!-- Page Hero -->
   <div class="page-hero">
     <div class="container">
-      <span class="section-label">Let's Connect</span>
+      <span class="section-label">I'd love to hear from you</span>
       <h1>Book Your Date</h1>
       <div class="divider"></div>
-      <p class="subheading" style="margin:0 auto;">Fill out the form below and Colleen will be in touch within 48 hours</p>
+      <p class="subheading" style="margin:0 auto;">Tell me a little about your wedding and I'll be in touch within a couple of days — I can't wait to hear what you're planning.</p>
     </div>
   </div>
 
@@ -269,7 +291,7 @@
 
         <!-- Sidebar -->
         <div class="booking-sidebar">
-          <span class="section-label">Before You Write</span>
+          <span class="section-label">A few notes from me</span>
           <h3>What to Expect</h3>
           <div class="sidebar-divider"></div>
           <p style="font-size:0.92rem; color:var(--taupe); font-family:var(--font-sub); font-style:italic;">
@@ -339,7 +361,7 @@
 
         <!-- Form -->
         <div class="form-card">
-          <span class="cta-script" style="font-size:2.2rem;">Inquiry form</span>
+          <span class="cta-script" style="font-size:2.2rem;">Let's begin</span>
           <h2>Tell Me About Your Day</h2>
           <span class="subheading">All fields marked * are required</span>
 
