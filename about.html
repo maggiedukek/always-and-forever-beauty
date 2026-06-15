@@ -46,6 +46,18 @@
       align-items: center;
     }
 
+    /* Gold-flake texture behind Colleen's section */
+    .about-intro-section { position: relative; overflow: hidden; }
+    .about-intro-section::before {
+      content: "";
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background: url('images/gold-splatter.png') center / cover no-repeat;
+      opacity: 0.28;
+      -webkit-mask-image: radial-gradient(ellipse 72% 80% at 50% 50%, #000 28%, transparent 86%);
+      mask-image: radial-gradient(ellipse 72% 80% at 50% 50%, #000 28%, transparent 86%);
+    }
+    .about-intro-section .container { position: relative; z-index: 1; }
+
     .about-photo {
       position: relative;
       max-width: 430px;
@@ -92,23 +104,33 @@
 
     .about-years-badge {
       position: absolute;
-      bottom: 2rem;
-      left: -2rem;
-      background: var(--rose);
+      bottom: -1.5rem;
+      left: -1.5rem;
+      background: linear-gradient(150deg, #6a4848 0%, #5C3D3D 55%, #4a3030 100%);
       color: var(--cream);
-      padding: 1.2rem 1.5rem;
-      border-radius: 3px;
+      padding: 1.25rem 1.7rem;
+      border-radius: 4px;
+      border: 1px solid rgba(196,154,56,0.5);
       text-align: center;
-      box-shadow: 0 4px 20px rgba(92, 61, 61, 0.25);
+      box-shadow: 0 12px 32px rgba(92, 61, 61, 0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .about-years-badge::before {
+      content: ""; position: absolute; inset: 5px;
+      border: 1px solid rgba(196,154,56,0.3); border-radius: 2px; pointer-events: none;
     }
 
     .about-years-badge .years-num {
       font-family: var(--font-heading);
-      font-size: 2.5rem;
+      font-size: 2.6rem;
       font-weight: 700;
-      color: var(--gold);
       display: block;
       line-height: 1;
+      /* Metallic gold gradient instead of flat gold */
+      color: var(--gold);
+      background: linear-gradient(105deg, #A87E2A 0%, #D9B45C 42%, #C49A38 60%, #8A6420 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .about-years-badge .years-label {
@@ -242,7 +264,7 @@
   </div>
 
   <!-- About Intro -->
-  <section class="section">
+  <section class="section about-intro-section">
     <div class="container">
       <div class="about-intro">
 

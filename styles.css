@@ -168,7 +168,7 @@ p {
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: 1.4rem 2rem 1.4rem;
+  padding: 1.8rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -630,7 +630,7 @@ p {
 
 /* Tighter nav spacing as the screen narrows */
 @media (max-width: 1024px) {
-  .nav { padding: 1rem 1.25rem; }
+  .nav { padding: 1.35rem 1.25rem; }
   .nav-links { gap: 1.4rem; }
   .nav-links a { font-size: 0.78rem; letter-spacing: 0.1em; }
   .nav-cta-link { font-size: 0.78rem; margin-left: 0; }
