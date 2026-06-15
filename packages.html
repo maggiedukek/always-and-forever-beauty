@@ -21,6 +21,16 @@
       -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 32%, transparent 86%);
       mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 32%, transparent 86%);
     }
+    /* Soft cream fade so the hero's peach glow dissolves into the next section (kills the hard seam) */
+    .page-hero::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 45%;
+      background: linear-gradient(180deg, rgba(250,246,241,0) 0%, var(--cream) 88%);
+      z-index: 0;
+      pointer-events: none;
+    }
     .page-hero .container { position: relative; z-index: 1; }
 
     /* Gold headers get the hero's metallic gold gradient (instead of flat gold) */
