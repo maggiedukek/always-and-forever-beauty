@@ -11,6 +11,18 @@
   <meta name="description" content="Bridal hair and makeup portfolio by Colleen Mulholland — Pequot Lakes, MN." />
   <link rel="stylesheet" href="styles.css" />
   <style>
+    /* Gold floral watermark in the page hero */
+    .page-hero { position: relative; overflow: hidden; }
+    .page-hero::before {
+      content: "";
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background: url('images/background gold flowers.png') center / cover no-repeat;
+      opacity: 0.14;
+      -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 32%, transparent 86%);
+      mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 32%, transparent 86%);
+    }
+    .page-hero .container { position: relative; z-index: 1; }
+
     /* Filter tabs */
     .filter-tabs {
       display: flex;
@@ -22,8 +34,8 @@
 
     .filter-btn {
       background: none;
-      border: 1px solid rgba(201, 169, 110, 0.35);
-      color: var(--taupe);
+      border: 1px solid rgba(92, 61, 61, 0.3);
+      color: var(--rose);
       font-family: var(--font-body);
       font-size: 0.78rem;
       letter-spacing: 0.1em;
@@ -36,8 +48,8 @@
 
     .filter-btn:hover,
     .filter-btn.active {
-      background: var(--gold);
-      border-color: var(--gold);
+      background: var(--rose);
+      border-color: var(--rose);
       color: var(--white);
     }
 
@@ -182,10 +194,10 @@
   <!-- Page Hero -->
   <div class="page-hero">
     <div class="container">
-      <span class="section-label">The Work</span>
+      <span class="section-label">Real brides, real mornings</span>
       <h1>Gallery</h1>
       <div class="divider"></div>
-      <p class="subheading" style="margin:0 auto;">A collection of beautiful moments</p>
+      <p class="subheading" style="margin:0 auto;">A few of my favorite looks from weddings I've had the joy of being part of — each one made just for her.</p>
     </div>
   </div>
 
