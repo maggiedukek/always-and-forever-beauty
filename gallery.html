@@ -631,7 +631,11 @@
         // A managed gallery exists → replace the defaults with it
         grid.innerHTML = '';
         data.forEach(p => {
-          const url = p.image_url || sb.storage.from('gallery').getPublicUrl(p.file_path).data.publicUrl;
+          // image_url is stored root-relative ('/images/...'); strip the leading slash so it
+          // resolves both on the deployed site and when previewing the file locally (file://)
+          const url = p.image_url
+            ? p.image_url.replace(/^\//, '')
+            : sb.storage.from('gallery').getPublicUrl(p.file_path).data.publicUrl;
           const item = document.createElement('div');
           item.className = 'masonry-item';
           item.dataset.category = p.category || 'all';

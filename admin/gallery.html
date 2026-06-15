@@ -192,7 +192,9 @@
     });
 
     function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-    function photoUrl(p) { return p.image_url || sb.storage.from(BUCKET).getPublicUrl(p.file_path).data.publicUrl; }
+    // image_url is stored root-relative ('/images/...'); this page lives in /admin/, so prefix '../'
+    // to resolve it both on the deployed site and when previewing locally (file://)
+    function photoUrl(p) { return p.image_url ? '../' + p.image_url.replace(/^\//, '') : sb.storage.from(BUCKET).getPublicUrl(p.file_path).data.publicUrl; }
 
     async function loadGallery() {
       const { data, error } = await sb.from('gallery_photos').select('*')
