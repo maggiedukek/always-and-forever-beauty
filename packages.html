@@ -237,6 +237,25 @@
       .notes-list { padding: 0.5rem 1.4rem; }
     }
 
+    /* "Good to Know" — larger header + a few soft touches */
+    .notes-section { position: relative; overflow: hidden; }
+    .notes-section::before {
+      content: "";
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background: url('images/background gold flowers.png') center / cover no-repeat;
+      opacity: 0.10;
+      -webkit-mask-image: radial-gradient(ellipse 80% 78% at 50% 42%, #000 28%, transparent 80%);
+      mask-image: radial-gradient(ellipse 80% 78% at 50% 42%, #000 28%, transparent 80%);
+    }
+    .notes-section .container { position: relative; z-index: 1; }
+    .notes-section .section-label { font-size: 2.5rem; margin-bottom: 0.6rem; }
+    .notes-section h2 { font-size: clamp(1.9rem, 4vw, 2.7rem); }
+    .notes-section .section-header p { font-size: 1.1rem; max-width: 46ch; }
+
+    @media (max-width: 600px) {
+      .notes-section .section-label { font-size: 2rem; }
+    }
+
     @media (max-width: 900px) {
       .packages-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
       .addons-grid { grid-template-columns: 1fr; }
@@ -386,12 +405,13 @@
   </section>
 
   <!-- Notes -->
-  <section class="section">
+  <section class="section notes-section">
     <div class="container" style="max-width:760px;">
       <div class="section-header">
         <span class="section-label">Good to Know</span>
         <h2>Booking &amp; Travel Notes</h2>
         <div class="divider"></div>
+        <p>A few little details so everything feels smooth and stress-free on your big day.</p>
       </div>
       <ul class="notes-list">
         <li>A signed contract and deposit are required to hold your wedding date.</li>
