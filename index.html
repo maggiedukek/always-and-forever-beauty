@@ -85,14 +85,16 @@
       /* Cream wash over the photo's white wall so it melts into the page background
          (front photo is mirrored, so its wall sits top-right) */
       background-image:
-        linear-gradient(235deg, rgba(240,228,212,0.85) 0%, rgba(240,228,212,0.45) 28%, rgba(240,228,212,0) 52%),
-        linear-gradient(to bottom, rgba(240,228,212,0.7) 0%, rgba(240,228,212,0) 30%),
+        /* Wash sits top-LEFT (the mirror/wall side) so it never crosses the bride's face on the right */
+        radial-gradient(ellipse 65% 55% at 0% 0%, rgba(240,228,212,0.85) 0%, rgba(240,228,212,0.35) 38%, rgba(240,228,212,0) 70%),
+        linear-gradient(to bottom, rgba(240,228,212,0.5) 0%, rgba(240,228,212,0) 22%),
         url('images/gallery/preview-1-flipped.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      /* Warm the photo's cool whites toward the page's cream so edges stop reading as a rectangle */
-      filter: sepia(0.16) saturate(0.97) brightness(1.04);
+      /* Warm the photo's cool whites toward the page's cream so edges stop reading as a rectangle
+         (no brightness lift — it was washing out her face) */
+      filter: sepia(0.16) saturate(0.97);
       -webkit-mask-image:
         linear-gradient(to right, transparent 0%, #000 26%, #000 95%, transparent 100%),
         linear-gradient(to bottom, transparent 0%, #000 5%, #000 82%, transparent 100%);
@@ -1289,8 +1291,6 @@
       .ge-a,
       .ge-b { width: 100%; max-width: 330px; margin-left: auto; margin-right: auto; }
       .ge-frame img { object-position: center top; }
-      /* No. 03 (polished low bun) — shift the bride toward the right of the frame */
-      .ge-frame img[src*="preview-5"] { object-position: 25% top; }
       .gallery-preview-footer { margin-top: 2.5rem; }
     }
   </style>
@@ -1486,10 +1486,10 @@
           <figure class="ge-item ge-b">
             <div class="ge-mat">
               <div class="ge-frame">
-                <img src="images/gallery/preview-5.jpg" alt="Client admiring her polished low bun in the mirror" loading="lazy" />
+                <img src="images/gallery/updo-08.jpg" alt="Bride with a romantic curled updo" loading="lazy" />
               </div>
             </div>
-            <figcaption><span class="ge-num">No. 03</span> Polished low bun</figcaption>
+            <figcaption><span class="ge-num">No. 03</span> Romantic curled updo</figcaption>
           </figure>
         </div>
 
