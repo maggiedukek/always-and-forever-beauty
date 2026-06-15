@@ -36,13 +36,19 @@
       background:
         linear-gradient(115deg,
           transparent 18%,
-          rgba(255,255,255,0.30) 34%,
-          transparent 48%,
-          rgba(255,255,255,0.16) 62%,
+          rgba(255,255,255,0.22) 32%,
+          transparent 46%,
+          rgba(255,255,255,0.05) 62%,
           transparent 76%),
         radial-gradient(ellipse 130% 100% at 50% 42%, transparent 58%, rgba(92,61,61,0.07) 100%);
-      -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 96%);
-      mask-image: linear-gradient(to bottom, #000 72%, transparent 96%);
+      -webkit-mask-image:
+        linear-gradient(to bottom, #000 72%, transparent 96%),
+        linear-gradient(to right, #000 0%, #000 40%, transparent 60%);
+      -webkit-mask-composite: source-in;
+      mask-image:
+        linear-gradient(to bottom, #000 72%, transparent 96%),
+        linear-gradient(to right, #000 0%, #000 40%, transparent 60%);
+      mask-composite: intersect;
     }
 
     /* Gold splatter texture over the cream areas — fades out where the photo sits */
