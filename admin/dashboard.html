@@ -1625,31 +1625,98 @@
 
     async function sendConfirmation(inquiry) {
       const btn = document.getElementById('confirmBtn');
+      if (!inquiry.email) {
+        alert('This client has no email address on file. Add one with “Edit details” first.');
+        return;
+      }
       btn.textContent = 'Sending…';
       btn.disabled = true;
 
-      // Log the email send in email_logs table
-      const { error: logError } = await sb.from('email_logs').insert([{
-        booking_id:   null,
-        recipient_email: inquiry.email,
-        email_type:   'booking_confirmation',
-        sent_at:      new Date().toISOString(),
-        success:      true
-      }]);
+      const subject = "You're booked with Always & Forever Beauty";
+      const html = buildConfirmationEmail(inquiry);
 
-      if (logError) {
-        alert('Error logging email: ' + logError.message);
-        btn.textContent = 'Send Booking Confirmation';
-        btn.disabled = false;
-        return;
+      // Call the send-email Edge Function (Resend). Returns { ok, id } or { ok:false, error }.
+      let sentOk = false;
+      let errMsg = '';
+      try {
+        const { data, error } = await sb.functions.invoke('send-email', {
+          body: { to: inquiry.email, subject, html }
+        });
+        if (error)                         errMsg = error.message;
+        else if (data && data.ok === false) errMsg = data.error || 'Email service returned an error.';
+        else                                sentOk = true;
+      } catch (e) {
+        errMsg = String(e && e.message ? e.message : e);
       }
 
-      // Mark confirmation sent on inquiry
-      await sb.from('inquiries').update({ confirmation_sent: true }).eq('id', inquiry.id);
+      // Record every attempt in the email log — success or failure
+      await sb.from('email_logs').insert([{
+        booking_id:      null,
+        recipient_email: inquiry.email,
+        email_type:      'booking_confirmation',
+        sent_at:         new Date().toISOString(),
+        success:         sentOk
+      }]);
 
-      alert(`✓ Confirmation logged for ${inquiry.name}.\n\nNote: To actually send the email, wire up a Supabase Edge Function with the Resend API as described in your project docs.`);
-      btn.textContent = '✓ Confirmation Sent';
+      if (sentOk) {
+        await sb.from('inquiries').update({ confirmation_sent: true }).eq('id', inquiry.id);
+        inquiry.confirmation_sent = true;
+        allInquiries = allInquiries.map(i => i.id === inquiry.id ? inquiry : i);
+        btn.textContent = '✓ Confirmation Sent';
+        alert(`✓ Confirmation email sent to ${inquiry.name} (${inquiry.email}).`);
+      } else {
+        btn.textContent = 'Send Booking Confirmation';
+        btn.disabled = false;
+        alert(`Could not send the email.\n\n${errMsg}\n\nIf the Resend setup isn't finished yet, see SETUP-EMAIL.md in the project folder.`);
+      }
       loadEmailLog();
+    }
+
+    // Branded HTML for the booking confirmation email
+    function buildConfirmationEmail(i) {
+      const firstName = esc((i.name || '').trim().split(/\s+/)[0] || 'there');
+      const weddingDate = i.wedding_date ? formatDate(i.wedding_date) : null;
+      return `
+<div style="margin:0;padding:0;background:#F2EBE3;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2EBE3;padding:32px 0;font-family:Georgia,'Times New Roman',serif;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#FAF6F1;border:1px solid #E4D3B8;border-radius:6px;overflow:hidden;">
+        <tr><td style="background:#5C3D3D;padding:28px 32px;text-align:center;">
+          <div style="font-family:Georgia,serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#F2C9B8;">Always &amp; Forever Beauty</div>
+          <div style="font-size:30px;color:#FAF6F1;margin-top:8px;">You're Booked!</div>
+        </td></tr>
+        <tr><td style="padding:34px 38px 10px;color:#5C3D3D;">
+          <p style="font-size:17px;line-height:1.6;margin:0 0 18px;">Hi ${firstName},</p>
+          <p style="font-size:16px;line-height:1.7;margin:0 0 18px;">
+            I'm so thrilled to officially be part of your wedding day! Your date is confirmed,
+            and I can't wait to make your morning calm, joyful, and absolutely beautiful.
+          </p>
+          ${weddingDate ? `
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 22px;">
+            <tr><td style="background:#F4EAD8;border:1px solid #D9B45C;border-radius:4px;padding:16px;text-align:center;">
+              <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#B5A49A;">Your Wedding Date</div>
+              <div style="font-size:22px;color:#C49A38;margin-top:6px;">${esc(weddingDate)}</div>
+            </td></tr>
+          </table>` : ''}
+          <p style="font-size:16px;line-height:1.7;margin:0 0 18px;">
+            <strong>A few next steps:</strong> if we haven't already, we'll schedule your trial
+            session and finalize your timeline as the day gets closer. If you have any questions
+            in the meantime, just reply to this email — it comes straight to me.
+          </p>
+          <p style="font-size:16px;line-height:1.7;margin:0 0 6px;">With love,</p>
+          <p style="font-size:20px;color:#C49A38;margin:0 0 4px;">Colleen</p>
+          <p style="font-size:13px;color:#B5A49A;margin:0;">Always &amp; Forever Beauty &middot; Pequot Lakes, MN</p>
+        </td></tr>
+        <tr><td style="padding:22px 38px 30px;">
+          <hr style="border:none;border-top:1px solid #E4D3B8;margin:0 0 16px;" />
+          <p style="font-size:12px;color:#B5A49A;text-align:center;margin:0;">
+            Beauty for your forever moments.
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</div>`;
     }
 
     // Load email log
