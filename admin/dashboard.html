@@ -199,40 +199,38 @@
       margin-bottom: 2rem;
     }
 
-    /* 4 compact stat boxes tucked into the header bar, beside the greeting */
-    .stats-col {
+    /* Quick-action buttons tucked into the header bar, beside the greeting */
+    .welcome-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 0.7rem;
+      align-items: center;
     }
 
-    .stat-card {
-      background: linear-gradient(170deg, #FFFDF8 0%, #F8F1E7 100%);
-      border: 1px solid rgba(196,154,56,0.28);
-      border-left: 3px solid var(--gold);
-      border-radius: 4px;
-      padding: 0.4rem 0.85rem;
-      /* equal-width cards that share the row evenly */
-      flex: 1 1 0;
-      min-width: 84px;
-      box-shadow: 0 2px 10px rgba(92,61,61,0.04);
-    }
-
-    .stat-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      font-weight: 600;
-      color: var(--rose);
-      display: block;
-      line-height: 1;
-      margin-bottom: 0.1rem;
-    }
-
-    .stat-label {
-      font-size: 0.72rem;
-      letter-spacing: 0.1em;
+    .welcome-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--taupe);
+      color: var(--rose);
+      background: linear-gradient(170deg, #FFFDF8 0%, #F8F1E7 100%);
+      border: 1px solid rgba(196,154,56,0.5);
+      border-radius: 4px;
+      padding: 0.7rem 1.4rem;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 2px 10px rgba(92,61,61,0.06);
+      transition: all 0.2s;
+    }
+
+    .welcome-btn:hover {
+      background: var(--rose);
+      border-color: var(--rose);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(92,61,61,0.18);
     }
 
     /* ---- Panel ---- */
@@ -261,9 +259,12 @@
     /* Calendar — bigger heading + a very light peach layer for depth */
     .cal-panel .panel-header h2 { font-size: 1.6rem; }
     .cal-panel {
+      /* Solid white base so the page texture never shows through, with a soft
+         peach wash on top for warmth (was too transparent at the top before) */
       background:
-        radial-gradient(ellipse 85% 55% at 50% 0%, rgba(244,206,186,0.22), rgba(244,206,186,0) 68%),
-        linear-gradient(180deg, rgba(247,228,216,0.32) 0%, rgba(255,255,255,0.95) 38%, var(--white) 100%);
+        radial-gradient(ellipse 85% 55% at 50% 0%, rgba(244,206,186,0.35), rgba(244,206,186,0) 68%),
+        linear-gradient(180deg, rgba(247,228,216,0.9) 0%, rgba(255,255,255,0.98) 42%, var(--white) 100%),
+        var(--white);
     }
 
     .filter-row {
@@ -763,17 +764,15 @@
     /* Responsive */
     @media (max-width: 900px) {
       .dash-grid { grid-template-columns: 1fr; }
-      .stats-col { grid-template-columns: repeat(4, 1fr); }
     }
 
     @media (max-width: 768px) {
-      .stats-col { grid-template-columns: 1fr 1fr; }
       .main { padding: 1rem; }
     }
 
     @media (max-width: 480px) {
-      .stats-col { grid-template-columns: 1fr; }
       .welcome { flex-direction: column; text-align: center; }
+      .welcome-actions { justify-content: center; }
     }
 
     @media (max-width: 640px) {
@@ -911,23 +910,9 @@
           <p class="welcome-sub">Here's what's happening with your brides.</p>
         </div>
       </div>
-      <div class="stats-col">
-        <div class="stat-card">
-          <span class="stat-num" id="stat-total">—</span>
-          <span class="stat-label">Total Inquiries</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-num" id="stat-new">—</span>
-          <span class="stat-label">New</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-num" id="stat-booked">—</span>
-          <span class="stat-label">Booked</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-num" id="stat-review">—</span>
-          <span class="stat-label">In Review</span>
-        </div>
+      <div class="welcome-actions">
+        <a href="gallery.html" class="welcome-btn">Gallery</a>
+        <button type="button" class="welcome-btn" id="openContractsBtn">Contracts</button>
       </div>
     </div>
 
@@ -986,33 +971,14 @@
       </div>
     </div>
 
-    <!-- Contracts Panel -->
+    <!-- Active Contracts Panel -->
     <div class="panel">
       <div class="panel-header">
-        <h2>Contracts</h2>
-        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-          <button class="btn-add-schedule" id="newContractBtn">+ New Contract</button>
-          <button class="btn-add-schedule" id="uploadContractBtn" style="background:transparent; color:var(--gold); border:1px solid var(--gold);">Upload Signed PDF</button>
-        </div>
+        <h2>Active Contracts</h2>
+        <button class="btn-add-schedule" id="viewAllContractsBtn">Manage Contracts →</button>
       </div>
-      <div id="sentContractsList">
+      <div id="activeContractsList">
         <div style="padding:1.5rem 1.75rem; color:var(--taupe); font-style:italic; font-size:0.88rem;">Loading contracts…</div>
-      </div>
-      <div class="contracts-subhead">Uploaded files</div>
-      <div id="contractsList">
-        <div style="padding:1.5rem 1.75rem; color:var(--taupe); font-style:italic; font-size:0.9rem;">Loading contracts…</div>
-      </div>
-    </div>
-
-    <!-- Gallery Panel -->
-    <div class="panel">
-      <div class="panel-header">
-        <h2>Gallery</h2>
-        <a href="gallery.html" class="btn-add-schedule" style="text-decoration:none;">Manage Gallery →</a>
-      </div>
-      <div style="padding:1.5rem 1.75rem; color:var(--taupe); font-size:0.92rem; line-height:1.6;">
-        Add, reorder, recategorize, and remove the photos on your public gallery — all on the
-        <a href="gallery.html" style="color:var(--gold); text-decoration:underline;">Manage Gallery</a> page.
       </div>
     </div>
 
@@ -1179,6 +1145,28 @@
       <button class="drawer-close" id="ctViewClose" aria-label="Close">&times;</button>
     </div>
     <div class="modal-body" id="ctViewBody"></div>
+  </div>
+
+  <!-- Contracts Modal (opened from the header button) -->
+  <div class="modal-overlay" id="contractsOverlay"></div>
+  <div class="modal modal-lg" id="contractsModal" role="dialog" aria-modal="true" aria-labelledby="contractsTitle">
+    <div class="modal-header">
+      <h3 id="contractsTitle">Contracts</h3>
+      <button class="drawer-close" id="contractsClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" style="padding:0;">
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap; padding:1.25rem 1.75rem 0.5rem;">
+        <button class="btn-add-schedule" id="newContractBtn">+ New Contract</button>
+        <button class="btn-add-schedule" id="uploadContractBtn" style="background:transparent; color:var(--gold); border:1px solid var(--gold);">Upload Signed PDF</button>
+      </div>
+      <div id="sentContractsList">
+        <div style="padding:1.5rem 1.75rem; color:var(--taupe); font-style:italic; font-size:0.88rem;">Loading contracts…</div>
+      </div>
+      <div class="contracts-subhead">Uploaded files</div>
+      <div id="contractsList">
+        <div style="padding:1.5rem 1.75rem; color:var(--taupe); font-style:italic; font-size:0.9rem;">Loading contracts…</div>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1358,6 +1346,22 @@
       }
     });
 
+    // ---- Contracts popup (opened from the header button) ----
+    const contractsOverlay = document.getElementById('contractsOverlay');
+    const contractsModal = document.getElementById('contractsModal');
+    function openContracts() {
+      contractsOverlay.classList.add('open');
+      contractsModal.classList.add('open');
+    }
+    function closeContracts() {
+      contractsOverlay.classList.remove('open');
+      contractsModal.classList.remove('open');
+    }
+    document.getElementById('openContractsBtn').addEventListener('click', openContracts);
+    document.getElementById('viewAllContractsBtn').addEventListener('click', openContracts);
+    document.getElementById('contractsClose').addEventListener('click', closeContracts);
+    contractsOverlay.addEventListener('click', closeContracts);
+
     // ---- Contracts (upload / house / download) ----
     const CONTRACTS_BUCKET = 'contracts';
     const uploadContractOverlay = document.getElementById('uploadContractOverlay');
@@ -1500,11 +1504,14 @@
 
     function pad2(n) { return String(n).padStart(2, '0'); }
 
+    // Stat counters were removed from the header; keep this as a safe no-op
+    // so the callers (load, edit, delete) don't error if the boxes are gone.
     function updateStats() {
-      document.getElementById('stat-total').textContent  = allInquiries.length;
-      document.getElementById('stat-new').textContent    = allInquiries.filter(i => i.status === 'new').length;
-      document.getElementById('stat-booked').textContent = allInquiries.filter(i => i.status === 'booked').length;
-      document.getElementById('stat-review').textContent = allInquiries.filter(i => i.status === 'in_review').length;
+      const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      set('stat-total',  allInquiries.length);
+      set('stat-new',    allInquiries.filter(i => i.status === 'new').length);
+      set('stat-booked', allInquiries.filter(i => i.status === 'booked').length);
+      set('stat-review', allInquiries.filter(i => i.status === 'in_review').length);
     }
 
     function renderTable() {
@@ -2308,9 +2315,38 @@
       } catch (e) { prompt('Email failed. Copy this signing link:', url); }
     }
 
+    // Render the "active" (awaiting-signature) contracts onto the dashboard panel
+    function renderActiveContracts(data, error) {
+      const el = document.getElementById('activeContractsList');
+      if (!el) return;
+      if (error) {
+        el.innerHTML = `<div style="padding:1.5rem 1.75rem;color:var(--taupe);font-style:italic;font-size:0.88rem;">Contracts aren't set up yet.</div>`;
+        return;
+      }
+      const active = (data || []).filter(c => c.status === 'sent');
+      if (!active.length) {
+        el.innerHTML = `<div style="padding:1.5rem 1.75rem;color:var(--taupe);font-style:italic;font-size:0.88rem;">No active contracts awaiting signature.</div>`;
+        return;
+      }
+      el.innerHTML = active.map(c => {
+        const sub = [c.package_name || 'À la carte', c.total ? money(c.total) : null, c.wedding_date ? formatDate(c.wedding_date) : null].filter(Boolean).join(' · ');
+        return `<div class="ct-row"><div class="ct-meta"><span class="nm">${esc(c.client_name)} <span class="ct-badge sent">Awaiting signature</span></span><span class="sub">${esc(sub)}</span></div><div class="ct-actions"><button data-aa="view">View</button><button data-aa="copy">Copy link</button><button data-aa="resend">Resend</button></div></div>`;
+      }).join('');
+      el.querySelectorAll('.ct-row').forEach((row, idx) => {
+        const c = active[idx];
+        row.querySelector('[data-aa="view"]').addEventListener('click', () => openContractView(c));
+        row.querySelector('[data-aa="copy"]').addEventListener('click', (e) => {
+          const u = location.origin + '/sign.html?token=' + c.token;
+          navigator.clipboard?.writeText(u); e.target.textContent = 'Copied!';
+        });
+        row.querySelector('[data-aa="resend"]').addEventListener('click', () => resendLink(c));
+      });
+    }
+
     window.loadSentContracts = async function () {
       const el = document.getElementById('sentContractsList');
       const { data, error } = await sb.from('contracts').select('*').order('created_at', { ascending: false });
+      renderActiveContracts(data, error);
       if (error) {
         el.innerHTML = `<div style="padding:1.5rem 1.75rem;color:var(--taupe);font-style:italic;font-size:0.88rem;">Contracts aren't set up yet. Run <strong>admin/contracts-setup.sql</strong> in Supabase. (${esc(error.message)})</div>`;
         return;
