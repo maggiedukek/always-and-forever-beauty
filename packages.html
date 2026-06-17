@@ -77,18 +77,23 @@
 
     .packages-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2rem;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
       align-items: start;
-      max-width: 920px;
+      max-width: 1200px;
       margin: 0 auto;
     }
+
+    /* Artful stagger — a gentle zigzag across the row so the four cards
+       read as an editorial spread rather than a rigid block */
+    .packages-grid .package-card:nth-child(odd)  { margin-top: 2.75rem; }
+    .packages-grid .package-card:nth-child(even) { margin-top: 0; }
 
     .package-card {
       background: var(--white);
       border: 1px solid rgba(201, 169, 110, 0.25);
       border-radius: 4px;
-      padding: 2.5rem 2rem;
+      padding: 2rem 1.4rem;
       text-align: center;
       transition: border-color 0.3s, box-shadow 0.3s;
       position: relative;
@@ -122,7 +127,7 @@
 
     .package-name {
       font-family: var(--font-script);
-      font-size: 1.8rem;
+      font-size: 1.55rem;
       color: var(--gold);
       display: block;
       margin-bottom: 0.5rem;
@@ -132,14 +137,14 @@
       font-family: var(--font-sub);
       font-style: italic;
       color: var(--taupe);
-      font-size: 0.95rem;
+      font-size: 0.88rem;
       margin-bottom: 1.5rem;
       display: block;
     }
 
     .package-price {
       font-family: var(--font-heading);
-      font-size: 2.8rem;
+      font-size: 2.2rem;
       color: var(--rose);
       line-height: 1;
       margin-bottom: 0.25rem;
@@ -173,10 +178,10 @@
     .package-features li {
       display: flex;
       align-items: flex-start;
-      gap: 0.75rem;
-      font-size: 0.9rem;
+      gap: 0.6rem;
+      font-size: 0.82rem;
       color: var(--rose);
-      padding: 0.5rem 0;
+      padding: 0.45rem 0;
       border-bottom: 1px solid rgba(201, 169, 110, 0.12);
     }
 
@@ -269,9 +274,19 @@
       .notes-section .section-label { font-size: 2rem; }
     }
 
+    /* Tablet — drop to two columns and flatten the stagger */
+    @media (max-width: 1080px) {
+      .packages-grid { grid-template-columns: repeat(2, 1fr); max-width: 720px; gap: 1.75rem; }
+      .packages-grid .package-card { margin-top: 0; }
+    }
+
     @media (max-width: 900px) {
-      .packages-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
       .addons-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Phone — single column */
+    @media (max-width: 600px) {
+      .packages-grid { grid-template-columns: 1fr; max-width: 420px; }
     }
   </style>
 </head>
@@ -355,25 +370,6 @@
           <a href="booking.html" class="hero-link">Inquire</a>
         </div>
 
-        <!-- Platinum -->
-        <div class="package-card">
-          <span class="package-name">The Platinum Package</span>
-          <span class="package-subtitle">Bride + full party</span>
-          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">Everyone you love, polished and camera-ready — additional artist available.</p>
-          <div class="package-price" style="font-size:2rem;">Custom Quote</div>
-          <p class="price-note">Priced by your final headcount</p>
-          <div class="package-divider"></div>
-          <ul class="package-features">
-            <li><span class="check">✦</span> Bridal hair &amp; makeup</li>
-            <li><span class="check">✦</span> Full wedding party — hair &amp; makeup</li>
-            <li><span class="check">✦</span> Mother(s) &amp; guests welcome</li>
-            <li><span class="check">✦</span> Additional artist available</li>
-            <li><span class="check">✦</span> Pre-wedding consultation</li>
-            <li><span class="check">✦</span> On-location service</li>
-          </ul>
-          <a href="booking.html" class="hero-link">Inquire</a>
-        </div>
-
         <!-- The Luxe Bride -->
         <div class="package-card">
           <span class="package-name">The Luxe Bride</span>
@@ -389,6 +385,25 @@
             <li><span class="check">✦</span> Second look created for your reception</li>
             <li><span class="check">✦</span> Touch-ups throughout your day</li>
             <li><span class="check">✦</span> Pre-wedding consultation</li>
+          </ul>
+          <a href="booking.html" class="hero-link">Inquire</a>
+        </div>
+
+        <!-- Platinum (Custom Quote — kept last) -->
+        <div class="package-card">
+          <span class="package-name">The Platinum Package</span>
+          <span class="package-subtitle">Bride + full party</span>
+          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">Everyone you love, polished and camera-ready — additional artist available.</p>
+          <div class="package-price" style="font-size:2rem;">Custom Quote</div>
+          <p class="price-note">Priced by your final headcount</p>
+          <div class="package-divider"></div>
+          <ul class="package-features">
+            <li><span class="check">✦</span> Bridal hair &amp; makeup</li>
+            <li><span class="check">✦</span> Full wedding party — hair &amp; makeup</li>
+            <li><span class="check">✦</span> Mother(s) &amp; guests welcome</li>
+            <li><span class="check">✦</span> Additional artist available</li>
+            <li><span class="check">✦</span> Pre-wedding consultation</li>
+            <li><span class="check">✦</span> On-location service</li>
           </ul>
           <a href="booking.html" class="hero-link">Inquire</a>
         </div>

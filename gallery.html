@@ -119,14 +119,11 @@
       background: rgba(92, 61, 61, 0.3);
     }
 
+    /* The "+" affordance is hidden — the hover tint alone signals the tiles
+       are clickable (they still open the lightbox) */
     .masonry-overlay-icon {
-      opacity: 0;
-      color: var(--white);
-      font-size: 1.5rem;
-      transition: opacity 0.3s;
+      display: none;
     }
-
-    .masonry-item:hover .masonry-overlay-icon { opacity: 1; }
 
     /* Lightbox */
     .lightbox {
