@@ -87,6 +87,24 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
+    }
+
+    /* The second portrait overlays the first (in-flow) one and crossfades */
+    .about-photo-frame img:last-child {
+      position: absolute;
+      inset: 0;
+      animation: aboutCrossfade 12s ease-in-out infinite;
+    }
+
+    @keyframes aboutCrossfade {
+      0%, 42%  { opacity: 1; }
+      50%, 92% { opacity: 0; }
+      100%     { opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .about-photo-frame img:last-child { animation: none; }
     }
 
     .about-photo-placeholder {
@@ -282,6 +300,7 @@
         <div class="about-photo">
           <div class="about-photo-frame">
             <img src="images/colleen.jpg" alt="Colleen Mulholland" />
+            <img src="images/723406330_2310427992698296_8935159144137868163_n.jpg" alt="Colleen placing a veil on a bride" style="object-position: center 15%;" />
           </div>
           <div class="about-photo-accent"></div>
           <div class="about-years-badge">

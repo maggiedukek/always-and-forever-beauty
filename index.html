@@ -811,6 +811,8 @@
     }
 
     .about-photo-clip img {
+      position: absolute;
+      inset: 0;
       width: 100%; height: 100%;
       object-fit: cover;
       display: block;
@@ -823,6 +825,22 @@
         linear-gradient(to right, transparent 0%, #000 13%, #000 87%, transparent 100%),
         linear-gradient(to bottom, transparent 0%, #000 11%, #000 89%, transparent 100%);
       mask-composite: intersect;
+    }
+
+    /* Crossfade between the two portraits — the top one fades out to reveal
+       the one beneath (which stays fully opaque), then fades back */
+    .about-photo-clip img:last-child {
+      animation: aboutCrossfade 12s ease-in-out infinite;
+    }
+
+    @keyframes aboutCrossfade {
+      0%, 42%  { opacity: 1; }
+      50%, 92% { opacity: 0; }
+      100%     { opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .about-photo-clip img:last-child { animation: none; }
     }
 
     /* Subtle gold accent line left of text block */
@@ -1414,6 +1432,7 @@
           <div class="about-photo-frame">
             <div class="about-photo-clip">
               <img src="images/colleen.jpg" alt="Colleen Mulholland" />
+              <img src="images/723406330_2310427992698296_8935159144137868163_n.jpg" alt="Colleen placing a veil on a bride" style="object-position: center 15%;" />
             </div>
             <span class="about-editorial-script">Colleen</span>
           </div>

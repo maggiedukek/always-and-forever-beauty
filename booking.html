@@ -400,27 +400,15 @@
             </div>
 
             <div class="form-group">
-              <label>Services Needed *</label>
-              <div class="checkbox-group">
-                <label class="checkbox-item">
-                  <input type="checkbox" name="services" value="Bridal Hair" /> Bridal Hair
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" name="services" value="Bridal Makeup" /> Bridal Makeup
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" name="services" value="Bridesmaid Hair" /> Bridesmaid Hair
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" name="services" value="Bridesmaid Makeup" /> Bridesmaid Makeup
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" name="services" value="Hair Trial" /> Hair Trial
-                </label>
-                <label class="checkbox-item">
-                  <input type="checkbox" name="services" value="Makeup Trial" /> Makeup Trial
-                </label>
-              </div>
+              <label for="package_interest">Which Package Interests You? *</label>
+              <select id="package_interest" name="package_interest" required>
+                <option value="" disabled selected>Select one</option>
+                <option value="The Silver Package">The Silver Package — Bride + up to 4, hair only ($775)</option>
+                <option value="The Golden Package">The Golden Package — Bride + up to 4, hair &amp; makeup ($1,665)</option>
+                <option value="The Luxe Bride">The Luxe Bride — a full day, just for you ($2,300)</option>
+                <option value="The Platinum Package">The Platinum Package — full party (custom quote)</option>
+                <option value="Not sure yet">I'm not sure — I'd love your suggestion</option>
+              </select>
             </div>
 
             <div class="form-group">
@@ -516,18 +504,18 @@
       submitBtn.textContent = 'Sending…';
       submitBtn.disabled = true;
 
-      // Gather checked services
-      const checked = [...document.querySelectorAll('input[name="services"]:checked')];
-      const services = checked.map(c => c.value).join(', ');
+      // The package the bride is interested in surfaces in the dashboard "Services" column
+      const pkg = document.getElementById('package_interest').value;
+      const typedMessage = document.getElementById('message').value.trim();
 
       const payload = {
         name:           document.getElementById('name').value.trim(),
         email:          document.getElementById('email').value.trim(),
         phone:          document.getElementById('phone').value.trim(),
         wedding_date:   document.getElementById('wedding_date').value,
-        services_needed: services || null,
+        services_needed: pkg || null,
         wedding_size:   document.getElementById('wedding_size').value,
-        message:        document.getElementById('message').value.trim() || null,
+        message:        typedMessage || null,
         status:         'new'
       };
 
