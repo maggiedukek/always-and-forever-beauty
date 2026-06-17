@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /sign.html
+
+Sitemap: https://alwaysforeverbeauty.com/sitemap.xml
