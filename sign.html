@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Your Contract | Always & Forever Beauty</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png" />
+  <style>
+    :root { --cream:#FAF6F1; --gold:#C49A38; --rose:#5C3D3D; --taupe:#B5A49A; --ink:#3A2A2A; --line:#E4D3B8; --green:#2E7D51; --red:#8C1A1A; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#F2EBE3; color:var(--ink); font-family:Calibri,Arial,sans-serif; line-height:1.55; }
+    .wrap { max-width:780px; margin:0 auto; padding:24px 16px 60px; }
+    .brandbar { text-align:center; padding:22px 0 14px; }
+    .brandbar .ey { font-family:Georgia,serif; font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); }
+    .brandbar .ttl { font-family:Georgia,serif; font-size:26px; color:var(--rose); margin-top:4px; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:22px 26px; box-shadow:0 10px 40px rgba(92,61,61,0.08); }
+    .msg { text-align:center; padding:60px 20px; color:var(--rose); font-size:18px; }
+    .sign-box { margin-top:18px; background:var(--cream); border:1px solid var(--line); border-radius:8px; padding:18px 20px; }
+    .sign-box h3 { font-family:Georgia,serif; color:var(--rose); margin:0 0 10px; }
+    .tabs { display:flex; gap:8px; margin-bottom:12px; }
+    .tabs button { flex:1; padding:9px; border:1px solid var(--gold); background:#fff; color:var(--rose); border-radius:6px; cursor:pointer; font-size:14px; }
+    .tabs button.active { background:var(--gold); color:#fff; }
+    .pane { display:none; } .pane.active { display:block; }
+    input[type=text] { width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:6px; font-size:16px; }
+    .typed-preview { margin-top:10px; min-height:54px; font-family:'Brush Script MT','Segoe Script',cursive; font-size:38px; color:var(--ink); border-bottom:1px solid var(--line); }
+    canvas { width:100%; height:160px; background:#fff; border:1px dashed var(--gold); border-radius:6px; touch-action:none; display:block; }
+    .canvas-tools { margin-top:6px; text-align:right; }
+    .canvas-tools button { background:transparent; border:none; color:var(--gold); cursor:pointer; font-size:13px; text-decoration:underline; }
+    .consent { display:flex; gap:10px; align-items:flex-start; margin:16px 0; font-size:14px; color:var(--rose); }
+    .consent input { margin-top:3px; width:18px; height:18px; flex-shrink:0; }
+    .signbtn { width:100%; padding:14px; background:var(--gold); color:#fff; border:none; border-radius:6px; font-size:16px; cursor:pointer; }
+    .signbtn:disabled { opacity:0.5; cursor:not-allowed; }
+    .err { color:var(--red); font-size:14px; margin-top:10px; min-height:18px; text-align:center; }
+    .ok-panel { text-align:center; padding:20px; }
+    .ok-panel .check { width:58px; height:58px; border-radius:50%; background:var(--green); color:#fff; font-size:30px; line-height:58px; margin:0 auto 12px; }
+    .printbtn { margin-top:14px; padding:11px 22px; background:var(--rose); color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:14px; }
+    .foot { text-align:center; color:var(--taupe); font-size:12px; margin-top:26px; }
+    @media print {
+      body { background:#fff; }
+      .brandbar, .sign-box, .foot, #printRow { display:none !important; }
+      .card { border:none; box-shadow:none; padding:0; }
+      .signed-stamp { display:block !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brandbar">
+      <div class="ey">Always &amp; Forever Beauty</div>
+      <div class="ttl">Your Services Agreement</div>
+    </div>
+    <div id="root">
+      <div class="msg">Loading your contract…</div>
+    </div>
+    <div class="foot">Always &amp; Forever Beauty LLC · Pequot Lakes, MN</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SB_URL = 'https://bikidhccblbhibaniduw.supabase.co';
+    const SB_KEY = 'sb_publishable_uQG4MBWVmanCL7oOUWiYEg_eMI5FdBE';
+    const NOTIFY_EMAIL = 'alwaysandforeverbeautycolleen@gmail.com'; // Colleen's inbox (Gmail ignores dots)
+    const sb = supabase.createClient(SB_URL, SB_KEY);
+    const root = document.getElementById('root');
+    const token = new URLSearchParams(location.search).get('token');
+    let contract = null;
+    let clientIP = null;
+
+    function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    (async function start(){
+      if (!token) { root.innerHTML = '<div class="msg">This link is missing its contract code. Please use the full link from your email.</div>'; return; }
+      // best-effort IP for the audit trail
+      try { const r = await fetch('https://api.ipify.org?format=json'); clientIP = (await r.json()).ip; } catch(e){}
+      const { data, error } = await sb.rpc('get_contract_by_token', { p_token: token });
+      if (error) { root.innerHTML = '<div class="msg">Sorry — we couldn’t load this contract.<br><small>'+esc(error.message)+'</small></div>'; return; }
+      contract = (data && data[0]) || null;
+      if (!contract) { root.innerHTML = '<div class="msg">This contract link is invalid or has been removed.</div>'; return; }
+      if (contract.status === 'void') { root.innerHTML = '<div class="msg">This contract is no longer active. Please contact Colleen for an updated one.</div>'; return; }
+      render();
+    })();
+
+    function render(){
+      const signed = contract.status === 'signed';
+      let html = '<div class="card"><div id="contractDoc">'+(contract.contract_html||'')+'</div>';
+      if (signed) {
+        html += signedStamp();
+        html += '</div><div id="printRow" style="text-align:center;"><button class="printbtn" onclick="window.print()">Save a PDF copy</button></div>';
+        root.innerHTML = html;
+        return;
+      }
+      html += '</div>';
+      html += `
+      <div class="sign-box">
+        <h3>Sign your contract</h3>
+        <div class="tabs">
+          <button id="tabType" class="active" type="button">Type my name</button>
+          <button id="tabDraw" type="button">Draw signature</button>
+        </div>
+        <div id="paneType" class="pane active">
+          <input type="text" id="typedName" placeholder="Type your full legal name" autocomplete="name" />
+          <div class="typed-preview" id="typedPreview"></div>
+        </div>
+        <div id="paneDraw" class="pane">
+          <canvas id="sigCanvas"></canvas>
+          <div class="canvas-tools"><button type="button" id="clearCanvas">Clear</button></div>
+        </div>
+        <label class="consent"><input type="checkbox" id="consent" />
+          <span>I have read this agreement and I agree to its terms. I understand that signing electronically is the legal equivalent of signing by hand.</span></label>
+        <button class="signbtn" id="signBtn" disabled>Sign &amp; Submit</button>
+        <div class="err" id="signErr"></div>
+      </div>`;
+      root.innerHTML = html;
+      wireSigning();
+    }
+
+    function signedStamp(){
+      const when = contract.signed_at ? new Date(contract.signed_at).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}) : '';
+      return '<div class="signed-stamp" style="margin-top:22px;border-top:2px solid var(--gold);padding-top:12px;">'
+        + '<div style="font-weight:bold;color:var(--rose);margin-bottom:6px;">Signed by Client</div>'
+        + (window._sigMark || ('<div style="font-family:\'Brush Script MT\',cursive;font-size:34px;">'+esc(contract.signer_name||'')+'</div>'))
+        + '<div style="font-size:12px;margin-top:6px;">'+esc(contract.signer_name||'')+' &middot; '+when+'</div>'
+        + '<div style="font-size:11px;color:#8a7d72;margin-top:3px;">Electronically signed'+(clientIP?(' &middot; IP '+esc(clientIP)):'')+'</div></div>';
+    }
+
+    let mode = 'typed';
+    function wireSigning(){
+      const tabType=document.getElementById('tabType'), tabDraw=document.getElementById('tabDraw');
+      const paneType=document.getElementById('paneType'), paneDraw=document.getElementById('paneDraw');
+      const typed=document.getElementById('typedName'), preview=document.getElementById('typedPreview');
+      const consent=document.getElementById('consent'), signBtn=document.getElementById('signBtn');
+      const canvas=document.getElementById('sigCanvas');
+
+      function setMode(m){
+        mode=m;
+        tabType.classList.toggle('active', m==='typed'); tabDraw.classList.toggle('active', m==='drawn');
+        paneType.classList.toggle('active', m==='typed'); paneDraw.classList.toggle('active', m==='drawn');
+        if (m==='drawn') setTimeout(initCanvas,30);
+        validate();
+      }
+      tabType.addEventListener('click',()=>setMode('typed'));
+      tabDraw.addEventListener('click',()=>setMode('drawn'));
+      typed.addEventListener('input',()=>{ preview.textContent = typed.value; validate(); });
+      consent.addEventListener('change', validate);
+
+      // canvas drawing
+      let ctx, drawing=false, hasInk=false, last=null;
+      function initCanvas(){
+        if (ctx) return;
+        const ratio = window.devicePixelRatio||1;
+        const r = canvas.getBoundingClientRect();
+        canvas.width = r.width*ratio; canvas.height = r.height*ratio;
+        ctx = canvas.getContext('2d'); ctx.scale(ratio,ratio);
+        ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.strokeStyle='#3A2A2A';
+      }
+      function pos(e){ const r=canvas.getBoundingClientRect(); const p=e.touches?e.touches[0]:e; return {x:p.clientX-r.left, y:p.clientY-r.top}; }
+      function down(e){ initCanvas(); drawing=true; last=pos(e); e.preventDefault(); }
+      function move(e){ if(!drawing)return; const p=pos(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; hasInk=true; e.preventDefault(); validate(); }
+      function up(){ drawing=false; }
+      canvas.addEventListener('mousedown',down); canvas.addEventListener('mousemove',move); window.addEventListener('mouseup',up);
+      canvas.addEventListener('touchstart',down); canvas.addEventListener('touchmove',move); canvas.addEventListener('touchend',up);
+      document.getElementById('clearCanvas').addEventListener('click',()=>{ if(ctx){ctx.clearRect(0,0,canvas.width,canvas.height);} hasInk=false; validate(); });
+
+      window._getDrawn = () => hasInk ? canvas.toDataURL('image/png') : null;
+      window._hasInk = () => hasInk;
+
+      function validate(){
+        const ok = consent.checked && ((mode==='typed' && typed.value.trim().length>1) || (mode==='drawn' && hasInk));
+        signBtn.disabled = !ok;
+      }
+      window._validate = validate;
+
+      signBtn.addEventListener('click', submitSign);
+    }
+
+    async function submitSign(){
+      const signBtn=document.getElementById('signBtn'); const err=document.getElementById('signErr');
+      err.textContent='';
+      const typed=document.getElementById('typedName');
+      const name = (mode==='typed') ? typed.value.trim() : (contract.client_name||'Client');
+      const sigData = (mode==='typed') ? name : window._getDrawn();
+      if (!sigData) { err.textContent='Please add your signature first.'; return; }
+      signBtn.disabled=true; signBtn.textContent='Signing…';
+      const { data, error } = await sb.rpc('sign_contract', {
+        p_token: token, p_signer_name: name, p_signature_type: mode,
+        p_signature_data: sigData, p_consent: true,
+        p_user_agent: navigator.userAgent, p_ip: clientIP
+      });
+      if (error || (data && data!=='signed')) {
+        signBtn.disabled=false; signBtn.textContent='Sign & Submit';
+        err.textContent = error ? error.message : (data==='already_signed' ? 'This contract was already signed.' : 'Could not sign — please try again.');
+        if (data==='already_signed') location.reload();
+        return;
+      }
+      // local stamp for immediate display
+      window._sigMark = (mode==='drawn')
+        ? '<img src="'+sigData+'" alt="signature" style="max-height:90px;display:block;" />'
+        : '<div style="font-family:\'Brush Script MT\',cursive;font-size:34px;">'+esc(name)+'</div>';
+      contract.status='signed'; contract.signer_name=name; contract.signed_at=new Date().toISOString();
+      notifyColleen(name);
+      showSuccess(name);
+    }
+
+    function showSuccess(name){
+      root.innerHTML = '<div class="card"><div class="ok-panel"><div class="check">&#10003;</div>'
+        + '<h2 style="font-family:Georgia,serif;color:var(--rose);margin:0 0 6px;">Thank you, '+esc((name||'').split(' ')[0])+'!</h2>'
+        + '<p style="color:var(--rose);">Your contract is signed and a copy has been sent to Colleen. You can save your own copy below.</p>'
+        + '<button class="printbtn" onclick="window.print()">Save a PDF copy</button></div>'
+        + '<div id="contractDoc">'+(contract.contract_html||'')+'</div>'+signedStamp()+'</div>';
+    }
+
+    async function notifyColleen(name){
+      const url = location.origin + '/sign.html?token=' + token;
+      const total = contract.total ? ('$' + Number(contract.total).toLocaleString('en-US')) : null;
+      const wd = contract.wedding_date ? new Date(contract.wedding_date + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : null;
+      const html = `
+<div style="margin:0;padding:0;background:#F2EBE3;font-family:Georgia,serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2EBE3;padding:30px 0;"><tr><td align="center">
+    <table role="presentation" width="540" cellpadding="0" cellspacing="0" style="max-width:540px;width:100%;background:#FAF6F1;border:1px solid #E4D3B8;border-radius:10px;overflow:hidden;box-shadow:0 10px 36px rgba(92,61,61,0.10);">
+      <tr><td style="height:4px;background:#C49A38;font-size:0;line-height:4px;">&nbsp;</td></tr>
+      <tr><td style="background:#5C3D3D;padding:24px;text-align:center;">
+        <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#F2C9B8;">Always &amp; Forever Beauty</div>
+        <div style="font-size:23px;color:#FAF6F1;margin-top:6px;">A Contract Was Just Signed &#10003;</div>
+      </td></tr>
+      <tr><td style="padding:28px 32px;color:#5C3D3D;font-size:16px;line-height:1.7;">
+        <p style="margin:0 0 12px;"><strong>${esc(name)}</strong> just signed their contract${wd ? (' for <strong>' + esc(wd) + '</strong>') : ''}.</p>
+        ${total ? ('<p style="margin:0 0 12px;">Event total: <strong style="color:#C49A38;">' + total + '</strong></p>') : ''}
+        <p style="margin:0 0 20px;">It&rsquo;s now marked <strong>Signed</strong> in your dashboard, with a copy saved for you.</p>
+        <p style="text-align:center;margin:0;"><a href="${url}" style="background:#C49A38;color:#fff;text-decoration:none;padding:12px 28px;border-radius:4px;font-size:14px;letter-spacing:0.5px;display:inline-block;">View the signed contract</a></p>
+      </td></tr>
+      <tr><td style="padding:0 32px 24px;text-align:center;color:#B5A49A;font-size:12px;">Always &amp; Forever Beauty LLC &middot; Pequot Lakes, MN</td></tr>
+    </table>
+  </td></tr></table>
+</div>`;
+      try {
+        await sb.functions.invoke('send-email', { body: { to: NOTIFY_EMAIL, subject: 'Contract signed — '+name, html, replyTo: contract.client_email || undefined } });
+      } catch(e){ /* non-blocking */ }
+    }
+  </script>
+</body>
+</html>

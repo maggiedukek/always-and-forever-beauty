@@ -990,10 +990,17 @@
     <div class="panel">
       <div class="panel-header">
         <h2>Contracts</h2>
-        <button class="btn-add-schedule" id="uploadContractBtn">+ Upload Contract</button>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button class="btn-add-schedule" id="newContractBtn">+ New Contract</button>
+          <button class="btn-add-schedule" id="uploadContractBtn" style="background:transparent; color:var(--gold); border:1px solid var(--gold);">Upload Signed PDF</button>
+        </div>
       </div>
+      <div id="sentContractsList">
+        <div style="padding:1.5rem 1.75rem; color:var(--taupe); font-style:italic; font-size:0.88rem;">Loading contracts…</div>
+      </div>
+      <div class="contracts-subhead">Uploaded files</div>
       <div id="contractsList">
-        <div style="padding:2rem; text-align:center; color:var(--taupe); font-style:italic; font-size:0.9rem;">Loading contracts…</div>
+        <div style="padding:1.5rem 1.75rem; color:var(--taupe); font-style:italic; font-size:0.9rem;">Loading contracts…</div>
       </div>
     </div>
 
@@ -1113,6 +1120,65 @@
       <div class="form-error" id="uploadContractError"></div>
       <button type="submit" class="btn-confirm" id="uploadContractSubmit" style="margin-top:0;">Upload Contract</button>
     </form>
+  </div>
+
+
+  <!-- New Contract Modal -->
+  <div class="modal-overlay" id="newContractOverlay"></div>
+  <div class="modal modal-lg" id="newContractModal" role="dialog" aria-modal="true" aria-labelledby="newContractTitle">
+    <div class="modal-header">
+      <h3 id="newContractTitle">New Contract</h3>
+      <button class="drawer-close" id="newContractClose" aria-label="Close">&times;</button>
+    </div>
+    <form class="modal-body" id="newContractForm">
+      <div class="form-field">
+        <label>Prefill from an existing client</label>
+        <select id="ncPrefill"><option value="">— choose a client (optional) —</option></select>
+      </div>
+      <div class="detail-grid">
+        <div class="form-field"><label>Client name *</label><input type="text" name="client_name" required /></div>
+        <div class="form-field"><label>Client email</label><input type="email" name="client_email" placeholder="for the signing link" /></div>
+        <div class="form-field"><label>Client phone</label><input type="tel" name="client_phone" /></div>
+        <div class="form-field"><label>Wedding date</label><input type="date" name="wedding_date" /></div>
+        <div class="form-field"><label>Getting-ready start time</label><input type="text" name="start_time" placeholder="e.g. 8:00 AM" /></div>
+        <div class="form-field"><label>Venue / location</label><input type="text" name="venue" /></div>
+      </div>
+
+      <div class="nc-sec">Package</div>
+      <div class="detail-grid">
+        <div class="form-field"><label>Package</label><select name="package_name" id="ncPackage"></select></div>
+        <div class="form-field"><label>Package price ($)</label><input type="number" name="package_price" id="ncPackagePrice" min="0" step="1" placeholder="0" /></div>
+      </div>
+
+      <div class="nc-sec">À la carte services</div>
+      <div id="ncItems"></div>
+      <button type="button" class="nc-additem" id="ncAddItem">+ Add service</button>
+
+      <div class="nc-sec">Totals</div>
+      <div class="detail-grid">
+        <div class="form-field"><label>Travel fee ($)</label><input type="number" name="travel_fee" id="ncTravel" min="0" step="1" value="0" /></div>
+        <div class="form-field"><label>Non-refundable retainer ($)</label><input type="number" name="retainer" id="ncRetainer" min="0" step="1" value="150" /></div>
+        <div class="form-field"><label>Balance due by</label><input type="date" name="balance_due_date" /></div>
+        <div class="form-field"><label>No changes after</label><input type="date" name="no_changes_date" /></div>
+      </div>
+      <div class="nc-totals" id="ncTotals"></div>
+
+      <div class="form-field"><label>Notes (optional, shown on the contract)</label><textarea name="notes" rows="2"></textarea></div>
+
+      <div class="form-error" id="newContractError"></div>
+      <div id="ncResult" style="display:none;"></div>
+      <button type="submit" class="btn-confirm" id="newContractSubmit" style="margin-top:0;">Create &amp; Send for Signature</button>
+    </form>
+  </div>
+
+  <!-- Contract View Modal -->
+  <div class="modal-overlay" id="ctViewOverlay"></div>
+  <div class="modal modal-lg" id="ctViewModal" role="dialog" aria-modal="true" aria-labelledby="ctViewTitle">
+    <div class="modal-header">
+      <h3 id="ctViewTitle">Contract</h3>
+      <button class="drawer-close" id="ctViewClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="ctViewBody"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1703,51 +1769,64 @@
       loadEmailLog();
     }
 
-    // Branded HTML for the booking confirmation email
-    function buildConfirmationEmail(i) {
-      const firstName = esc((i.name || '').trim().split(/\s+/)[0] || 'there');
-      const weddingDate = i.wedding_date ? formatDate(i.wedding_date) : null;
+    // ---- Shared branded email frame (mirrors Colleen's website) ----
+    function brandedEmail(scriptTitle, innerHtml) {
+      const IMG = 'https://dancing-dragon-be7906.netlify.app/images';
       return `
 <div style="margin:0;padding:0;background:#F2EBE3;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2EBE3;padding:32px 0;font-family:Georgia,'Times New Roman',serif;">
+  <style>@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');</style>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2EBE3;padding:34px 0;font-family:Georgia,serif;">
     <tr><td align="center">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#FAF6F1;border:1px solid #E4D3B8;border-radius:6px;overflow:hidden;">
-        <tr><td style="background:#5C3D3D;padding:28px 32px;text-align:center;">
-          <div style="font-family:Georgia,serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#F2C9B8;">Always &amp; Forever Beauty</div>
-          <div style="font-size:30px;color:#FAF6F1;margin-top:8px;">You're Booked!</div>
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#FAF6F1;border:1px solid #E4D3B8;border-radius:10px;overflow:hidden;box-shadow:0 14px 44px rgba(92,61,61,0.10);">
+        <tr><td style="height:5px;background:#C49A38;line-height:5px;font-size:0;">&nbsp;</td></tr>
+        <tr><td style="background:#FAF6F1;padding:26px 32px 14px;text-align:center;">
+          <img src="${IMG}/logo-horizontal-cropped.png" alt="Always &amp; Forever Beauty" width="262" style="display:inline-block;width:262px;max-width:76%;height:auto;" />
         </td></tr>
-        <tr><td style="padding:34px 38px 10px;color:#5C3D3D;">
-          <p style="font-size:17px;line-height:1.6;margin:0 0 18px;">Hi ${firstName},</p>
-          <p style="font-size:16px;line-height:1.7;margin:0 0 18px;">
-            I'm so thrilled to officially be part of your wedding day! Your date is confirmed,
-            and I can't wait to make your morning calm, joyful, and absolutely beautiful.
-          </p>
-          ${weddingDate ? `
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 22px;">
-            <tr><td style="background:#F4EAD8;border:1px solid #D9B45C;border-radius:4px;padding:16px;text-align:center;">
-              <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#B5A49A;">Your Wedding Date</div>
-              <div style="font-size:22px;color:#C49A38;margin-top:6px;">${esc(weddingDate)}</div>
-            </td></tr>
-          </table>` : ''}
-          <p style="font-size:16px;line-height:1.7;margin:0 0 18px;">
-            <strong>A few next steps:</strong> if we haven't already, we'll schedule your trial
-            session and finalize your timeline as the day gets closer. If you have any questions
-            in the meantime, just reply to this email — it comes straight to me.
-          </p>
-          <p style="font-size:16px;line-height:1.7;margin:0 0 6px;">With love,</p>
-          <p style="font-size:20px;color:#C49A38;margin:0 0 4px;">Colleen</p>
-          <p style="font-size:13px;color:#B5A49A;margin:0;">Always &amp; Forever Beauty &middot; Pequot Lakes, MN</p>
+        <tr><td background="${IMG}/background%20gold%20flowers.png" bgcolor="#F4EAD8" style="background-color:#F4EAD8;background-image:url('${IMG}/background%20gold%20flowers.png');background-position:center;background-size:cover;background-repeat:no-repeat;padding:32px 32px;text-align:center;">
+          <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#8A6420;">Always &amp; Forever Beauty</div>
+          <div style="font-family:'Great Vibes','Brush Script MT',cursive;font-size:46px;color:#5C3D3D;margin-top:4px;line-height:1.18;">${scriptTitle}</div>
+          <div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:15px;color:#8A6420;margin-top:8px;letter-spacing:0.5px;">Timeless beauty.&nbsp; Lasting love.</div>
         </td></tr>
-        <tr><td style="padding:22px 38px 30px;">
-          <hr style="border:none;border-top:1px solid #E4D3B8;margin:0 0 16px;" />
-          <p style="font-size:12px;color:#B5A49A;text-align:center;margin:0;">
-            Beauty for your forever moments.
+        <tr><td style="text-align:center;padding:20px 0 0;">
+          <img src="${IMG}/floweraccent.png" alt="" width="56" style="width:56px;height:auto;" />
+        </td></tr>
+        <tr><td style="padding:10px 46px 6px;color:#5C3D3D;">
+          ${innerHtml}
+        </td></tr>
+        <tr><td style="padding:14px 46px 34px;">
+          <p style="font-family:'Great Vibes',cursive;font-size:24px;color:#C49A38;text-align:center;margin:8px 0 12px;">Beauty for your forever moments</p>
+          <p style="text-align:center;margin:0 0 10px;">
+            <a href="https://www.instagram.com/always.forever.beauty_hmua" style="color:#5C3D3D;text-decoration:none;font-size:11px;letter-spacing:2px;font-family:Georgia,serif;">INSTAGRAM</a>
+            <span style="color:#D9B45C;">&nbsp;&middot;&nbsp;</span>
+            <a href="https://www.facebook.com/share/1B8esVaDLR/" style="color:#5C3D3D;text-decoration:none;font-size:11px;letter-spacing:2px;font-family:Georgia,serif;">FACEBOOK</a>
           </p>
+          <p style="font-size:12px;color:#B5A49A;text-align:center;margin:0;font-family:Georgia,serif;">Always &amp; Forever Beauty LLC &middot; Pequot Lakes, MN</p>
         </td></tr>
       </table>
     </td></tr>
   </table>
 </div>`;
+    }
+
+    // Branded HTML for the booking confirmation email
+    function buildConfirmationEmail(i) {
+      const firstName = esc((i.name || '').trim().split(/\s+/)[0] || 'there');
+      const weddingDate = i.wedding_date ? formatDate(i.wedding_date) : null;
+      const inner = `
+        <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;line-height:1.6;margin:10px 0 16px;color:#5C3D3D;">Hi ${firstName},</p>
+        <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.8;margin:0 0 18px;color:#5C3D3D;">I&rsquo;m so honored to be part of your wedding day. Your date is officially saved &mdash; and I already can&rsquo;t wait to make your morning feel calm, glowing, and completely <em>you</em>.</p>
+        ${weddingDate ? `
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 22px;">
+          <tr><td style="background:#F4EAD8;border:1px solid #D9B45C;border-radius:8px;padding:20px;text-align:center;">
+            <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#B5A49A;">Your Wedding Date</div>
+            <div style="font-family:'Playfair Display',Georgia,serif;font-size:25px;color:#C49A38;margin-top:6px;">${esc(weddingDate)}</div>
+          </td></tr>
+        </table>` : ''}
+        <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.8;margin:0 0 18px;color:#5C3D3D;"><strong style="color:#C49A38;">What happens next &mdash;</strong> we&rsquo;ll gently map out your morning timeline as the day draws closer. If you&rsquo;d love a preview of your look beforehand, a trial is always available as an optional add-on &mdash; just say the word and we&rsquo;ll find a date. Any questions in the meantime? Simply reply to this note; it comes straight to me.</p>
+        <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.6;margin:24px 0 2px;color:#5C3D3D;">With all my love,</p>
+        <p style="font-family:'Great Vibes',cursive;font-size:34px;color:#C49A38;margin:0;line-height:1;">Colleen</p>
+        <p style="font-family:Georgia,serif;font-size:12px;color:#B5A49A;margin:4px 0 6px;letter-spacing:1px;">Always &amp; Forever Beauty</p>`;
+      return brandedEmail("You&rsquo;re Booked", inner);
     }
 
     // Load email log
@@ -1832,5 +1911,442 @@
     // Boot the dashboard
     init();
   </script>
+  <style>
+    .modal.modal-lg { width: min(680px, 94vw); }
+    .modal-lg .modal-body { max-height: 80vh; overflow: auto; }
+    .nc-sec { font-family:'Playfair Display',serif; color:var(--rose); font-size:0.95rem; margin:1.2rem 0 0.55rem; padding-bottom:0.3rem; border-bottom:1px solid rgba(196,154,56,0.3); }
+    .nc-item { display:grid; grid-template-columns: 1fr 64px 78px 26px; gap:0.5rem; align-items:center; margin-bottom:0.5rem; }
+    .nc-item select, .nc-item input { width:100%; }
+    .nc-item .ci-line { font-size:0.85rem; color:var(--rose); text-align:right; white-space:nowrap; }
+    .nc-item .ci-del { border:none; background:transparent; color:var(--declined); font-size:1.2rem; cursor:pointer; line-height:1; }
+    .nc-additem { background:transparent; border:1px dashed var(--gold); color:var(--gold); border-radius:6px; padding:0.45rem 0.9rem; cursor:pointer; font-size:0.85rem; }
+    .nc-totals { background:rgba(196,154,56,0.07); border:1px solid rgba(196,154,56,0.25); border-radius:8px; padding:0.75rem 1rem; font-size:0.9rem; margin-top:0.6rem; }
+    .nc-totals .row { display:flex; justify-content:space-between; padding:0.15rem 0; color:var(--rose); }
+    .nc-totals .row.total { font-weight:700; border-top:1px solid rgba(196,154,56,0.35); margin-top:0.3rem; padding-top:0.4rem; }
+    .nc-result { background:rgba(46,125,81,0.08); border:1px solid rgba(46,125,81,0.3); border-radius:8px; padding:0.9rem 1rem; margin-bottom:0.8rem; font-size:0.88rem; color:var(--rose); }
+    .nc-result .nc-link { display:flex; gap:0.4rem; margin-top:0.5rem; }
+    .nc-result input { flex:1; font-size:0.8rem; padding:0.4rem 0.55rem; }
+    .contracts-subhead { padding:1.1rem 1.75rem 0.3rem; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.09em; color:var(--taupe); }
+    .ct-row { display:flex; justify-content:space-between; align-items:center; gap:0.75rem; padding:0.85rem 1.75rem; border-bottom:1px solid rgba(196,154,56,0.15); flex-wrap:wrap; }
+    .ct-row:last-child { border-bottom:none; }
+    .ct-meta { display:flex; flex-direction:column; gap:0.15rem; min-width:0; }
+    .ct-meta .nm { font-weight:600; color:var(--rose); }
+    .ct-meta .sub { font-size:0.76rem; color:var(--taupe); }
+    .ct-badge { font-size:0.68rem; padding:0.2rem 0.6rem; border-radius:20px; font-weight:600; white-space:nowrap; }
+    .ct-badge.sent { background:rgba(184,134,11,0.16); color:#8a5e00; }
+    .ct-badge.signed { background:rgba(46,125,81,0.16); color:var(--new); }
+    .ct-badge.void { background:rgba(140,26,26,0.12); color:var(--declined); }
+    .ct-actions { display:flex; gap:0.4rem; flex-wrap:wrap; }
+    .ct-actions button { font-size:0.74rem; padding:0.32rem 0.62rem; border-radius:5px; border:1px solid var(--gold); background:#fff; color:var(--rose); cursor:pointer; }
+    .ct-actions button:hover { background:var(--gold); color:#fff; }
+    .ct-actions button.danger { border-color:rgba(140,26,26,0.4); color:var(--declined); }
+    .ct-actions button.danger:hover { background:var(--declined); color:#fff; border-color:var(--declined); }
+  </style>
+  <script>
+  (function () {
+    // ---------- Pricing data ----------
+    const NC_PACKAGES = [
+      ['', 0, ''],
+      ['The Silver Package', 775, 'Bride + up to 4 bridesmaids — hair only (trial not included)'],
+      ['The Golden Package', 1665, 'Bride + up to 4 bridesmaids — hair & makeup (trial not included)'],
+      ['The Platinum Package', 0, 'Bride + full wedding party — hair & makeup; additional artist available (custom quote)'],
+      ['The Luxe Bride', 2300, 'A full day of sole attention — bridal hair & makeup, luxe skin prep, a second look for the reception, and touch-ups throughout (private lodging required)']
+    ];
+    const NC_ALACARTE = [
+      ['Bride — hair & makeup', 350], ['Bride — hair only', 175], ['Bride — makeup only', 175],
+      ['Bridesmaid — hair', 150], ['Bridesmaid — makeup', 135], ['Mother / guest — hair', 150],
+      ['Mother / guest — makeup', 135], ['Jr. bridesmaid hair (9–14)', 80], ['Flower girl hair (8 & under)', 50],
+      ['Hair trial', 150], ['Makeup trial', 150], ['Strip lashes', 20], ['Hair extension placement (per set)', 50]
+    ];
+    const money = (n) => '$' + Number(n || 0).toLocaleString('en-US');
+
+    // ---------- Modal open/close ----------
+    const ov = document.getElementById('newContractOverlay');
+    const md = document.getElementById('newContractModal');
+    function openNC(prefill) {
+      const form = document.getElementById('newContractForm');
+      form.reset();
+      document.getElementById('newContractError').textContent = '';
+      const res = document.getElementById('ncResult'); res.style.display = 'none'; res.innerHTML = '';
+      document.getElementById('newContractSubmit').style.display = '';
+      // prefill clients dropdown
+      const sel = document.getElementById('ncPrefill');
+      sel.innerHTML = '<option value="">— choose a client (optional) —</option>' +
+        (allInquiries || []).map((i, idx) => `<option value="${idx}">${esc(i.name || 'Unnamed')}${i.email ? ' — ' + esc(i.email) : ''}</option>`).join('');
+      // package dropdown
+      const pk = document.getElementById('ncPackage');
+      pk.innerHTML = NC_PACKAGES.map((p, idx) => `<option value="${idx}">${p[0] ? esc(p[0]) : '— No package (à la carte only) —'}</option>`).join('');
+      document.getElementById('ncPackagePrice').value = '';
+      document.getElementById('ncItems').innerHTML = '';
+      document.getElementById('ncTravel').value = '0';
+      document.getElementById('ncRetainer').value = '150';
+      if (prefill) {
+        form.client_name.value = prefill.name || '';
+        form.client_email.value = prefill.email || '';
+        form.client_phone.value = prefill.phone || '';
+        if (prefill.wedding_date) form.wedding_date.value = prefill.wedding_date;
+      }
+      recalc();
+      ov.classList.add('open'); md.classList.add('open');
+    }
+    function closeNC() { ov.classList.remove('open'); md.classList.remove('open'); }
+    document.getElementById('newContractBtn').addEventListener('click', () => openNC(null));
+    document.getElementById('newContractClose').addEventListener('click', closeNC);
+    ov.addEventListener('click', closeNC);
+    window.openNewContract = openNC; // so other parts can call it
+
+    document.getElementById('ncPrefill').addEventListener('change', (e) => {
+      const i = allInquiries[Number(e.target.value)];
+      if (!i) return;
+      const form = document.getElementById('newContractForm');
+      form.client_name.value = i.name || '';
+      form.client_email.value = i.email || '';
+      form.client_phone.value = i.phone || '';
+      form.wedding_date.value = i.wedding_date || '';
+    });
+    document.getElementById('ncPackage').addEventListener('change', (e) => {
+      const p = NC_PACKAGES[Number(e.target.value)];
+      document.getElementById('ncPackagePrice').value = (p && p[1]) ? p[1] : '';
+      recalc();
+    });
+
+    // ---------- Line items ----------
+    function addItem() {
+      const wrap = document.createElement('div');
+      wrap.className = 'nc-item';
+      wrap.innerHTML =
+        '<select class="ci-svc">' + NC_ALACARTE.map((a, idx) => `<option value="${idx}">${esc(a[0])}</option>`).join('') + '</select>' +
+        '<input class="ci-qty" type="number" min="1" value="1" />' +
+        '<span class="ci-line"></span>' +
+        '<button type="button" class="ci-del" title="Remove">&times;</button>';
+      document.getElementById('ncItems').appendChild(wrap);
+      wrap.querySelector('.ci-svc').addEventListener('change', recalc);
+      wrap.querySelector('.ci-qty').addEventListener('input', recalc);
+      wrap.querySelector('.ci-del').addEventListener('click', () => { wrap.remove(); recalc(); });
+      recalc();
+    }
+    document.getElementById('ncAddItem').addEventListener('click', addItem);
+    ['ncPackagePrice', 'ncTravel', 'ncRetainer'].forEach(id => document.getElementById(id).addEventListener('input', recalc));
+
+    function collectItems() {
+      const out = [];
+      document.querySelectorAll('#ncItems .nc-item').forEach(row => {
+        const a = NC_ALACARTE[Number(row.querySelector('.ci-svc').value)];
+        const qty = Math.max(1, parseInt(row.querySelector('.ci-qty').value || '1', 10));
+        const total = a[1] * qty;
+        row.querySelector('.ci-line').textContent = money(total);
+        out.push({ name: a[0], qty, price: a[1], total });
+      });
+      return out;
+    }
+    function currentTotals() {
+      const items = collectItems();
+      const pkgPrice = parseFloat(document.getElementById('ncPackagePrice').value || '0') || 0;
+      const travel = parseFloat(document.getElementById('ncTravel').value || '0') || 0;
+      const retainer = parseFloat(document.getElementById('ncRetainer').value || '0') || 0;
+      const itemsSum = items.reduce((s, i) => s + i.total, 0);
+      const subtotal = pkgPrice + itemsSum;
+      const total = subtotal + travel;
+      const balance = Math.max(0, total - retainer);
+      return { items, pkgPrice, travel, retainer, subtotal, total, balance };
+    }
+    function recalc() {
+      const t = currentTotals();
+      document.getElementById('ncTotals').innerHTML =
+        `<div class="row"><span>Subtotal</span><span>${money(t.subtotal)}</span></div>` +
+        `<div class="row"><span>Travel fee</span><span>${money(t.travel)}</span></div>` +
+        `<div class="row total"><span>Event total</span><span>${money(t.total)}</span></div>` +
+        `<div class="row"><span>Retainer (non-refundable)</span><span>${money(t.retainer)}</span></div>` +
+        `<div class="row"><span>Balance due</span><span>${money(t.balance)}</span></div>`;
+    }
+
+    // ---------- Build the contract HTML snapshot ----------
+    function buildContractHTML(d) {
+      const G = '#C49A38', R = '#5C3D3D', T = '#3A2A2A', LINE = '#E4D3B8';
+      const sec = (t) => `<div style="background:${R};color:#fff;font-family:Georgia,serif;font-weight:bold;font-size:14px;padding:7px 12px;margin:18px 0 8px;border-radius:3px;">${t}</div>`;
+      const li = (x) => `<li style="margin:3px 0;">${x}</li>`;
+      const pkgPriceTxt = d.package_name ? (d.package_price > 0 ? money(d.package_price) : 'Custom quote') : '';
+      let rows = '';
+      if (d.package_name) rows += `<tr><td style="padding:5px 8px;border:1px solid ${LINE};">${esc(d.package_name)}</td><td style="padding:5px 8px;border:1px solid ${LINE};text-align:center;">1</td><td style="padding:5px 8px;border:1px solid ${LINE};text-align:right;">${pkgPriceTxt}</td></tr>`;
+      (d.line_items || []).forEach(it => {
+        rows += `<tr><td style="padding:5px 8px;border:1px solid ${LINE};">${esc(it.name)}</td><td style="padding:5px 8px;border:1px solid ${LINE};text-align:center;">${it.qty}</td><td style="padding:5px 8px;border:1px solid ${LINE};text-align:right;">${money(it.total)}</td></tr>`;
+      });
+      if (!rows) rows = `<tr><td colspan="3" style="padding:5px 8px;border:1px solid ${LINE};color:${T};font-style:italic;">Services to be detailed in your quote.</td></tr>`;
+      const fmtD = (x) => x ? formatDate(x) : '____________';
+      return `
+<div style="font-family:Calibri,Arial,sans-serif;color:${T};font-size:13px;line-height:1.5;max-width:720px;margin:0 auto;">
+  <div style="text-align:center;border-bottom:2px solid ${G};padding-bottom:10px;margin-bottom:14px;">
+    <div style="font-family:Georgia,serif;font-size:24px;color:${G};font-weight:bold;">Bridal Hair &amp; Makeup Services Agreement</div>
+    <div style="color:${R};font-weight:bold;margin-top:3px;">Always &amp; Forever Beauty LLC</div>
+    <div style="font-style:italic;color:${G};font-size:12px;">Timeless beauty. &nbsp;Lasting love.</div>
+  </div>
+  <p>This Agreement is entered into by and between <strong>Always &amp; Forever Beauty LLC</strong> (&ldquo;Company&rdquo; or &ldquo;Artist&rdquo;) and <strong>${esc(d.client_name)}</strong> (&ldquo;Client&rdquo;).</p>
+  ${sec('1. &nbsp;Event Details')}
+  <p style="margin:4px 0;">Wedding date: <strong>${fmtD(d.wedding_date)}</strong>${d.start_time ? ' &nbsp;&middot; &nbsp;Getting-ready start: <strong>' + esc(d.start_time) + '</strong>' : ''}</p>
+  <p style="margin:4px 0;">Venue / location: <strong>${esc(d.venue || '____________________')}</strong></p>
+  ${sec('2. &nbsp;Services &amp; Pricing')}
+  <table style="border-collapse:collapse;width:100%;font-size:12.5px;">
+    <tr><th style="padding:5px 8px;border:1px solid ${LINE};background:${R};color:#fff;text-align:left;">Service</th><th style="padding:5px 8px;border:1px solid ${LINE};background:${R};color:#fff;">Qty</th><th style="padding:5px 8px;border:1px solid ${LINE};background:${R};color:#fff;text-align:right;">Price</th></tr>
+    ${rows}
+  </table>
+  <table style="border-collapse:collapse;width:100%;margin-top:8px;font-size:12.5px;">
+    <tr><td style="padding:3px 8px;text-align:right;">Subtotal:</td><td style="padding:3px 8px;text-align:right;width:120px;">${money(d.subtotal)}</td></tr>
+    <tr><td style="padding:3px 8px;text-align:right;">Travel fee:</td><td style="padding:3px 8px;text-align:right;">${money(d.travel_fee)}</td></tr>
+    <tr><td style="padding:3px 8px;text-align:right;font-weight:bold;color:${R};">Event total:</td><td style="padding:3px 8px;text-align:right;font-weight:bold;color:${R};">${money(d.total)}</td></tr>
+    <tr><td style="padding:3px 8px;text-align:right;">Non-refundable retainer:</td><td style="padding:3px 8px;text-align:right;">${money(d.retainer)}</td></tr>
+    <tr><td style="padding:3px 8px;text-align:right;font-weight:bold;">Balance due:</td><td style="padding:3px 8px;text-align:right;font-weight:bold;">${money(d.balance)}</td></tr>
+  </table>
+  ${d.notes ? '<p style="margin-top:8px;"><strong>Notes:</strong> ' + esc(d.notes) + '</p>' : ''}
+  ${sec('3. &nbsp;Payment Terms')}
+  <ul style="margin:4px 0;padding-left:20px;">
+    ${li('A non-refundable retainer of ' + money(d.retainer) + ' is due upon signing. It reserves your date and is separate from your service total.')}
+    ${li('The remaining balance for services and travel is due no later than <strong>' + fmtD(d.balance_due_date) + '</strong>.')}
+    ${li('Payment may be made via Venmo, Cash, or PayPal.')}
+    ${li('If the balance is not paid by the due date, services may not be performed, the retainer is forfeited, and the cancellation terms below apply.')}
+  </ul>
+  ${sec('4. &nbsp;Travel &amp; Logistics')}
+  <ul style="margin:4px 0;padding-left:20px;">
+    ${li('Travel is charged at $0.75 per mile from Pequot Lakes, MN.')}
+    ${li('An early-start fee of $50 per hour applies for any start before 6:00 AM.')}
+    ${li('If the event is over 2 hours from Pequot Lakes, MN, the Client provides $200 toward private lodging the night before when morning prep is required (by prior arrangement).')}
+    ${li('If booked for the full day (second look, touch-ups), the Client provides $200 toward private lodging the evening of the event (by prior arrangement).')}
+    ${li('Meals and refreshments are made available to the Artist during extended stays.')}
+  </ul>
+  ${sec('5. &nbsp;Scheduling &amp; Day-Of')}
+  <ul style="margin:4px 0;padding-left:20px;">
+    ${li('If the Client moves the completion time up after signing, services may not finish on time and the Company is not liable.')}
+    ${li('If the Client or party members are late or unavailable, the Client remains responsible for payment of the booked services.')}
+    ${li('A $15 fee is added for every 15 minutes the Artist&rsquo;s chair sits empty due to a late or absent party member.')}
+    ${li('The Client and party will arrive on time with clean, dry hair and a clean face.')}
+    ${li('No services may be added or removed after <strong>' + fmtD(d.no_changes_date) + '</strong>.')}
+  </ul>
+  ${sec('6. &nbsp;Trials')}
+  <p>Trials are optional and not required. When booked, trials are held on weekdays in Pequot Lakes or Brainerd, MN.</p>
+  ${sec('7. &nbsp;Cancellation Policy')}
+  <ul style="margin:4px 0;padding-left:20px;">
+    ${li('More than 30 days before the wedding: no further liability; the retainer remains non-refundable.')}
+    ${li('Within 29 days: the Client is responsible for 50% of the remaining balance.')}
+    ${li('Within 14 days: the Client is responsible for 100% of the remaining balance.')}
+    ${li('If the Company must cancel due to emergency, it will try to arrange a replacement Artist; if none is available, the Client receives a full refund of payments made for the services.')}
+  </ul>
+  ${sec('8. &nbsp;Weather &amp; Force Majeure')}
+  <p>Neither party is liable for failure to perform due to causes beyond reasonable control (severe weather, natural disasters, road or venue closures, illness, or government restrictions). The parties will work in good faith to reschedule; if not possible, refunds are limited to amounts paid for services not yet rendered (the retainer remains non-refundable).</p>
+  ${sec('9. &nbsp;Liability')}
+  <ul style="margin:4px 0;padding-left:20px;">
+    ${li('The Company is not responsible for allergic reactions. The Client must disclose any allergies or sensitivities before services.')}
+    ${li('The Client is responsible for repair or replacement of the Artist&rsquo;s Kit (tools, products, bags, chair, lights) in the event of damage or theft.')}
+    ${li('The Company&rsquo;s total liability is limited to the total cost of the services provided under this Agreement.')}
+  </ul>
+  ${sec('10. &nbsp;Photo Release')}
+  <p>The Client grants the Company permission to use photos and video of the Client&rsquo;s hair and makeup for promotional purposes, including the Company&rsquo;s website and social media.</p>
+  ${sec('11. &nbsp;Governing Law &amp; Entire Agreement')}
+  <p>This Agreement is governed by the laws of the State of Minnesota. It constitutes the entire agreement between the parties and supersedes all prior communications, and may be signed electronically and in counterparts.</p>
+</div>`;
+    }
+
+    function buildContractEmail(d, url) {
+      const pkg = d.package_name || 'Your custom services';
+      const totalTxt = d.total ? money(d.total) : 'Custom quote';
+      const dateTxt = d.wedding_date ? formatDate(d.wedding_date) : 'Your wedding day';
+      const inner = `
+        <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;line-height:1.6;margin:10px 0 16px;color:#5C3D3D;">Hi ${esc((d.client_name || 'there').split(' ')[0])},</p>
+        <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.8;margin:0 0 8px;color:#5C3D3D;">Thank you for choosing Always &amp; Forever Beauty for your wedding day. Your services agreement is ready to review and sign online &mdash; it only takes a moment.</p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0 22px;">
+          <tr><td style="background:#F4EAD8;border:1px solid #D9B45C;border-radius:8px;padding:20px 24px;">
+            <div style="font-family:Georgia,serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#B5A49A;text-align:center;margin-bottom:6px;">Your Booking</div>
+            <div style="font-family:'Playfair Display',Georgia,serif;font-size:20px;color:#5C3D3D;text-align:center;margin-bottom:14px;">${esc(pkg)}</div>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;color:#5C3D3D;">
+              <tr><td style="padding:4px 0;">Wedding date</td><td style="padding:4px 0;text-align:right;font-weight:bold;">${esc(dateTxt)}</td></tr>
+              <tr><td style="padding:4px 0;border-top:1px solid #E6D2A8;">Event total</td><td style="padding:4px 0;text-align:right;font-weight:bold;color:#C49A38;border-top:1px solid #E6D2A8;">${esc(totalTxt)}</td></tr>
+              ${d.retainer ? `<tr><td style="padding:4px 0;border-top:1px solid #E6D2A8;">Retainer to reserve your date</td><td style="padding:4px 0;text-align:right;border-top:1px solid #E6D2A8;">${money(d.retainer)}</td></tr>` : ''}
+            </table>
+          </td></tr>
+        </table>
+        <p style="text-align:center;margin:24px 0;">
+          <a href="${url}" style="background:#5C3D3D;color:#FAF6F1;text-decoration:none;padding:15px 38px;border-radius:2px;font-family:'Playfair Display',Georgia,serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;display:inline-block;">Review &amp; Sign Your Contract</a>
+        </p>
+        <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;color:#8a7d72;text-align:center;margin:0 0 18px;">Or paste this link into your browser:<br><span style="color:#C49A38;word-break:break-all;">${url}</span></p>
+        <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.8;margin:0 0 2px;color:#5C3D3D;">Once you sign, you&rsquo;ll receive your own copy and I&rsquo;ll be notified right away. I can&rsquo;t wait to be part of your day!</p>
+        <p style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;line-height:1.6;margin:20px 0 2px;color:#5C3D3D;">With love,</p>
+        <p style="font-family:'Great Vibes',cursive;font-size:32px;color:#C49A38;margin:0;line-height:1;">Colleen</p>
+        <p style="font-family:Georgia,serif;font-size:12px;color:#B5A49A;margin:4px 0 6px;letter-spacing:1px;">Always &amp; Forever Beauty</p>`;
+      return brandedEmail("Your Contract Is Ready", inner);
+    }
+
+    // ---------- Submit: create + send ----------
+    document.getElementById('newContractForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('newContractSubmit');
+      const err = document.getElementById('newContractError');
+      err.textContent = '';
+      const form = e.target;
+      const name = (form.client_name.value || '').trim();
+      if (!name) { err.textContent = 'Client name is required.'; return; }
+      const t = currentTotals();
+      const pkgIdx = Number(document.getElementById('ncPackage').value);
+      const pkgName = NC_PACKAGES[pkgIdx] ? NC_PACKAGES[pkgIdx][0] : '';
+      const token = (window.crypto && crypto.randomUUID ? crypto.randomUUID().replace(/-/g, '') : (Date.now().toString(36))) + Math.random().toString(36).slice(2, 8);
+      const d = {
+        token,
+        client_name: name,
+        client_email: (form.client_email.value || '').trim() || null,
+        client_phone: (form.client_phone.value || '').trim() || null,
+        wedding_date: form.wedding_date.value || null,
+        venue: (form.venue.value || '').trim() || null,
+        start_time: (form.start_time.value || '').trim() || null,
+        package_name: pkgName || null,
+        package_price: t.pkgPrice || null,
+        line_items: t.items,
+        subtotal: t.subtotal,
+        travel_fee: t.travel,
+        total: t.total,
+        retainer: t.retainer,
+        balance: t.balance,
+        balance_due_date: form.balance_due_date.value || null,
+        no_changes_date: form.no_changes_date.value || null,
+        notes: (form.notes.value || '').trim() || null,
+        status: 'sent'
+      };
+      d.contract_html = buildContractHTML(d);
+
+      btn.disabled = true; btn.textContent = 'Creating…';
+      const { error } = await sb.from('contracts').insert([d]);
+      if (error) {
+        btn.disabled = false; btn.textContent = 'Create & Send for Signature';
+        err.textContent = 'Could not save: ' + error.message + (error.message.includes('relation') ? '  (Run admin/contracts-setup.sql in Supabase first.)' : '');
+        return;
+      }
+      const url = location.origin + '/sign.html?token=' + token;
+
+      // Try to email the client the signing link
+      let emailMsg = '';
+      if (d.client_email) {
+        btn.textContent = 'Sending…';
+        try {
+          const { data: r, error: e2 } = await sb.functions.invoke('send-email', {
+            body: { to: d.client_email, subject: 'Your Always & Forever Beauty contract — ready to sign', html: buildContractEmail(d, url) }
+          });
+          const ok = !e2 && !(r && r.ok === false);
+          await sb.from('email_logs').insert([{ booking_id: null, recipient_email: d.client_email, email_type: 'contract_link', sent_at: new Date().toISOString(), success: ok }]);
+          emailMsg = ok ? `✓ Signing link emailed to ${esc(d.client_email)}.` : `Saved, but the email didn't send (${esc((e2 && e2.message) || (r && r.error) || 'email not set up yet')}). Copy the link below and send it yourself.`;
+        } catch (ex) {
+          emailMsg = `Saved, but the email didn't send. Copy the link below and send it yourself.`;
+        }
+      } else {
+        emailMsg = 'No client email on file — copy the link below and send it however you like.';
+      }
+
+      btn.style.display = 'none';
+      const res = document.getElementById('ncResult');
+      res.className = 'nc-result';
+      res.style.display = 'block';
+      res.innerHTML = `<div>${emailMsg}</div>
+        <div class="nc-link">
+          <input type="text" readonly value="${esc(url)}" id="ncLinkField" />
+          <button type="button" class="btn-add-schedule" id="ncCopyBtn" style="padding:0.4rem 0.8rem;">Copy</button>
+        </div>
+        <div style="margin-top:0.7rem;"><button type="button" class="btn-confirm" id="ncDoneBtn" style="margin:0;">Done</button></div>`;
+      document.getElementById('ncCopyBtn').addEventListener('click', () => {
+        const fld = document.getElementById('ncLinkField'); fld.select();
+        navigator.clipboard?.writeText(fld.value); document.getElementById('ncCopyBtn').textContent = 'Copied!';
+      });
+      document.getElementById('ncDoneBtn').addEventListener('click', () => { closeNC(); loadSentContracts(); loadEmailLog(); });
+      loadSentContracts();
+    });
+
+    // ---------- Sent / signed contracts list ----------
+    function composeSignedDoc(c) {
+      let sig = '';
+      if (c.status === 'signed') {
+        const when = c.signed_at ? formatDateTime(c.signed_at) : '';
+        const mark = (c.signature_type === 'drawn' && c.signature_data)
+          ? `<img src="${c.signature_data}" alt="signature" style="max-height:90px;display:block;" />`
+          : `<div style="font-family:'Brush Script MT',cursive;font-size:34px;color:#3A2A2A;">${esc(c.signer_name || '')}</div>`;
+        sig = `<div style="margin-top:22px;border-top:2px solid #C49A38;padding-top:12px;">
+          <div style="font-weight:bold;color:#5C3D3D;margin-bottom:6px;">Signed by Client</div>
+          ${mark}
+          <div style="font-size:12px;color:#3A2A2A;margin-top:6px;">${esc(c.signer_name || '')} &nbsp;&middot;&nbsp; ${when}</div>
+          <div style="font-size:11px;color:#8a7d72;margin-top:3px;">Electronically signed (${esc(c.signature_type || 'typed')})${c.signer_ip ? ' &middot; IP ' + esc(c.signer_ip) : ''}</div>
+        </div>`;
+      } else {
+        sig = `<div style="margin-top:22px;border-top:2px dashed #C49A38;padding-top:12px;color:#8a7d72;font-style:italic;">Awaiting client signature.</div>`;
+      }
+      return (c.contract_html || '') + sig;
+    }
+    function printDoc(c) {
+      const w = window.open('', '_blank');
+      if (!w) { alert('Please allow pop-ups to print/save the contract.'); return; }
+      w.document.write('<html><head><title>Contract — ' + (c.client_name || '') + '</title></head><body style="margin:24px;">' + composeSignedDoc(c) + '</body></html>');
+      w.document.close();
+      setTimeout(() => w.print(), 400);
+    }
+    const ctOv = document.getElementById('ctViewOverlay');
+    const ctMd = document.getElementById('ctViewModal');
+    function openContractView(c) {
+      document.getElementById('ctViewTitle').textContent = 'Contract — ' + (c.client_name || '');
+      document.getElementById('ctViewBody').innerHTML =
+        '<div style="text-align:right;margin-bottom:10px;"><button class="btn-add-schedule" id="ctPrintBtn" style="padding:0.4rem 0.9rem;">Print / Save PDF</button></div>' +
+        '<div style="background:#fff;border:1px solid #E4D3B8;border-radius:6px;padding:18px;">' + composeSignedDoc(c) + '</div>';
+      document.getElementById('ctPrintBtn').addEventListener('click', () => printDoc(c));
+      ctOv.classList.add('open'); ctMd.classList.add('open');
+    }
+    function closeCtView() { ctOv.classList.remove('open'); ctMd.classList.remove('open'); }
+    document.getElementById('ctViewClose').addEventListener('click', closeCtView);
+    ctOv.addEventListener('click', closeCtView);
+
+    async function resendLink(c) {
+      const url = location.origin + '/sign.html?token=' + c.token;
+      if (!c.client_email) { prompt('No email on file. Copy this signing link:', url); return; }
+      try {
+        const { data: r, error } = await sb.functions.invoke('send-email', {
+          body: { to: c.client_email, subject: 'Your Always & Forever Beauty contract — ready to sign', html: buildContractEmail(c, url) }
+        });
+        const ok = !error && !(r && r.ok === false);
+        await sb.from('email_logs').insert([{ booking_id: null, recipient_email: c.client_email, email_type: 'contract_link', sent_at: new Date().toISOString(), success: ok }]);
+        alert(ok ? 'Signing link re-sent to ' + c.client_email : "Couldn't send email. Link:\n\n" + url);
+        loadEmailLog();
+      } catch (e) { prompt('Email failed. Copy this signing link:', url); }
+    }
+
+    window.loadSentContracts = async function () {
+      const el = document.getElementById('sentContractsList');
+      const { data, error } = await sb.from('contracts').select('*').order('created_at', { ascending: false });
+      if (error) {
+        el.innerHTML = `<div style="padding:1.5rem 1.75rem;color:var(--taupe);font-style:italic;font-size:0.88rem;">Contracts aren't set up yet. Run <strong>admin/contracts-setup.sql</strong> in Supabase. (${esc(error.message)})</div>`;
+        return;
+      }
+      if (!data || !data.length) {
+        el.innerHTML = `<div style="padding:1.5rem 1.75rem;color:var(--taupe);font-style:italic;font-size:0.88rem;">No contracts yet. Click <strong>+ New Contract</strong> to create one.</div>`;
+        return;
+      }
+      el.innerHTML = data.map((c, idx) => {
+        const badge = c.status === 'signed' ? '<span class="ct-badge signed">Signed</span>'
+          : c.status === 'void' ? '<span class="ct-badge void">Void</span>'
+          : '<span class="ct-badge sent">Awaiting signature</span>';
+        const sub = [c.package_name || 'À la carte', c.total ? money(c.total) : null, c.wedding_date ? formatDate(c.wedding_date) : null].filter(Boolean).join(' · ');
+        let actions = `<button data-a="view" data-i="${idx}">View</button>`;
+        if (c.status === 'sent') actions += `<button data-a="copy" data-i="${idx}">Copy link</button><button data-a="resend" data-i="${idx}">Resend</button><button class="danger" data-a="void" data-i="${idx}">Void</button>`;
+        else actions += `<button data-a="print" data-i="${idx}">Print</button><button class="danger" data-a="del" data-i="${idx}">Delete</button>`;
+        return `<div class="ct-row"><div class="ct-meta"><span class="nm">${esc(c.client_name)} ${badge}</span><span class="sub">${esc(sub)}</span></div><div class="ct-actions">${actions}</div></div>`;
+      }).join('');
+      el.querySelectorAll('button[data-a]').forEach(b => {
+        const c = data[Number(b.dataset.i)];
+        const a = b.dataset.a;
+        b.addEventListener('click', async () => {
+          if (a === 'view') openContractView(c);
+          else if (a === 'print') printDoc(c);
+          else if (a === 'copy') { const u = location.origin + '/sign.html?token=' + c.token; navigator.clipboard?.writeText(u); b.textContent = 'Copied!'; }
+          else if (a === 'resend') resendLink(c);
+          else if (a === 'void') { if (confirm('Void this contract? The signing link will stop working.')) { await sb.from('contracts').update({ status: 'void' }).eq('id', c.id); loadSentContracts(); } }
+          else if (a === 'del') { if (confirm('Delete this contract permanently?')) { await sb.from('contracts').delete().eq('id', c.id); loadSentContracts(); } }
+        });
+      });
+    };
+
+    // Load once the owner session is confirmed
+    sb.auth.getSession().then(({ data }) => { if (data && data.session) loadSentContracts(); });
+  })();
+  </script>
 </body>
+
 </html>

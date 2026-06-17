@@ -66,9 +66,11 @@
 
     .packages-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 2rem;
       align-items: start;
+      max-width: 920px;
+      margin: 0 auto;
     }
 
     .package-card {
@@ -301,20 +303,20 @@
         <h2 class="gallery-title">Bridal Collections</h2>
         <p>Choose Your Package</p>
       </header>
-      <p style="text-align:center; max-width:60ch; margin:0 auto 3rem; font-family:var(--font-sub); font-style:italic; font-size:1.05rem; color:var(--taupe);">Every package includes a pre-wedding consultation, and I'm always happy to tailor one to fit your day. These are starting points — I'll send your personal quote once we've talked through what you're dreaming up.</p>
+      <p style="text-align:center; max-width:60ch; margin:0 auto 3rem; font-family:var(--font-sub); font-style:italic; font-size:1.05rem; color:var(--taupe);">Every package includes a pre-wedding consultation, and I'm always happy to tailor one to fit your day. Prices below are your starting point — reach out anytime and I'll send a personal quote for your morning.</p>
       <div class="packages-grid">
 
-        <!-- Package 1 -->
+        <!-- Silver -->
         <div class="package-card">
-          <span class="package-name">The Blushing Bride</span>
-          <span class="package-subtitle">Bride only</span>
-          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">Just you — soft, glowing, and completely ready for your moment.</p>
-          <div class="package-price"><span>$</span>TBD</div>
-          <p class="price-note">Pricing confirmed at inquiry</p>
+          <span class="package-name">The Silver Package</span>
+          <span class="package-subtitle">Bride + up to 4 — hair only</span>
+          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">You and your girls, beautifully styled — gorgeous hair for everyone.</p>
+          <div class="package-price"><span>$</span>775</div>
+          <p class="price-note">Trial not included</p>
           <div class="package-divider"></div>
           <ul class="package-features">
             <li><span class="check">✦</span> Bridal hair styling</li>
-            <li><span class="check">✦</span> Bridal makeup application</li>
+            <li><span class="check">✦</span> Up to 4 bridesmaids — hair</li>
             <li><span class="check">✦</span> Pre-wedding consultation</li>
             <li><span class="check">✦</span> On-location service</li>
             <li><span class="check">✦</span> Touch-up kit provided</li>
@@ -322,18 +324,18 @@
           <a href="booking.html" class="hero-link">Inquire</a>
         </div>
 
-        <!-- Package 2 — Featured -->
+        <!-- Golden (Featured) -->
         <div class="package-card featured">
           <div class="featured-badge">Most Popular</div>
-          <span class="package-name">The Golden Hour</span>
-          <span class="package-subtitle">Bride + up to 4 in party</span>
-          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">You and your closest girls, getting ready and glowing together.</p>
-          <div class="package-price"><span>$</span>TBD</div>
-          <p class="price-note">Pricing confirmed at inquiry</p>
+          <span class="package-name">The Golden Package</span>
+          <span class="package-subtitle">Bride + up to 4 — hair &amp; makeup</span>
+          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">The full look for you and your closest girls, glowing together.</p>
+          <div class="package-price"><span>$</span>1,665</div>
+          <p class="price-note">Trial not included</p>
           <div class="package-divider"></div>
           <ul class="package-features">
             <li><span class="check">✦</span> Bridal hair &amp; makeup</li>
-            <li><span class="check">✦</span> Up to 4 bridesmaids (hair or makeup)</li>
+            <li><span class="check">✦</span> Up to 4 bridesmaids — hair &amp; makeup</li>
             <li><span class="check">✦</span> Pre-wedding consultation</li>
             <li><span class="check">✦</span> On-location service</li>
             <li><span class="check">✦</span> Touch-up kit provided</li>
@@ -342,22 +344,40 @@
           <a href="booking.html" class="hero-link">Inquire</a>
         </div>
 
-        <!-- Package 3 -->
+        <!-- Platinum -->
         <div class="package-card">
-          <span class="package-name">The Full Experience</span>
-          <span class="package-subtitle">Full wedding party</span>
-          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">Everyone you love, polished and camera-ready from the first look on.</p>
-          <div class="package-price"><span>$</span>TBD</div>
-          <p class="price-note">Pricing confirmed at inquiry</p>
+          <span class="package-name">The Platinum Package</span>
+          <span class="package-subtitle">Bride + full party</span>
+          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">Everyone you love, polished and camera-ready — additional artist available.</p>
+          <div class="package-price" style="font-size:2rem;">Custom Quote</div>
+          <p class="price-note">Priced by your final headcount</p>
           <div class="package-divider"></div>
           <ul class="package-features">
             <li><span class="check">✦</span> Bridal hair &amp; makeup</li>
-            <li><span class="check">✦</span> Full bridal party (hair &amp; makeup)</li>
-            <li><span class="check">✦</span> Mother(s) of bride/groom</li>
-            <li><span class="check">✦</span> Pre-wedding consultation &amp; trial</li>
+            <li><span class="check">✦</span> Full wedding party — hair &amp; makeup</li>
+            <li><span class="check">✦</span> Mother(s) &amp; guests welcome</li>
+            <li><span class="check">✦</span> Additional artist available</li>
+            <li><span class="check">✦</span> Pre-wedding consultation</li>
             <li><span class="check">✦</span> On-location service</li>
-            <li><span class="check">✦</span> Touch-up kit provided</li>
-            <li><span class="check">✦</span> Full timeline coordination</li>
+          </ul>
+          <a href="booking.html" class="hero-link">Inquire</a>
+        </div>
+
+        <!-- The Luxe Bride -->
+        <div class="package-card">
+          <span class="package-name">The Luxe Bride</span>
+          <span class="package-subtitle">A full day, just for you</span>
+          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">My sole attention — a calm morning of prep through your reception.</p>
+          <div class="package-price"><span>$</span>2,300</div>
+          <p class="price-note">Private lodging required</p>
+          <div class="package-divider"></div>
+          <ul class="package-features">
+            <li><span class="check">✦</span> A full day of dedicated service</li>
+            <li><span class="check">✦</span> Luxurious skin prep before makeup</li>
+            <li><span class="check">✦</span> Bridal hair &amp; makeup</li>
+            <li><span class="check">✦</span> Second look created for your reception</li>
+            <li><span class="check">✦</span> Touch-ups throughout your day</li>
+            <li><span class="check">✦</span> Pre-wedding consultation</li>
           </ul>
           <a href="booking.html" class="hero-link">Inquire</a>
         </div>
@@ -370,35 +390,63 @@
   <section class="section section--alt">
     <div class="container">
       <div class="section-header">
-        <span class="section-label">A few extra touches</span>
-        <h2>Add-On Services</h2>
+        <span class="section-label">À la carte</span>
+        <h2>Services &amp; Add-Ons</h2>
         <div class="divider"></div>
-        <p>Little extras to make the morning fully yours — add any of them to your package.</p>
+        <p>Prefer to build your own, or add a few extra touches? Every service is available on its own.</p>
       </div>
       <div class="addons-grid">
         <div class="addon-item">
-          <span>Bridal Hair Trial Session</span>
-          <span>+ Ask</span>
+          <span>Bride — Hair &amp; Makeup</span>
+          <span>$350</span>
         </div>
         <div class="addon-item">
-          <span>Bridal Makeup Trial Session</span>
-          <span>+ Ask</span>
+          <span>Bride — Hair Only</span>
+          <span>$175</span>
         </div>
         <div class="addon-item">
-          <span>Additional Bridesmaid (Hair)</span>
-          <span>+ Ask</span>
+          <span>Bride — Makeup Only</span>
+          <span>$175</span>
         </div>
         <div class="addon-item">
-          <span>Additional Bridesmaid (Makeup)</span>
-          <span>+ Ask</span>
+          <span>Bridesmaid — Hair</span>
+          <span>$150</span>
         </div>
         <div class="addon-item">
-          <span>Flower Girl Styling</span>
-          <span>+ Ask</span>
+          <span>Bridesmaid — Makeup</span>
+          <span>$135</span>
         </div>
         <div class="addon-item">
-          <span>Rehearsal Dinner Glam</span>
-          <span>+ Ask</span>
+          <span>Mother / Guest — Hair</span>
+          <span>$150</span>
+        </div>
+        <div class="addon-item">
+          <span>Mother / Guest — Makeup</span>
+          <span>$135</span>
+        </div>
+        <div class="addon-item">
+          <span>Jr. Bridesmaid Hair (ages 9–14)</span>
+          <span>$80</span>
+        </div>
+        <div class="addon-item">
+          <span>Flower Girl Hair (8 &amp; under)</span>
+          <span>$50</span>
+        </div>
+        <div class="addon-item">
+          <span>Hair Trial</span>
+          <span>$150</span>
+        </div>
+        <div class="addon-item">
+          <span>Makeup Trial</span>
+          <span>$150</span>
+        </div>
+        <div class="addon-item">
+          <span>Strip Lashes</span>
+          <span>$20</span>
+        </div>
+        <div class="addon-item">
+          <span>Hair Extension Placement (per set)</span>
+          <span>$50</span>
         </div>
       </div>
     </div>
@@ -414,11 +462,11 @@
         <p>A few little details so everything feels smooth and stress-free on your big day.</p>
       </div>
       <ul class="notes-list">
-        <li>A signed contract and deposit are required to hold your wedding date.</li>
-        <li>Travel fees may apply for venues outside the Pequot Lakes / Brainerd Lakes area — ask for details when you inquire.</li>
-        <li>Trial sessions are strongly recommended and are conducted separately from the wedding day.</li>
-        <li>Final headcount is due 30 days before your wedding date.</li>
-        <li>All pricing is in USD. Final quote is provided after the inquiry form is reviewed.</li>
+        <li>A signed contract and a $150 non-refundable retainer are required to hold your wedding date.</li>
+        <li>Travel is $0.75/mile from Pequot Lakes, MN. For venues over 2 hours away, $200 toward private lodging applies.</li>
+        <li>An early-start fee of $50/hour applies for any start before 6:00 AM.</li>
+        <li>Trials are optional and booked on weekdays in Pequot Lakes or Brainerd, MN — separate from the wedding day.</li>
+        <li>Final headcount and any changes are due 30 days before your wedding date.</li>
         <li>I take a limited number of weddings each season — reach out early to save your date.</li>
       </ul>
     </div>
