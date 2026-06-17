@@ -721,6 +721,36 @@
     .email-log-status.success { color: var(--new); }
     .email-log-status.fail    { color: var(--declined); }
 
+    /* delete a single log row */
+    .email-log-main { flex: 1; min-width: 0; }
+    .email-log-top { gap: 0.75rem; }
+    .email-log-delete {
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      color: var(--taupe);
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0.15rem 0.35rem;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .email-log-delete:hover { background: rgba(176,74,74,0.1); color: var(--declined); }
+
+    /* clear-all button in the panel header */
+    .email-log-clear-all {
+      background: none;
+      border: 1px solid rgba(176,74,74,0.4);
+      color: var(--declined);
+      font-size: 0.74rem;
+      cursor: pointer;
+      padding: 0.3rem 0.7rem;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+    .email-log-clear-all:hover { background: rgba(176,74,74,0.08); }
+
     /* ---- Loading ---- */
     .loading-row td {
       text-align: center;
@@ -983,6 +1013,7 @@
     <div class="panel">
       <div class="panel-header">
         <h2>Email Log</h2>
+        <button id="clearEmailLogBtn" class="email-log-clear-all" onclick="clearAllEmailLogs()" style="display:none;">Clear all</button>
       </div>
       <div id="emailLog">
         <div style="padding:2rem; text-align:center; color:var(--taupe); font-style:italic; font-size:0.9rem;">Loading email log…</div>
@@ -1728,23 +1759,55 @@
         .limit(20);
 
       const el = document.getElementById('emailLog');
+      const clearBtn = document.getElementById('clearEmailLogBtn');
 
       if (error || !data || !data.length) {
         el.innerHTML = `<div style="padding:1.5rem 1.75rem; color:var(--taupe); font-style:italic; font-size:0.88rem;">No emails sent yet.</div>`;
+        if (clearBtn) clearBtn.style.display = 'none';
         return;
       }
+
+      if (clearBtn) clearBtn.style.display = 'inline-block';
 
       el.innerHTML = data.map(log => `
         <div class="email-log-item">
           <div class="email-log-top">
-            <span class="email-log-recipient">${esc(log.recipient_email)}</span>
-            <span class="email-log-time">${formatDateTime(log.sent_at)}</span>
+            <div class="email-log-main">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:0.75rem; margin-bottom:0.25rem;">
+                <span class="email-log-recipient">${esc(log.recipient_email)}</span>
+                <span class="email-log-time">${formatDateTime(log.sent_at)}</span>
+              </div>
+              <span class="email-log-status ${log.success ? 'success' : 'fail'}">
+                ${log.success ? '✓ Sent' : '✗ Failed'} — ${esc(log.email_type || 'booking_confirmation')}
+              </span>
+            </div>
+            <button class="email-log-delete" title="Delete this entry"
+                    onclick="deleteEmailLog('${esc(log.id)}')">&times;</button>
           </div>
-          <span class="email-log-status ${log.success ? 'success' : 'fail'}">
-            ${log.success ? '✓ Sent' : '✗ Failed'} — ${esc(log.email_type || 'booking_confirmation')}
-          </span>
         </div>
       `).join('');
+    }
+
+    // Delete a single email log entry
+    async function deleteEmailLog(id) {
+      if (!confirm('Delete this email log entry? This cannot be undone.')) return;
+      const { error } = await sb.from('email_logs').delete().eq('id', id);
+      if (error) {
+        alert('Could not delete that entry.\n\n' + error.message);
+        return;
+      }
+      loadEmailLog();
+    }
+
+    // Clear the entire email log
+    async function clearAllEmailLogs() {
+      if (!confirm('Clear the ENTIRE email log? This permanently deletes every entry and cannot be undone.')) return;
+      const { error } = await sb.from('email_logs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      if (error) {
+        alert('Could not clear the email log.\n\n' + error.message);
+        return;
+      }
+      loadEmailLog();
     }
 
     // Helpers
