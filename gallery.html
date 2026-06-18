@@ -201,7 +201,7 @@
       <span></span><span></span><span></span>
     </button>
   </nav>
-  <a id="maincontent" tabindex="-1"></a>
+  <main id="maincontent" tabindex="-1">
 
   <!-- Page Hero -->
   <div class="page-hero">
@@ -571,6 +571,8 @@
     </div>
   </div>
 
+  </main>
+
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
@@ -580,7 +582,7 @@
           <p>Beauty for your forever moments.<br>Pequot Lakes, MN &amp; surrounding areas.</p>
         </div>
         <div class="footer-col">
-          <h4>Connect</h4>
+          <h3>Connect</h3>
           <ul>
             <li><a href="https://www.instagram.com/always.forever.beauty_hmua" target="_blank" rel="noopener">Instagram</a></li>
             <li><a href="https://www.facebook.com/share/1B8esVaDLR/" target="_blank" rel="noopener">Facebook</a></li>
@@ -649,9 +651,23 @@
           const item = document.createElement('div');
           item.className = 'masonry-item';
           item.dataset.category = p.category || 'all';
-          item.innerHTML =
-            '<img src="' + url + '" alt="' + (p.alt || 'Bridal hair &amp; makeup') + '" loading="lazy" />' +
-            '<div class="masonry-overlay"><span class="masonry-overlay-icon">+</span></div>';
+          // Prefer the photo's own alt text; otherwise fall back to an accurate,
+          // category-specific description (better for screen readers + image SEO).
+          const catAlt = {
+            updo:   'Bridal updo styled by Always and Forever Beauty',
+            waves:  'Bridal waves and down style by Always and Forever Beauty',
+            makeup: 'Bridal makeup by Always and Forever Beauty',
+            party:  'Wedding party hair and makeup by Always and Forever Beauty'
+          };
+          const altText = (p.alt && p.alt.trim())
+            ? p.alt.trim()
+            : (catAlt[p.category] || 'Bridal hair and makeup by Always and Forever Beauty');
+          const gimg = document.createElement('img');
+          gimg.src = url; gimg.alt = altText; gimg.loading = 'lazy';
+          const gov = document.createElement('div');
+          gov.className = 'masonry-overlay';
+          gov.innerHTML = '<span class="masonry-overlay-icon">+</span>';
+          item.appendChild(gimg); item.appendChild(gov);
           grid.appendChild(item);
         });
       } catch (e) { /* gallery storage not set up yet — defaults still show */ }

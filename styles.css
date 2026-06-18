@@ -386,7 +386,7 @@ p {
   max-width: 30ch;
 }
 
-.footer-col h4 {
+.footer-col h3 {
   color: var(--cream);
   font-family: var(--font-body);
   font-size: 0.75rem;
