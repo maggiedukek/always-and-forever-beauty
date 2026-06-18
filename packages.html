@@ -214,6 +214,23 @@
       font-size: 0.84rem;
     }
 
+    /* Trials grid has only two items — center them under the heading (and make
+       them a touch larger) instead of leaving the right half of the row empty */
+    .addons-grid.addons-grid--centered {
+      grid-template-columns: repeat(2, 1fr);
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
+      gap: 1.25rem;
+    }
+    .addons-grid--centered .addon-item {
+      padding: 1.35rem 1.6rem;
+      font-size: 0.95rem;
+    }
+    @media (max-width: 540px) {
+      .addons-grid.addons-grid--centered { grid-template-columns: 1fr; max-width: 380px; }
+    }
+
     .addon-item span:first-child { color: var(--rose); line-height: 1.35; }
     .addon-item span:last-child {
       color: var(--gold-deep);
@@ -483,7 +500,7 @@
         <div class="divider"></div>
         <p>An optional run-through before the big day, booked on a weekday in Pequot Lakes or Brainerd, MN.</p>
       </div>
-      <div class="addons-grid">
+      <div class="addons-grid addons-grid--centered">
         <div class="addon-item">
           <span>Hair Trial / Preview</span>
           <span>$150</span>
