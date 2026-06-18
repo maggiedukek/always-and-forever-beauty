@@ -815,6 +815,12 @@
       transition: opacity 0.22s ease, transform 0.22s ease;
     }
     .modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+    /* New Contract must stack ABOVE the Contracts pop-up it's launched from
+       (both modals share z-index 301; New Contract appears earlier in the DOM,
+       so without this it can open *behind* the Contracts window — looking like
+       the button did nothing, especially on mobile). */
+    #newContractOverlay { z-index: 400; }
+    #newContractModal { z-index: 401; }
     .modal-header {
       padding: 1.2rem 1.5rem;
       background: linear-gradient(180deg, #7a5050 0%, #5C3D3D 100%);
@@ -1994,6 +2000,8 @@
         if (prefill.wedding_date) form.wedding_date.value = prefill.wedding_date;
       }
       recalc();
+      // Close the Contracts pop-up underneath so New Contract is never hidden behind it
+      if (typeof closeContracts === 'function') closeContracts();
       ov.classList.add('open'); md.classList.add('open');
     }
     function closeNC() { ov.classList.remove('open'); md.classList.remove('open'); }

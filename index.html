@@ -1356,6 +1356,7 @@
   </script>
 </head>
 <body>
+  <a class="skip-link" href="#maincontent">Skip to content</a>
 
   <!-- Navigation -->
   <nav class="nav" id="mainNav">
@@ -1376,6 +1377,7 @@
       <span></span><span></span><span></span>
     </button>
   </nav>
+  <a id="maincontent" tabindex="-1"></a>
 
   <!-- Hero -->
   <section class="hero">
@@ -1704,25 +1706,4 @@
 
     // Gallery — rotate slides every 10 seconds
     const slides = document.querySelectorAll('.gallery-slide');
-    if (slides.length > 1) {
-      let current = 0;
-      setInterval(() => {
-        slides[current].classList.remove('active');
-        current = (current + 1) % slides.length;
-        slides[current].classList.add('active');
-      }, 10000);
-    }
-
-    // Testimonials — tap/click (or Enter/Space) to flip a card on mobile & tablet
-    document.querySelectorAll('.testimonial-quote').forEach(card => {
-      card.addEventListener('click', () => card.classList.toggle('flipped'));
-      card.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          card.classList.toggle('flipped');
-        }
-      });
-    });
-  </script>
-</body>
-</html>
+    i

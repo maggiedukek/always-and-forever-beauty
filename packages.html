@@ -216,7 +216,7 @@
 
     .addon-item span:first-child { color: var(--rose); line-height: 1.35; }
     .addon-item span:last-child {
-      color: var(--gold);
+      color: var(--gold-deep);
       font-family: var(--font-heading);
       font-weight: 600;
     }
@@ -297,6 +297,7 @@
   </style>
 </head>
 <body>
+  <a class="skip-link" href="#maincontent">Skip to content</a>
 
   <!-- Navigation -->
   <nav class="nav scrolled" id="mainNav">
@@ -317,6 +318,7 @@
       <span></span><span></span><span></span>
     </button>
   </nav>
+  <a id="maincontent" tabindex="-1"></a>
 
   <!-- Page Hero -->
   <div class="page-hero">
@@ -351,7 +353,6 @@
             <li><span class="check">✦</span> Up to 4 bridesmaids — hair</li>
             <li><span class="check">✦</span> Pre-wedding consultation</li>
             <li><span class="check">✦</span> On-location service</li>
-            <li><span class="check">✦</span> Touch-up kit provided</li>
           </ul>
           <a href="booking.html" class="hero-link">Inquire</a>
         </div>
@@ -376,26 +377,7 @@
           <a href="booking.html" class="hero-link">Inquire</a>
         </div>
 
-        <!-- The Luxe Bride -->
-        <div class="package-card">
-          <span class="package-name">The Luxe Bride</span>
-          <span class="package-subtitle">A full day, just for you</span>
-          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">My sole attention — a calm morning of prep through your reception.</p>
-          <div class="package-price"><span>$</span>2,300</div>
-          <p class="price-note">Private lodging required</p>
-          <div class="package-divider"></div>
-          <ul class="package-features">
-            <li><span class="check">✦</span> A full day of dedicated service</li>
-            <li><span class="check">✦</span> Luxurious skin prep before makeup</li>
-            <li><span class="check">✦</span> Bridal hair &amp; makeup</li>
-            <li><span class="check">✦</span> Second look created for your reception</li>
-            <li><span class="check">✦</span> Touch-ups throughout your day</li>
-            <li><span class="check">✦</span> Pre-wedding consultation</li>
-          </ul>
-          <a href="booking.html" class="hero-link">Inquire</a>
-        </div>
-
-        <!-- Platinum (Custom Quote — kept last) -->
+        <!-- Platinum (Bride + full party) -->
         <div class="package-card">
           <span class="package-name">The Platinum Package</span>
           <span class="package-subtitle">Bride + full party</span>
@@ -410,6 +392,26 @@
             <li><span class="check">✦</span> Additional artist available</li>
             <li><span class="check">✦</span> Pre-wedding consultation</li>
             <li><span class="check">✦</span> On-location service</li>
+          </ul>
+          <a href="booking.html" class="hero-link">Inquire</a>
+        </div>
+
+        <!-- The Luxe Bride (cherry on top — kept last) -->
+        <div class="package-card">
+          <span class="package-name">The Luxe Bride</span>
+          <span class="package-subtitle">A full day, just for you</span>
+          <p style="font-family:var(--font-sub); font-style:italic; font-size:0.92rem; color:var(--taupe); margin:0.35rem auto 0.6rem; max-width:26ch;">My sole attention — a calm morning of prep through your reception.</p>
+          <div class="package-price"><span>$</span>2,300</div>
+          <p class="price-note">Private lodging required</p>
+          <div class="package-divider"></div>
+          <ul class="package-features">
+            <li><span class="check">✦</span> A full day of dedicated service</li>
+            <li><span class="check">✦</span> Luxurious skin prep before makeup</li>
+            <li><span class="check">✦</span> Bridal hair &amp; makeup</li>
+            <li><span class="check">✦</span> Hair &amp; makeup preview included</li>
+            <li><span class="check">✦</span> Second look created for your reception</li>
+            <li><span class="check">✦</span> Touch-ups throughout your day</li>
+            <li><span class="check">✦</span> Pre-wedding consultation</li>
           </ul>
           <a href="booking.html" class="hero-link">Inquire</a>
         </div>
@@ -465,20 +467,30 @@
           <span>$50</span>
         </div>
         <div class="addon-item">
-          <span>Hair Trial</span>
-          <span>$150</span>
-        </div>
-        <div class="addon-item">
-          <span>Makeup Trial</span>
-          <span>$150</span>
-        </div>
-        <div class="addon-item">
           <span>Strip Lashes</span>
           <span>$20</span>
         </div>
         <div class="addon-item">
           <span>Hair Extension Placement (per set)</span>
           <span>$50</span>
+        </div>
+      </div>
+
+      <!-- Trials / Previews -->
+      <div class="section-header" style="margin-top:3.5rem;">
+        <span class="section-label">Trials &amp; Previews</span>
+        <h2>Preview Your Look</h2>
+        <div class="divider"></div>
+        <p>An optional run-through before the big day, booked on a weekday in Pequot Lakes or Brainerd, MN.</p>
+      </div>
+      <div class="addons-grid">
+        <div class="addon-item">
+          <span>Hair Trial / Preview</span>
+          <span>$150</span>
+        </div>
+        <div class="addon-item">
+          <span>Makeup Trial / Preview</span>
+          <span>$150</span>
         </div>
       </div>
     </div>
@@ -526,30 +538,4 @@
           <span class="script">Always &amp; Forever Beauty</span>
           <p>Beauty for your forever moments.<br>Pequot Lakes, MN &amp; surrounding areas.</p>
         </div>
-        <div class="footer-col">
-          <h4>Connect</h4>
-          <ul>
-            <li><a href="https://www.instagram.com/always.forever.beauty_hmua" target="_blank" rel="noopener">Instagram</a></li>
-            <li><a href="https://www.facebook.com/share/1B8esVaDLR/" target="_blank" rel="noopener">Facebook</a></li>
-            <li><a href="booking.html">Send an Inquiry</a></li>
-            <li><a href="admin/login.html">Owner Login</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span>&copy; 2025 Always &amp; Forever Beauty LLC. All rights reserved.</span>
-        <span>Designed by <a href="https://maggiedukek.com/" target="_blank" style="color:rgba(250,246,241,0.4); text-decoration:underline;">MaggieDukek.com</a></span>
-      </div>
-    </div>
-  </footer>
-
-  <script>
-    const nav = document.getElementById('mainNav');
-    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
-    const toggle = document.getElementById('navToggle');
-    const links  = document.getElementById('navLinks');
-    toggle.addEventListener('click', () => links.classList.toggle('open'));
-    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
-  </script>
-</body>
-</html>
+   
