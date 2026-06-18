@@ -1095,6 +1095,20 @@
   </div>
 
 
+  <style>
+    /* Artist signature widget on the New Contract modal */
+    .nc-sig { margin-top:10px; }
+    .nc-sig-tabs { display:flex; gap:8px; margin-bottom:10px; }
+    .nc-sig-tabs button { flex:1; padding:8px; border:1px solid var(--gold); background:#fff; color:var(--rose); border-radius:6px; cursor:pointer; font-size:13px; }
+    .nc-sig-tabs button.active { background:var(--gold); color:#fff; }
+    .nc-sig-pane { display:none; } .nc-sig-pane.active { display:block; }
+    .nc-sig-preview { min-height:54px; font-family:'Brush Script MT','Segoe Script',cursive; font-size:36px; color:#3A2A2A; border-bottom:1px solid #E4D3B8; padding:4px 2px; line-height:1.2; }
+    #ncSigCanvas { width:100%; height:150px; background:#fff; border:1px dashed var(--gold); border-radius:6px; touch-action:none; display:block; }
+    .nc-sig-clear { background:transparent; border:none; color:var(--gold); cursor:pointer; font-size:13px; text-decoration:underline; padding:4px 0; }
+    .nc-sig-remember { display:flex; align-items:center; gap:8px; margin-top:10px; font-size:13px; color:var(--taupe); }
+    .nc-sig-remember input { width:16px; height:16px; }
+  </style>
+
   <!-- New Contract Modal -->
   <div class="modal-overlay" id="newContractOverlay"></div>
   <div class="modal modal-lg" id="newContractModal" role="dialog" aria-modal="true" aria-labelledby="newContractTitle">
@@ -1136,6 +1150,24 @@
       <div class="nc-totals" id="ncTotals"></div>
 
       <div class="form-field"><label>Notes (optional, shown on the contract)</label><textarea name="notes" rows="2"></textarea></div>
+
+      <div class="nc-sec">Your signature (Artist)</div>
+      <p style="margin:-2px 0 10px; font-size:0.8rem; color:var(--taupe);">Sign here before sending. Your signature is added to the contract so the client receives it already signed by you.</p>
+      <div class="form-field"><label>Your name *</label><input type="text" id="ncArtistName" value="Colleen" /></div>
+      <div class="nc-sig">
+        <div class="nc-sig-tabs">
+          <button type="button" id="ncSigTabType" class="active">Type my name</button>
+          <button type="button" id="ncSigTabDraw">Draw signature</button>
+        </div>
+        <div id="ncSigPaneType" class="nc-sig-pane active">
+          <div class="nc-sig-preview" id="ncSigPreview">Colleen</div>
+        </div>
+        <div id="ncSigPaneDraw" class="nc-sig-pane">
+          <canvas id="ncSigCanvas"></canvas>
+          <div style="text-align:right;"><button type="button" id="ncSigClear" class="nc-sig-clear">Clear</button></div>
+        </div>
+        <label class="nc-sig-remember"><input type="checkbox" id="ncSigRemember" checked /> Remember my signature on this device</label>
+      </div>
 
       <div class="form-error" id="newContractError"></div>
       <div id="ncResult" style="display:none;"></div>
@@ -2003,6 +2035,7 @@
       // Close the Contracts pop-up underneath so New Contract is never hidden behind it
       if (typeof closeContracts === 'function') closeContracts();
       ov.classList.add('open'); md.classList.add('open');
+      if (typeof ncArtistSig !== 'undefined') ncArtistSig.reset(); // restore/clear the artist signature
     }
     function closeNC() { ov.classList.remove('open'); md.classList.remove('open'); }
     document.getElementById('newContractBtn').addEventListener('click', () => openNC(null));
@@ -2073,6 +2106,94 @@
         `<div class="row total"><span>Event total</span><span>${money(t.total)}</span></div>` +
         `<div class="row"><span>Retainer (non-refundable)</span><span>${money(t.retainer)}</span></div>` +
         `<div class="row"><span>Balance due</span><span>${money(t.balance)}</span></div>`;
+    }
+
+    // ---------- Artist (owner) signature on the New Contract ----------
+    const ncArtistSig = (function () {
+      const STORE_KEY = 'af_artist_sig';
+      let mode = 'typed', ctx = null, drawing = false, hasInk = false, last = null;
+      const nameInput = document.getElementById('ncArtistName');
+      const preview = document.getElementById('ncSigPreview');
+      const canvas = document.getElementById('ncSigCanvas');
+      const tabType = document.getElementById('ncSigTabType');
+      const tabDraw = document.getElementById('ncSigTabDraw');
+      const paneType = document.getElementById('ncSigPaneType');
+      const paneDraw = document.getElementById('ncSigPaneDraw');
+      const remember = document.getElementById('ncSigRemember');
+
+      function setMode(m) {
+        mode = m;
+        tabType.classList.toggle('active', m === 'typed');
+        tabDraw.classList.toggle('active', m === 'drawn');
+        paneType.classList.toggle('active', m === 'typed');
+        paneDraw.classList.toggle('active', m === 'drawn');
+        if (m === 'drawn') setTimeout(initCanvas, 30);
+      }
+      function initCanvas() {
+        if (ctx) return;
+        const ratio = window.devicePixelRatio || 1;
+        const r = canvas.getBoundingClientRect();
+        canvas.width = r.width * ratio; canvas.height = r.height * ratio;
+        ctx = canvas.getContext('2d'); ctx.scale(ratio, ratio);
+        ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.strokeStyle = '#3A2A2A';
+      }
+      function pos(e) { const r = canvas.getBoundingClientRect(); const p = e.touches ? e.touches[0] : e; return { x: p.clientX - r.left, y: p.clientY - r.top }; }
+      function down(e) { initCanvas(); drawing = true; last = pos(e); e.preventDefault(); }
+      function move(e) { if (!drawing) return; const p = pos(e); ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke(); last = p; hasInk = true; e.preventDefault(); }
+      function up() { drawing = false; }
+      function clearCanvas() { initCanvas(); if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); hasInk = false; }
+
+      tabType.addEventListener('click', () => setMode('typed'));
+      tabDraw.addEventListener('click', () => setMode('drawn'));
+      nameInput.addEventListener('input', () => { preview.textContent = nameInput.value || ''; });
+      canvas.addEventListener('mousedown', down); canvas.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+      canvas.addEventListener('touchstart', down, { passive: false }); canvas.addEventListener('touchmove', move, { passive: false }); canvas.addEventListener('touchend', up);
+      document.getElementById('ncSigClear').addEventListener('click', clearCanvas);
+
+      // Returns { name, type, data } or null if not signed yet.
+      function get() {
+        const name = (nameInput.value || '').trim();
+        if (!name) return null;
+        if (mode === 'drawn') { return hasInk ? { name, type: 'drawn', data: canvas.toDataURL('image/png') } : null; }
+        return { name, type: 'typed', data: name };
+      }
+      // Called each time the modal opens — restores a remembered signature if present.
+      function reset() {
+        let saved = null;
+        try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { }
+        clearCanvas();
+        const name = (saved && saved.name) ? saved.name : 'Colleen';
+        nameInput.value = name; preview.textContent = name;
+        if (saved && saved.type === 'drawn' && saved.data) {
+          setMode('drawn'); initCanvas();
+          const img = new Image();
+          img.onload = () => { const r = canvas.getBoundingClientRect(); ctx.drawImage(img, 0, 0, r.width, r.height); hasInk = true; };
+          img.src = saved.data;
+        } else {
+          setMode('typed');
+        }
+      }
+      function save(sig) {
+        try {
+          if (remember && remember.checked) localStorage.setItem(STORE_KEY, JSON.stringify(sig));
+          else localStorage.removeItem(STORE_KEY);
+        } catch (e) { }
+      }
+      return { get, reset, save };
+    })();
+
+    // Signature block stamped onto the contract for the Artist (Colleen).
+    function buildArtistSigBlock(sig) {
+      const when = formatDateTime(new Date().toISOString());
+      const mark = (sig.type === 'drawn' && sig.data && sig.data.indexOf('data:') === 0)
+        ? `<img src="${sig.data}" alt="signature" style="max-height:90px;display:block;" />`
+        : `<div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:34px;color:#3A2A2A;">${esc(sig.name)}</div>`;
+      return `<div style="margin-top:22px;border-top:2px solid #C49A38;padding-top:12px;">
+        <div style="font-weight:bold;color:#5C3D3D;margin-bottom:6px;">Signed by Artist — Always &amp; Forever Beauty LLC</div>
+        ${mark}
+        <div style="font-size:12px;color:#3A2A2A;margin-top:6px;">${esc(sig.name)} &middot; ${when}</div>
+        <div style="font-size:11px;color:#8a7d72;margin-top:3px;">Electronically signed</div>
+      </div>`;
     }
 
     // ---------- Build the contract HTML snapshot ----------
@@ -2197,6 +2318,8 @@
       const form = e.target;
       const name = (form.client_name.value || '').trim();
       if (!name) { err.textContent = 'Client name is required.'; return; }
+      const artistSig = ncArtistSig.get();
+      if (!artistSig) { err.textContent = 'Please sign the contract first — type your name or draw your signature in the "Your signature (Artist)" section.'; return; }
       const t = currentTotals();
       const pkgIdx = Number(document.getElementById('ncPackage').value);
       const pkgName = NC_PACKAGES[pkgIdx] ? NC_PACKAGES[pkgIdx][0] : '';
@@ -2222,7 +2345,7 @@
         notes: (form.notes.value || '').trim() || null,
         status: 'sent'
       };
-      d.contract_html = buildContractHTML(d);
+      d.contract_html = buildContractHTML(d) + buildArtistSigBlock(artistSig);
 
       btn.disabled = true; btn.textContent = 'Creating…';
       const { error } = await sb.from('contracts').insert([d]);
@@ -2231,6 +2354,7 @@
         err.textContent = 'Could not save: ' + error.message + (error.message.includes('relation') ? '  (Run admin/contracts-setup.sql in Supabase first.)' : '');
         return;
       }
+      ncArtistSig.save(artistSig); // remember (or forget) the artist signature per the checkbox
       const url = location.origin + '/sign.html?token=' + token;
 
       // Try to email the client the signing link
@@ -2323,7 +2447,8 @@
       } catch (e) { prompt('Email failed. Copy this signing link:', url); }
     }
 
-    // Render the "active" (awaiting-signature) contracts onto the dashboard panel
+    // Render contracts onto the dashboard panel: ones awaiting signature first,
+    // then recently signed ones (so they don't "disappear" after a client signs).
     function renderActiveContracts(data, error) {
       const el = document.getElementById('activeContractsList');
       if (!el) return;
@@ -2331,23 +2456,34 @@
         el.innerHTML = `<div style="padding:1.5rem 1.75rem;color:var(--taupe);font-style:italic;font-size:0.88rem;">Contracts aren't set up yet.</div>`;
         return;
       }
-      const active = (data || []).filter(c => c.status === 'sent');
+      const sent = (data || []).filter(c => c.status === 'sent');
+      const signed = (data || []).filter(c => c.status === 'signed');
+      const active = sent.concat(signed);   // awaiting signature first, then signed
       if (!active.length) {
         el.innerHTML = `<div style="padding:1.5rem 1.75rem;color:var(--taupe);font-style:italic;font-size:0.88rem;">No active contracts awaiting signature.</div>`;
         return;
       }
       el.innerHTML = active.map(c => {
+        const isSigned = c.status === 'signed';
+        const badge = isSigned ? '<span class="ct-badge signed">Signed</span>' : '<span class="ct-badge sent">Awaiting signature</span>';
         const sub = [c.package_name || 'À la carte', c.total ? money(c.total) : null, c.wedding_date ? formatDate(c.wedding_date) : null].filter(Boolean).join(' · ');
-        return `<div class="ct-row"><div class="ct-meta"><span class="nm">${esc(c.client_name)} <span class="ct-badge sent">Awaiting signature</span></span><span class="sub">${esc(sub)}</span></div><div class="ct-actions"><button data-aa="view">View</button><button data-aa="copy">Copy link</button><button data-aa="resend">Resend</button></div></div>`;
+        const actions = isSigned
+          ? `<button data-aa="view">View</button><button data-aa="print">Print</button>`
+          : `<button data-aa="view">View</button><button data-aa="copy">Copy link</button><button data-aa="resend">Resend</button>`;
+        return `<div class="ct-row"><div class="ct-meta"><span class="nm">${esc(c.client_name)} ${badge}</span><span class="sub">${esc(sub)}</span></div><div class="ct-actions">${actions}</div></div>`;
       }).join('');
       el.querySelectorAll('.ct-row').forEach((row, idx) => {
         const c = active[idx];
         row.querySelector('[data-aa="view"]').addEventListener('click', () => openContractView(c));
-        row.querySelector('[data-aa="copy"]').addEventListener('click', (e) => {
+        const printBtn = row.querySelector('[data-aa="print"]');
+        if (printBtn) printBtn.addEventListener('click', () => printDoc(c));
+        const copyBtn = row.querySelector('[data-aa="copy"]');
+        if (copyBtn) copyBtn.addEventListener('click', (e) => {
           const u = location.origin + '/sign.html?token=' + c.token;
           navigator.clipboard?.writeText(u); e.target.textContent = 'Copied!';
         });
-        row.querySelector('[data-aa="resend"]').addEventListener('click', () => resendLink(c));
+        const resendBtn = row.querySelector('[data-aa="resend"]');
+        if (resendBtn) resendBtn.addEventListener('click', () => resendLink(c));
       });
     }
 
