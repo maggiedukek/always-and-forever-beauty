@@ -429,4 +429,21 @@
       </div>
       <div class="footer-bottom">
         <span>&copy; 2025 Always &amp; Forever Beauty LLC. All rights reserved.</span>
-        <span>Designed by <a href="https:/
+        <span>Designed by <a href="https://maggiedukek.com/" target="_blank" style="color:rgba(250,246,241,0.4); text-decoration:underline;">MaggieDukek.com</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Sticky nav
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+
+    // Mobile menu
+    const toggle = document.getElementById('navToggle');
+    const links  = document.getElementById('navLinks');
+    toggle.addEventListener('click', () => links.classList.toggle('open'));
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
+  </script>
+</body>
+</html>

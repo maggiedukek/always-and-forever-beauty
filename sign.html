@@ -56,6 +56,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js"></script>
   <script>
     const SB_URL = 'https://bikidhccblbhibaniduw.supabase.co';
     const SB_KEY = 'sb_publishable_uQG4MBWVmanCL7oOUWiYEg_eMI5FdBE';
@@ -198,7 +199,72 @@
         : '<div style="font-family:\'Brush Script MT\',cursive;font-size:34px;">'+esc(name)+'</div>';
       contract.status='signed'; contract.signer_name=name; contract.signed_at=new Date().toISOString();
       notifyColleen(name);
+      emailClientCopy(name);
       showSuccess(name);
+    }
+
+    // Render the signed contract to a PDF (base64) for emailing/attaching.
+    async function buildContractPdfBase64(){
+      if (typeof html2pdf === 'undefined') return null;
+      const holder = document.createElement('div');
+      holder.style.cssText = 'position:fixed;left:-10000px;top:0;width:720px;padding:24px;background:#fff;color:#3A2A2A;';
+      holder.innerHTML = (contract.contract_html || '') + signedStamp();
+      document.body.appendChild(holder);
+      let base64 = null;
+      try {
+        const dataUri = await html2pdf().set({
+          margin: 8,
+          image: { type: 'jpeg', quality: 0.96 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }).from(holder).output('datauristring');
+        base64 = (dataUri.split(',')[1]) || null;
+      } catch(e){ base64 = null; }
+      document.body.removeChild(holder);
+      return base64;
+    }
+
+    function buildClientEmail(name){
+      const first = esc((name || 'there').split(' ')[0]);
+      const wd = contract.wedding_date ? new Date(contract.wedding_date + 'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : null;
+      return `
+<div style="margin:0;padding:0;background:#F2EBE3;font-family:Georgia,serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2EBE3;padding:30px 0;"><tr><td align="center">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#FAF6F1;border:1px solid #E4D3B8;border-radius:10px;overflow:hidden;box-shadow:0 10px 36px rgba(92,61,61,0.10);">
+      <tr><td style="height:4px;background:#C49A38;font-size:0;line-height:4px;">&nbsp;</td></tr>
+      <tr><td style="background:#5C3D3D;padding:26px;text-align:center;">
+        <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#F2C9B8;">Always &amp; Forever Beauty</div>
+        <div style="font-size:23px;color:#FAF6F1;margin-top:6px;">Your Contract Is Signed &#10003;</div>
+      </td></tr>
+      <tr><td style="padding:28px 32px;color:#5C3D3D;font-size:16px;line-height:1.7;">
+        <p style="margin:0 0 12px;">Hi ${first},</p>
+        <p style="margin:0 0 12px;">Thank you for signing your services agreement${wd ? (' for <strong>' + esc(wd) + '</strong>') : ''}! Your completed contract is <strong>attached as a PDF</strong> for your records, and shown in full below.</p>
+        <p style="margin:0 0 4px;">I can't wait to be part of your day.</p>
+        <p style="margin:18px 0 2px;font-family:'Brush Script MT',cursive;font-size:26px;color:#C49A38;">Colleen</p>
+        <p style="margin:0;font-size:12px;color:#B5A49A;letter-spacing:1px;">Always &amp; Forever Beauty</p>
+      </td></tr>
+      <tr><td style="padding:0 24px 26px;">
+        <div style="background:#fff;border:1px solid #E4D3B8;border-radius:8px;padding:18px;">${(contract.contract_html || '') + signedStamp()}</div>
+      </td></tr>
+      <tr><td style="padding:0 32px 24px;text-align:center;color:#B5A49A;font-size:12px;">Always &amp; Forever Beauty LLC &middot; Pequot Lakes, MN</td></tr>
+    </table>
+  </td></tr></table>
+</div>`;
+    }
+
+    async function emailClientCopy(name){
+      if (!contract.client_email) return;
+      try {
+        const base64 = await buildContractPdfBase64();
+        const body = {
+          to: contract.client_email,
+          subject: 'Your signed contract — Always & Forever Beauty',
+          html: buildClientEmail(name),
+          replyTo: NOTIFY_EMAIL
+        };
+        if (base64) body.attachments = [{ filename: 'Always-and-Forever-Beauty-Contract.pdf', content: base64 }];
+        await sb.functions.invoke('send-email', { body });
+      } catch(e){ /* non-blocking */ }
     }
 
     function showSuccess(name){

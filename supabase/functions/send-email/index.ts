@@ -47,7 +47,7 @@ serve(async (req) => {
       );
     }
 
-    const { to, subject, html, replyTo } = await req.json();
+    const { to, subject, html, replyTo, attachments } = await req.json();
 
     if (!to || !subject || !html) {
       return json(
@@ -55,6 +55,10 @@ serve(async (req) => {
         400,
       );
     }
+
+    // Optional PDF/file attachments. Each item: { filename, content } where
+    // `content` is a base64-encoded string (Resend's expected format).
+    const hasAttachments = Array.isArray(attachments) && attachments.length > 0;
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -68,6 +72,7 @@ serve(async (req) => {
         subject,
         html,
         reply_to: replyTo || REPLY_TO_EMAIL,
+        ...(hasAttachments ? { attachments } : {}),
       }),
     });
 

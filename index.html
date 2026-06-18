@@ -1706,4 +1706,14 @@
 
     // Gallery — rotate slides every 10 seconds
     const slides = document.querySelectorAll('.gallery-slide');
-    i
+    if (slides.length > 1) {
+      let current = 0;
+      setInterval(() => {
+        slides[current].classList.remove('active');
+        current = (current + 1) % slides.length;
+        slides[current].classList.add('active');
+      }, 10000);
+    }
+  </script>
+</body>
+</html>

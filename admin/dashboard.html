@@ -821,6 +821,11 @@
        the button did nothing, especially on mobile). */
     #newContractOverlay { z-index: 400; }
     #newContractModal { z-index: 401; }
+    /* The Contract view can be opened from on top of the Contracts pop-up, so it
+       must stack above everything (it appears later/earlier in the DOM at the same
+       z-index, which left it hidden behind the Contracts window). */
+    #ctViewOverlay { z-index: 500; }
+    #ctViewModal { z-index: 501; }
     .modal-header {
       padding: 1.2rem 1.5rem;
       background: linear-gradient(180deg, #7a5050 0%, #5C3D3D 100%);
@@ -1629,9 +1634,13 @@
       const editBtn = document.getElementById('editDetailsBtn');
       if (editBtn) editBtn.addEventListener('click', () => openAddClient(inquiry));
 
-      // Contract — upload a contract for this client (pre-fills their name)
-      const contractBtn = document.getElementById('contractBtn');
-      if (contractBtn) contractBtn.addEventListener('click', () => openUploadContract(inquiry.name));
+      // Contract — create & send a contract to this client for signature
+      const sendContractBtn = document.getElementById('sendContractBtn');
+      if (sendContractBtn) sendContractBtn.addEventListener('click', () => {
+        if (typeof window.openNewContract === 'function') {
+          window.openNewContract({ name: inquiry.name, email: inquiry.email, phone: inquiry.phone, wedding_date: inquiry.wedding_date });
+        }
+      });
 
       // Delete an old / declined request
       const deleteBtn = document.getElementById('deleteInquiryBtn');
@@ -1742,9 +1751,9 @@
         <div class="drawer-section">
           <h4>Contract</h4>
           <p style="font-size:0.95rem; color:var(--taupe); margin-bottom:1rem;">
-            Upload this client's contract to keep it on file. <em>(Emailing it to the client is coming soon.)</em>
+            Create a contract for ${esc(i.name)} and email it for signature — they'll get a link to review and sign online.
           </p>
-          <button class="btn-confirm" id="contractBtn">Upload Contract for ${esc(i.name)}</button>
+          <button class="btn-confirm" id="sendContractBtn">Send a Contract to ${esc(i.name)}</button>
         </div>
 
         <div class="drawer-section">
@@ -2129,19 +2138,25 @@
         paneDraw.classList.toggle('active', m === 'drawn');
         if (m === 'drawn') setTimeout(initCanvas, 30);
       }
+      // Size the canvas to its on-screen box. Returns false (without locking) if
+      // the canvas is hidden/zero-sized, so we never lock it at 0x0 — the cause of
+      // blank "data:," captures that render as a broken signature image.
       function initCanvas() {
-        if (ctx) return;
-        const ratio = window.devicePixelRatio || 1;
         const r = canvas.getBoundingClientRect();
-        canvas.width = r.width * ratio; canvas.height = r.height * ratio;
+        if (!r.width || !r.height) return false;
+        const ratio = window.devicePixelRatio || 1;
+        const w = Math.round(r.width * ratio), h = Math.round(r.height * ratio);
+        if (ctx && canvas.width === w && canvas.height === h) return true; // already sized
+        canvas.width = w; canvas.height = h;
         ctx = canvas.getContext('2d'); ctx.scale(ratio, ratio);
         ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.strokeStyle = '#3A2A2A';
+        return true;
       }
       function pos(e) { const r = canvas.getBoundingClientRect(); const p = e.touches ? e.touches[0] : e; return { x: p.clientX - r.left, y: p.clientY - r.top }; }
-      function down(e) { initCanvas(); drawing = true; last = pos(e); e.preventDefault(); }
+      function down(e) { if (!initCanvas()) return; drawing = true; last = pos(e); e.preventDefault(); }
       function move(e) { if (!drawing) return; const p = pos(e); ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke(); last = p; hasInk = true; e.preventDefault(); }
       function up() { drawing = false; }
-      function clearCanvas() { initCanvas(); if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); hasInk = false; }
+      function clearCanvas() { if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); hasInk = false; }
 
       tabType.addEventListener('click', () => setMode('typed'));
       tabDraw.addEventListener('click', () => setMode('drawn'));
@@ -2150,11 +2165,19 @@
       canvas.addEventListener('touchstart', down, { passive: false }); canvas.addEventListener('touchmove', move, { passive: false }); canvas.addEventListener('touchend', up);
       document.getElementById('ncSigClear').addEventListener('click', clearCanvas);
 
+      // A usable drawn-signature data URL (not the blank "data:," a 0x0 canvas gives).
+      function validDataUrl(s) { return typeof s === 'string' && s.indexOf('data:image') === 0 && s.length > 200; }
+
       // Returns { name, type, data } or null if not signed yet.
       function get() {
         const name = (nameInput.value || '').trim();
         if (!name) return null;
-        if (mode === 'drawn') { return hasInk ? { name, type: 'drawn', data: canvas.toDataURL('image/png') } : null; }
+        if (mode === 'drawn') {
+          if (!hasInk) return null;
+          let url = '';
+          try { url = canvas.toDataURL('image/png'); } catch (e) { url = ''; }
+          return validDataUrl(url) ? { name, type: 'drawn', data: url } : null;
+        }
         return { name, type: 'typed', data: name };
       }
       // Called each time the modal opens — restores a remembered signature if present.
@@ -2164,11 +2187,20 @@
         clearCanvas();
         const name = (saved && saved.name) ? saved.name : 'Colleen';
         nameInput.value = name; preview.textContent = name;
-        if (saved && saved.type === 'drawn' && saved.data) {
-          setMode('drawn'); initCanvas();
-          const img = new Image();
-          img.onload = () => { const r = canvas.getBoundingClientRect(); ctx.drawImage(img, 0, 0, r.width, r.height); hasInk = true; };
-          img.src = saved.data;
+        if (saved && saved.type === 'drawn' && validDataUrl(saved.data)) {
+          setMode('drawn');
+          // wait for the (now visible) draw pane to lay out before sizing/painting
+          requestAnimationFrame(() => {
+            if (!initCanvas()) return;
+            const img = new Image();
+            img.onload = () => {
+              const r = canvas.getBoundingClientRect();
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(img, 0, 0, r.width, r.height);
+              hasInk = true;
+            };
+            img.src = saved.data;
+          });
         } else {
           setMode('typed');
         }
@@ -2185,7 +2217,8 @@
     // Signature block stamped onto the contract for the Artist (Colleen).
     function buildArtistSigBlock(sig) {
       const when = formatDateTime(new Date().toISOString());
-      const mark = (sig.type === 'drawn' && sig.data && sig.data.indexOf('data:') === 0)
+      const drawn = sig.type === 'drawn' && typeof sig.data === 'string' && sig.data.indexOf('data:image') === 0 && sig.data.length > 200;
+      const mark = drawn
         ? `<img src="${sig.data}" alt="signature" style="max-height:90px;display:block;" />`
         : `<div style="font-family:'Brush Script MT','Segoe Script',cursive;font-size:34px;color:#3A2A2A;">${esc(sig.name)}</div>`;
       return `<div style="margin-top:22px;border-top:2px solid #C49A38;padding-top:12px;">
