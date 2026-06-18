@@ -96,6 +96,11 @@ h2 { font-size: clamp(1.3rem, 2.5vw, 1.9rem); }
 h3 { font-size: clamp(1.3rem, 2.5vw, 1.8rem); }
 h4 { font-size: 1.1rem; }
 
+/* Size-only helpers: let a heading sit at the correct semantic level for
+   accessibility (no skipped levels) while keeping its original visual size. */
+.size-h3 { font-size: clamp(1.3rem, 2.5vw, 1.8rem); }
+.size-h4 { font-size: 1.1rem; }
+
 .script {
   font-family: var(--font-script);
   font-weight: 400;
