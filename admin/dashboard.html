@@ -32,7 +32,7 @@
       /* Gold-flake texture washed with cream so it stays subtle behind the content */
       background:
         linear-gradient(rgba(248,242,233,0.58), rgba(248,242,233,0.58)),
-        url('../images/gold-splatter.png') center / cover fixed,
+        url('../images/gold-splatter.jpg') center / cover fixed,
         var(--bg);
     }
 
@@ -154,7 +154,7 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background: url('../images/background gold flowers.png') center / cover no-repeat;
+      background: url('../images/background gold flowers.jpg') center / cover no-repeat;
       opacity: 0.12;
     }
     .welcome > * { position: relative; z-index: 1; }
@@ -418,7 +418,7 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background: url('../images/background gold flowers.png') center / cover no-repeat;
+      background: url('../images/background gold flowers.jpg') center / cover no-repeat;
       opacity: 0.09;
       -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 80%, transparent 100%);
       mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 80%, transparent 100%);
@@ -1212,13 +1212,9 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/af-api.js"></script>
   <script>
-    const { createClient } = supabase;
-    const sb = createClient(
-      'https://bikidhccblbhibaniduw.supabase.co',
-      'sb_publishable_uQG4MBWVmanCL7oOUWiYEg_eMI5FdBE'
-    );
+    const sb = afApi.createClient();
 
     let allInquiries = [];
     let currentFilter = 'all';
@@ -2400,7 +2396,7 @@
       const { error } = await sb.from('contracts').insert([d]);
       if (error) {
         btn.disabled = false; btn.textContent = 'Create & Send for Signature';
-        err.textContent = 'Could not save: ' + error.message + (error.message.includes('relation') ? '  (Run admin/contracts-setup.sql in Supabase first.)' : '');
+        err.textContent = 'Could not save: ' + error.message;
         return;
       }
       ncArtistSig.save(artistSig); // remember (or forget) the artist signature per the checkbox
@@ -2541,7 +2537,7 @@
       const { data, error } = await sb.from('contracts').select('*').order('created_at', { ascending: false });
       renderActiveContracts(data, error);
       if (error) {
-        el.innerHTML = `<div style="padding:1.5rem 1.75rem;color:var(--taupe);font-style:italic;font-size:0.88rem;">Contracts aren't set up yet. Run <strong>admin/contracts-setup.sql</strong> in Supabase. (${esc(error.message)})</div>`;
+        el.innerHTML = `<div style="padding:1.5rem 1.75rem;color:var(--taupe);font-style:italic;font-size:0.88rem;">Contracts aren't set up yet. (${esc(error.message)})</div>`;
         return;
       }
       if (!data || !data.length) {

@@ -538,7 +538,7 @@ p {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url('images/background gold flowers.png');
+  background-image: url('images/background gold flowers.jpg');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -716,7 +716,4 @@ p {
   .nav-links.open { display: flex; }
   .nav-links a { font-size: 1.15rem; letter-spacing: 0.15em; color: var(--cream); }
   .nav-cta { display: none; }
-  .nav-toggle { display: flex; z-index: 1001; margin-left: auto; gap: 7px; }
-  .nav-toggle span { background: var(--cream); width: 30px; height: 2px; }
-  /* Hamburger morphs into an X while the menu is open */
-  .nav-links.open ~ .nav-toggle span:nth-child(1) { transform: transl
+  .nav-toggle { display: flex; z-index

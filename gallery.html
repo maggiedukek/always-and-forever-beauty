@@ -15,11 +15,11 @@
   <meta property="og:title" content="Gallery | Always & Forever Beauty" />
   <meta property="og:description" content="Bridal hair and makeup portfolio by Colleen Mulholland — Pequot Lakes, MN." />
   <meta property="og:url" content="https://alwaysforeverbeauty.com/gallery.html" />
-  <meta property="og:image" content="https://alwaysforeverbeauty.com/images/hero.jpg" />
+  <meta property="og:image" content="https://alwaysforeverbeauty.com/images/og-card.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Gallery | Always & Forever Beauty" />
   <meta name="twitter:description" content="Bridal hair and makeup portfolio by Colleen Mulholland — Pequot Lakes, MN." />
-  <meta name="twitter:image" content="https://alwaysforeverbeauty.com/images/hero.jpg" />
+  <meta name="twitter:image" content="https://alwaysforeverbeauty.com/images/og-card.jpg" />
   <link rel="stylesheet" href="styles.css" />
   <style>
     /* Gold floral watermark in the page hero */
@@ -27,7 +27,7 @@
     .page-hero::before {
       content: "";
       position: absolute; inset: 0; z-index: 0; pointer-events: none;
-      background: url('images/background gold flowers.png') center / cover no-repeat;
+      background: url('images/background gold flowers.jpg') center / cover no-repeat;
       opacity: 0.14;
       -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 32%, transparent 86%);
       mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 32%, transparent 86%);
@@ -604,7 +604,6 @@
     <img src="" alt="" id="lightboxImg" />
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // Nav
     const nav = document.getElementById('mainNav');
@@ -626,20 +625,21 @@
       });
     });
 
-    // Load Colleen's uploaded gallery photos from Supabase (newest first), keeping the defaults
-    const sb = supabase.createClient(
-      'https://bikidhccblbhibaniduw.supabase.co',
-      'sb_publishable_uQG4MBWVmanCL7oOUWiYEg_eMI5FdBE'
-    );
+    // Load Colleen's uploaded gallery photos (newest first), keeping the defaults
     (async function loadGalleryPhotos() {
       const grid = document.getElementById('gallery');
       try {
-        const { data, error } = await sb
-          .from('gallery_photos')
-          .select('*')
-          .order('sort_order', { ascending: true })
-          .order('created_at', { ascending: false });
-        if (error || !data || !data.length) return; // keep the built-in photos as a fallback
+        const res = await fetch('/api/db', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            table: 'gallery_photos', op: 'select',
+            order: [{ col: 'sort_order', asc: true }, { col: 'created_at', asc: false }]
+          })
+        });
+        const out = res.ok ? await res.json() : null;
+        const data = out && out.data;
+        if (!data || !data.length) return; // keep the built-in photos as a fallback
         // A managed gallery exists → replace the defaults with it
         grid.innerHTML = '';
         data.forEach(p => {
@@ -647,7 +647,7 @@
           // resolves both on the deployed site and when previewing the file locally (file://)
           const url = p.image_url
             ? p.image_url.replace(/^\//, '')
-            : sb.storage.from('gallery').getPublicUrl(p.file_path).data.publicUrl;
+            : p.file_path; // uploaded photos now carry their full public URL
           const item = document.createElement('div');
           item.className = 'masonry-item';
           item.dataset.category = p.category || 'all';
@@ -688,4 +688,3 @@
   </script>
 </body>
 </html>
-          

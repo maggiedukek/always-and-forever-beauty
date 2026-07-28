@@ -16,7 +16,7 @@
       font-family: 'Jost', sans-serif; color: var(--rose); min-height: 100vh;
       background:
         linear-gradient(rgba(249,244,236,0.8), rgba(249,244,236,0.8)),
-        url('../images/gold-splatter.png') center / cover fixed, var(--bg);
+        url('../images/gold-splatter.jpg') center / cover fixed, var(--bg);
     }
 
     .topbar {
@@ -170,12 +170,9 @@
     </form>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/af-api.js"></script>
   <script>
-    const sb = supabase.createClient(
-      'https://bikidhccblbhibaniduw.supabase.co',
-      'sb_publishable_uQG4MBWVmanCL7oOUWiYEg_eMI5FdBE'
-    );
+    const sb = afApi.createClient();
     const BUCKET = 'gallery';
     const CATS = { updo: 'Updos', waves: 'Waves & Down Styles', makeup: 'Makeup', party: 'Bridal Party' };
     let photos = [];

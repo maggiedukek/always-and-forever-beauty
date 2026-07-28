@@ -55,13 +55,20 @@
     <div class="foot">Always &amp; Forever Beauty LLC · Pequot Lakes, MN</div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js"></script>
   <script>
-    const SB_URL = 'https://bikidhccblbhibaniduw.supabase.co';
-    const SB_KEY = 'sb_publishable_uQG4MBWVmanCL7oOUWiYEg_eMI5FdBE';
-    const NOTIFY_EMAIL = 'alwaysandforeverbeautycolleen@gmail.com'; // Colleen's inbox (Gmail ignores dots)
-    const sb = supabase.createClient(SB_URL, SB_KEY);
+    // The contract API keeps the database private — this page can only reach
+    // one contract, through the secret token in its link.
+    async function contractApi(body) {
+      const res = await fetch('/api/contract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const out = await res.json().catch(() => null);
+      if (!res.ok) return { data: null, error: { message: (out && out.error) || 'Request failed' } };
+      return { data: out.data !== undefined ? out.data : out, error: null };
+    }
     const root = document.getElementById('root');
     const token = new URLSearchParams(location.search).get('token');
     let contract = null;
@@ -73,7 +80,12 @@
       if (!token) { root.innerHTML = '<div class="msg">This link is missing its contract code. Please use the full link from your email.</div>'; return; }
       // best-effort IP for the audit trail
       try { const r = await fetch('https://api.ipify.org?format=json'); clientIP = (await r.json()).ip; } catch(e){}
-      const { data, error } = await sb.rpc('get_contract_by_token', { p_token: token });
+      let data = null, error = null;
+      try {
+        const res = await fetch('/api/contract?token=' + encodeURIComponent(token));
+        const out = await res.json().catch(() => null);
+        if (res.ok) data = out && out.data; else error = { message: (out && out.error) || 'Request failed' };
+      } catch (e) { error = { message: 'Please check your connection and try again.' }; }
       if (error) { root.innerHTML = '<div class="msg">Sorry — we couldn’t load this contract.<br><small>'+esc(error.message)+'</small></div>'; return; }
       contract = (data && data[0]) || null;
       if (!contract) { root.innerHTML = '<div class="msg">This contract link is invalid or has been removed.</div>'; return; }
@@ -182,10 +194,10 @@
       const sigData = (mode==='typed') ? name : window._getDrawn();
       if (!sigData) { err.textContent='Please add your signature first.'; return; }
       signBtn.disabled=true; signBtn.textContent='Signing…';
-      const { data, error } = await sb.rpc('sign_contract', {
-        p_token: token, p_signer_name: name, p_signature_type: mode,
-        p_signature_data: sigData, p_consent: true,
-        p_user_agent: navigator.userAgent, p_ip: clientIP
+      const { data, error } = await contractApi({
+        action: 'sign', token: token, signer_name: name, signature_type: mode,
+        signature_data: sigData, consent: true,
+        user_agent: navigator.userAgent
       });
       if (error || (data && data!=='signed')) {
         signBtn.disabled=false; signBtn.textContent='Sign & Submit';
@@ -273,13 +285,11 @@
       try {
         const base64 = await buildContractPdfBase64();
         const body = {
-          to: contract.client_email,
-          subject: 'Your signed contract — Always & Forever Beauty',
-          html: buildClientEmail(name),
-          replyTo: NOTIFY_EMAIL
+          action: 'email', kind: 'client_copy', token: token,
+          html: buildClientEmail(name)
         };
         if (base64) body.attachments = [{ filename: 'Always-and-Forever-Beauty-Contract.pdf', content: base64 }];
-        await sb.functions.invoke('send-email', { body });
+        await contractApi(body);
       } catch(e){ /* non-blocking */ }
     }
 
@@ -315,7 +325,7 @@
   </td></tr></table>
 </div>`;
       try {
-        await sb.functions.invoke('send-email', { body: { to: NOTIFY_EMAIL, subject: 'Contract signed — '+name, html, replyTo: contract.client_email || undefined } });
+        await contractApi({ action: 'email', kind: 'owner_notify', token: token, html });
       } catch(e){ /* non-blocking */ }
     }
   </script>

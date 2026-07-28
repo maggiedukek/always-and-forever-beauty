@@ -15,11 +15,11 @@
   <meta property="og:title" content="Book Your Date | Always & Forever Beauty" />
   <meta property="og:description" content="Inquire about bridal hair and makeup with Colleen Mulholland — Always & Forever Beauty, Pequot Lakes, MN." />
   <meta property="og:url" content="https://alwaysforeverbeauty.com/booking.html" />
-  <meta property="og:image" content="https://alwaysforeverbeauty.com/images/hero.jpg" />
+  <meta property="og:image" content="https://alwaysforeverbeauty.com/images/og-card.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Book Your Date | Always & Forever Beauty" />
   <meta name="twitter:description" content="Inquire about bridal hair and makeup with Colleen Mulholland — Always & Forever Beauty, Pequot Lakes, MN." />
-  <meta name="twitter:image" content="https://alwaysforeverbeauty.com/images/hero.jpg" />
+  <meta name="twitter:image" content="https://alwaysforeverbeauty.com/images/og-card.jpg" />
   <link rel="stylesheet" href="styles.css" />
   <style>
     /* Soft peach blooms behind the form, like the glows on the home page */
@@ -33,7 +33,7 @@
     /* Subtle gold-flake texture over the booking section */
     .booking-section::before {
       content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-      background: url('images/gold-splatter.png') center / cover no-repeat;
+      background: url('images/gold-splatter.jpg') center / cover no-repeat;
       opacity: 0.1;
       -webkit-mask-image: radial-gradient(ellipse 75% 80% at 50% 50%, #000 30%, transparent 85%);
       mask-image: radial-gradient(ellipse 75% 80% at 50% 50%, #000 30%, transparent 85%);
@@ -44,7 +44,7 @@
     .page-hero { position: relative; overflow: hidden; }
     .page-hero::before {
       content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-      background: url('images/background gold flowers.png') center / cover no-repeat;
+      background: url('images/background gold flowers.jpg') center / cover no-repeat;
       opacity: 0.12;
       -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 32%, transparent 86%);
       mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 32%, transparent 86%);
@@ -482,8 +482,6 @@
     </div>
   </footer>
 
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // Nav
     const nav = document.getElementById('mainNav');
@@ -493,79 +491,6 @@
     toggle.addEventListener('click', () => links.classList.toggle('open'));
     links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
 
-    // Supabase client
-    const { createClient } = supabase;
-    const sb = createClient(
-      'https://bikidhccblbhibaniduw.supabase.co',
-      'sb_publishable_uQG4MBWVmanCL7oOUWiYEg_eMI5FdBE'
-    );
-
-    // Where new-inquiry alerts go (Colleen). Matches the send-email reply-to default.
-    const NOTIFY_EMAIL = 'alwaysandforeverbeautycolleen@gmail.com';
-
-    function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-    function prettyDate(d){ if(!d) return 'Not specified'; const dt = new Date(d + 'T00:00:00'); return isNaN(dt) ? d : dt.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
-
-    // Best-effort emails on a new inquiry: (1) alert Colleen, (2) auto-reply the bride.
-    // Failures here never block the on-screen confirmation — the inquiry is already saved.
-    async function sendInquiryEmails(p){
-      const dateStr = prettyDate(p.wedding_date);
-      const row = (l,v) => `<tr><td style="padding:6px 14px;color:#9a8b82;font:600 12px Arial,sans-serif;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;vertical-align:top">${l}</td><td style="padding:6px 14px;color:#4a322f;font:14px Georgia,serif">${v}</td></tr>`;
-
-      const ownerHtml = `
-        <div style="max-width:560px;margin:0 auto;font-family:Georgia,serif;color:#4a322f">
-          <div style="background:#5b4042;color:#f6e7db;padding:18px 22px;border-radius:8px 8px 0 0">
-            <div style="font:700 13px Arial;letter-spacing:.12em">ALWAYS &amp; FOREVER BEAUTY</div>
-            <div style="font-size:19px;margin-top:4px">New wedding inquiry</div>
-          </div>
-          <div style="border:1px solid #e7d9cc;border-top:none;border-radius:0 0 8px 8px;padding:14px 8px">
-            <table style="width:100%;border-collapse:collapse">
-              ${row('Name', esc(p.name))}
-              ${row('Email', esc(p.email))}
-              ${row('Phone', esc(p.phone))}
-              ${row('Wedding date', esc(dateStr))}
-              ${row('Package', esc(p.services_needed || 'Not specified'))}
-              ${row('Party size', esc(p.wedding_size || 'Not specified'))}
-              ${row('Message', esc(p.message || '—'))}
-            </table>
-            <p style="font:13px Arial;color:#9a8b82;padding:4px 14px 0">Reply to this email to respond directly to ${esc(p.name)}.</p>
-          </div>
-        </div>`;
-      await sb.functions.invoke('send-email', { body: {
-        to: NOTIFY_EMAIL,
-        subject: `New inquiry — ${p.name} · ${dateStr}`,
-        html: ownerHtml,
-        replyTo: p.email || undefined
-      }});
-
-      const firstName = (p.name || '').split(' ')[0] || p.name || 'there';
-      const brideHtml = `
-        <div style="max-width:560px;margin:0 auto;font-family:Georgia,serif;color:#4a322f">
-          <div style="background:#5b4042;color:#f6e7db;padding:22px;border-radius:8px 8px 0 0;text-align:center">
-            <div style="font:700 13px Arial;letter-spacing:.12em">ALWAYS &amp; FOREVER BEAUTY</div>
-            <div style="font-size:22px;margin-top:6px;font-style:italic">Thank you!</div>
-          </div>
-          <div style="border:1px solid #e7d9cc;border-top:none;border-radius:0 0 8px 8px;padding:24px">
-            <p style="font-size:15px;line-height:1.6">Hi ${esc(firstName)},</p>
-            <p style="font-size:15px;line-height:1.6">Thank you so much for reaching out to Always &amp; Forever Beauty! I've received your inquiry and I'll personally be in touch within 48 hours with the next steps for your big day.</p>
-            <table style="width:100%;border-collapse:collapse;margin:14px 0;background:#fbf5ee;border-radius:8px">
-              ${row('Wedding date', esc(dateStr))}
-              ${row('Package', esc(p.services_needed || 'We can help you choose'))}
-              ${row('Party size', esc(p.wedding_size || '—'))}
-            </table>
-            <p style="font-size:15px;line-height:1.6">I can't wait to hear more about your day.</p>
-            <p style="font-size:15px;line-height:1.6;margin-top:18px">With love,<br><span style="color:#a8843b;font-style:italic;font-size:17px">Colleen</span></p>
-          </div>
-          <p style="text-align:center;color:#9a8b82;font:12px Arial;margin-top:14px">Always &amp; Forever Beauty LLC · Pequot Lakes, MN</p>
-        </div>`;
-      await sb.functions.invoke('send-email', { body: {
-        to: p.email,
-        subject: 'Thank you for your inquiry — Always & Forever Beauty',
-        html: brideHtml
-      }});
-    }
-
-    // Form submission
     document.getElementById('inquiryForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
@@ -588,7 +513,20 @@
         status:         'new'
       };
 
-      const { error } = await sb.from('inquiries').insert([payload]);
+      // Save the inquiry (the server also emails Colleen an alert and the
+      // bride an auto-reply — never blocking the on-screen confirmation)
+      let error = null;
+      try {
+        const res = await fetch('/api/inquiry-submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const out = await res.json().catch(() => null);
+        if (!res.ok) error = { message: (out && out.error) || 'Please try again.' };
+      } catch (e) {
+        error = { message: 'Please check your connection and try again.' };
+      }
 
       if (error) {
         console.error(error);
@@ -605,11 +543,8 @@
         success.setAttribute('tabindex', '-1');
         success.scrollIntoView({ behavior: 'smooth', block: 'center' });
         try { success.focus({ preventScroll: true }); } catch (_) {}
-        // Fire notification + auto-reply; never block the bride's confirmation on email
-        sendInquiryEmails(payload).catch(err => console.warn('Inquiry email skipped:', err));
       }
     });
   </script>
 </body>
 </html>
-                                                                                                                                                                                                                                                                                        
